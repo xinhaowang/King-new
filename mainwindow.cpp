@@ -6,6 +6,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setBackground();
+}
+
+//set the background of the main window
+void MainWindow::setBackground()
+{
+    ui->centralWidget->setStyleSheet("border-image: url(:/background/image/background/background.jpg)");
 }
 
 MainWindow::~MainWindow()
