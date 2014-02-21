@@ -240,4 +240,7 @@
         <file>image/things/player_battle_building/Thing39.jpg</file>
         <file>image/things/player_battle_building/Thing40.jpg</file>
     </qresource>
+    <qresource prefix="/background">
+        <file>image/background/background.jpg</file>
+    </qresource>
 </RCC>
