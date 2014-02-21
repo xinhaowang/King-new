@@ -2,6 +2,7 @@
 #define MYLABEL_H
 
 #include <QLabel>
+#include <QMouseEvent>
 
 class mylabel : public QLabel
 {
@@ -10,9 +11,10 @@ public:
     explicit mylabel(QObject *parent = 0);
 
 protected:
-    virtual
+    virtual void mousePressEvent(QMouseEvent *event);
 
 signals:
+    void clicked();
 
 public slots:
 
