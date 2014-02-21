@@ -39,12 +39,12 @@ void EventMagic::setName(const QString &value)
 {
     Name = value;
 }
-Qstring EventMagic::getUrl() const
+QString EventMagic::getUrl() const
 {
     return Url;
 }
 
-void EventMagic::setUrl(const Qstring &value)
+void EventMagic::setUrl(const QString &value)
 {
     Url = value;
 }

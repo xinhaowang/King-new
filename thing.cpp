@@ -39,12 +39,12 @@ void Thing::setName(const QString &value)
 {
     Name = value;
 }
-Qstring Thing::getUrl() const
+QString Thing::getUrl() const
 {
     return Url;
 }
 
-void Thing::setUrl(const Qstring &value)
+void Thing::setUrl(const QString &value)
 {
     Url = value;
 }

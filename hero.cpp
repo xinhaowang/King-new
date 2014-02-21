@@ -40,12 +40,12 @@ void Hero::setName(const QString &value)
 {
     Name = value;
 }
-Qstring Hero::getUrl() const
+QString Hero::getUrl() const
 {
     return Url;
 }
 
-void Hero::setUrl(const Qstring &value)
+void Hero::setUrl(const QString &value)
 {
     Url = value;
 }

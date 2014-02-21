@@ -30,8 +30,8 @@ public:
     void setName(const QString &value);
 
     // Thing's Url
-    Qstring getUrl() const;
-    void setUrl(const Qstring &value);
+    QString getUrl() const;
+    void setUrl(const QString &value);
 
 // private members
 private:
@@ -40,7 +40,7 @@ private:
     int Type;
     int terrainType;
     QString Name;
-    Qstring Url;
+    QString Url;
 };
 
 #endif // THING_H
