@@ -19,7 +19,10 @@ SOURCES += main.cpp\
     building.cpp \
     hex.cpp \
     eventmagic.cpp \
-    hero.cpp
+    hero.cpp \
+    control.cpp \
+    combat.cpp \
+    mylabel.cpp
 
 HEADERS  += mainwindow.h \
     player.h \
@@ -27,6 +30,13 @@ HEADERS  += mainwindow.h \
     building.h \
     hex.h \
     eventmagic.h \
-    hero.h
+    hero.h \
+    control.h \
+    combat.h \
+    mylabel.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    combat.ui
+
+RESOURCES += \
+    Image.qrc
