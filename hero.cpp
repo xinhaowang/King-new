@@ -1,6 +1,6 @@
 #include "hero.h"
 
-Herosz::Herosz()
+Hero::Hero()
 {
 }
 
