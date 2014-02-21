@@ -19,31 +19,24 @@ class Player
 public:
     Player();
 
-    //Player ID accessors
     int getID() const;
     void setID(int value);
 
-    //Player Gold accessors
     int getGold() const;
     void setGold(int value);
 
-    //Player Things and Treause accessors
     vector<Thing> getPlayerThings() const;
     void setPlayerThings(const vector<Thing> &value);
 
-    //Player Forks accessors
     vector<Building> getPlayerBuildings() const;
     void setPlayerBuildings(const vector<Building> &value);
 
-    //Player Event and Magic accessors
     vector<EventMagic> getPlayerEVMA() const;
     void setPlayerEVMA(const vector<EventMagic> &value);
 
-    //Player Heros accessors
     vector<Hero> getPlayerHeros() const;
     void setPlayerHeros(const vector<Hero> &value);
 
-    //Player Hex accessors
     vector<Hex> getPlayerHexs() const;
     void setPlayerHexs(const vector<Hex> &value);
 
