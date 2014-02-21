@@ -20,6 +20,15 @@ public:
     int getID() const;
     void setID(int value);
 
+    // Building's income accessor
+    int getIncome() const;
+    void setIncome(int value);
+
+    // Building's Url accessor
+    QString getUrl() const;
+    void setUrl(const QString &value);
+
+
 private:
     int ID;         //building ID
     int income;     //building income
