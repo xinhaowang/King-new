@@ -13,6 +13,7 @@ class Building
 {
 public:
     //building's constructor
+    Building();
     Building(int tempID, int tempIncome, QString tempUrl);
     
     // building ID accessors
