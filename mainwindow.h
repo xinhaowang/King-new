@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "mapwidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -17,7 +18,9 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow  *ui;
+    MapWidget       *Things_rack;
+    MapWidget       *Hex_1;
 };
 
 #endif // MAINWINDOW_H

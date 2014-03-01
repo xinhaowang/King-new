@@ -2,7 +2,12 @@
 #define THING_H
 
 #include <QString>
+#include <QDebug>
+#include <QImage>
+
 using namespace std;
+
+enum {BigIcon_Mode = 0, SmallIcon_Mode};
 
 class Thing
 {
@@ -33,14 +38,22 @@ public:
     QString getUrl() const;
     void setUrl(const QString &value);
 
-// private members
+    // private members
+    int getMode() const;
+    void setMode(int value);
+
+    QImage getImage() const;
+    void setImage(const QImage &value);
+
 private:
     int ID;
     int attackValue;
     int Type;
     int terrainType;
+    int mode;
     QString Name;
     QString Url;
+    QImage image;
 };
 
 #endif // THING_H

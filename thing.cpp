@@ -3,6 +3,19 @@
 Thing::Thing()
 {
 }
+
+Thing::Thing(int tempID, int tempAttackValue, int tempType, int tempTerrainType, QString tempName, QString tempUrl)
+{
+    ID = tempID;
+    attackValue = tempAttackValue;
+    Type = tempType;
+    mode = SmallIcon_Mode;
+    Url = tempUrl;
+    Name = tempName;
+    terrainType = tempTerrainType;
+    //initial the Qimage for the thing
+    image = QImage(tempUrl);
+}
 int Thing::getID() const
 {
     return ID;
@@ -48,6 +61,26 @@ void Thing::setUrl(const QString &value)
 {
     Url = value;
 }
+int Thing::getMode() const
+{
+    return mode;
+}
+
+void Thing::setMode(int value)
+{
+    mode = value;
+}
+QImage Thing::getImage() const
+{
+    return image;
+}
+
+void Thing::setImage(const QImage &value)
+{
+    image = value;
+}
+
+
 
 
 

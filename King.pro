@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     hero.cpp \
     control.cpp \
     combat.cpp \
-    mylabel.cpp
+    mylabel.cpp \
+    mapwidget.cpp
 
 HEADERS  += mainwindow.h \
     player.h \
@@ -33,10 +34,13 @@ HEADERS  += mainwindow.h \
     hero.h \
     control.h \
     combat.h \
-    mylabel.h
+    mylabel.h \
+    mapwidget.h
 
 FORMS    += mainwindow.ui \
     combat.ui
 
 RESOURCES += \
     Image.qrc
+
+CONFIG += console
