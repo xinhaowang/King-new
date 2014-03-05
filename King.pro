@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     control.cpp \
     combat.cpp \
     mylabel.cpp \
-    mapwidget.cpp
+    mapwidget.cpp \
+    hexwidget.cpp
 
 HEADERS  += mainwindow.h \
     player.h \
@@ -35,7 +36,9 @@ HEADERS  += mainwindow.h \
     control.h \
     combat.h \
     mylabel.h \
-    mapwidget.h
+    mapwidget.h \
+    hexwidget.h \
+    ThingMimeData.h
 
 FORMS    += mainwindow.ui \
     combat.ui

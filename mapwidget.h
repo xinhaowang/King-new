@@ -7,8 +7,8 @@
 #include <QPainter>
 #include <QRect>
 #include <QDrag>
+#include "ThingMimeData.h"
 #include "thing.h"
-#include "control.h"
 #include "mylabel.h"
 
 class MapWidget : public QWidget
@@ -18,7 +18,8 @@ public:
     explicit MapWidget(QWidget *parent = 0);
     ~MapWidget();
 
-    void init();
+public slots:
+    void initThingToRackSlot(vector<Thing*> tempThings);
 
 private slots:
     void reLayoutIconSlot();
@@ -27,7 +28,6 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
-    void dragLeaveEvent(QDragLeaveEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
 
@@ -43,7 +43,6 @@ signals:
 
 private:
     int                 iconMode;
-    Control             *m_control;
     vector<mylabel*>    m_thingsLabel;
     vector<mylabel*>    m_selectThingsLabel;
     QPoint              m_mousePressPosn;

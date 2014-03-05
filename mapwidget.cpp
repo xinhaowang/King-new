@@ -4,7 +4,6 @@ MapWidget::MapWidget(QWidget *parent) :
     QWidget(parent)
 {
     this->setAcceptDrops(true);
-    m_control = new Control(this);
 }
 
 MapWidget::~MapWidget()
@@ -12,20 +11,13 @@ MapWidget::~MapWidget()
 
 }
 
-//just for test
-void MapWidget::init()
+void MapWidget::initThingToRackSlot(vector<Thing*> tempThings)
 {
-    //initial the data in the control
-    m_control->init();
-
-    //the board can only has less 10 things
-    if(m_control->getSize() <= 10)
+    clear();
+    for(size_t i = 0; i < tempThings.size(); i++)
     {
-        for(size_t i = 0; i < m_control->getSize(); i++)
-        {
-            mylabel *tempThingLabel = new mylabel(m_control->getThing(i), this);
-            m_thingsLabel.push_back(tempThingLabel);
-        }
+        mylabel *tempThingLabel = new mylabel(tempThings[i], this);
+        m_thingsLabel.push_back(tempThingLabel);
     }
 }
 
@@ -37,11 +29,9 @@ QRect MapWidget::getThingRect(int index)
     }
     const int spacing = 10;
     int width = this->width();
-    //int height = this->height();
     int itemWidth = m_thingsLabel[index]->width();
     int itemHeight = m_thingsLabel[index]->height();
     int colCount = width/(itemWidth + spacing);
-    //int rowCount = height/(itemHeight + spacing);
     int row = index/colCount;
     int col = index%colCount;
     int xPosn = col*(itemWidth + spacing);
@@ -98,12 +88,6 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
 
 void MapWidget::reLayoutIconSlot()
 {
-    clear();
-    for(size_t i = 0; i < m_control->getSize(); i++)
-    {
-        mylabel *tempThingLabel = new mylabel(m_control->getThing(i),this);
-        m_thingsLabel.push_back(tempThingLabel);
-    }
     for(size_t i = 0; i < m_thingsLabel.size(); i++)
     {
         QRect rect = getThingRect(i);
@@ -137,11 +121,6 @@ void MapWidget::dragEnterEvent(QDragEnterEvent *event)
     }
 }
 
-void MapWidget::dragLeaveEvent(QDragLeaveEvent *event)
-{
-
-}
-
 void MapWidget::dragMoveEvent(QDragMoveEvent *event)
 {
     event->accept();
@@ -155,12 +134,33 @@ void MapWidget::performDrag()
     for(size_t i = 0; i < m_selectThingsLabel.size(); i++)
     {
         pList->append(m_selectThingsLabel[i]->getData());
+        m_selectThingsLabel[i]->getData()->setInRack(false);
     }
+
     pData->setDragDatas("ThingMimeData",pList);
     pDrag->setMimeData(pData);
 
     QPixmap pixmap = QPixmap::fromImage(m_selectThingsLabel[0]->getData()->getImage()).scaled(50,50, Qt::IgnoreAspectRatio);
     pDrag->setPixmap(pixmap);
+
+    //delete all the selected things when we drage them
+    for(size_t a = 0; a < m_selectThingsLabel.size(); a++)
+    {
+        for(vector<mylabel*>::iterator iter = m_thingsLabel.begin(); iter != m_thingsLabel.end();)
+        {
+            if(*iter == m_selectThingsLabel[a])
+            {
+                iter = m_thingsLabel.erase(iter);
+            } else {
+                iter++;
+            }
+        }
+    }
+    qDeleteAll(m_selectThingsLabel);
+    m_selectThingsLabel.clear();
+
+    reLayoutIconSlot();
+
     pDrag->exec(Qt::CopyAction);
 }
 
@@ -172,8 +172,9 @@ void MapWidget::dropEvent(QDropEvent *event)
     {
         for(int i = 0; i < pList->size(); i++)
         {
-            m_control->addThing(pList->at(i));
-
+            pList->at(i)->setInRack(true);
+            mylabel *tempLabel = new mylabel(pList->at(i), this);
+            m_thingsLabel.push_back(tempLabel);
         }
         reLayoutIconSlot();
         event->accept();

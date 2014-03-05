@@ -7,6 +7,8 @@
 #include <QMimeData>
 #include <QDebug>
 #include "thing.h"
+#include "hex.h"
+#include "player.h"
 
 using namespace std;
 
@@ -17,72 +19,32 @@ public:
     explicit Control(QObject *parent = 0);
     ~Control();
     //function for things' operation
-    void init();
+    void initThings();
     void addThing(Thing *tempThing);
     void deleteThing(int thingID);
     void deleteThing(Thing* tempThing);
     void changeIconMode(int mode);
     size_t getSize() {  return m_thingData.size(); }
+    vector<Thing*> getAllThings();
     Thing *getThing(int index);
     Thing *getThingFromID(int thingID);
+    //function for players' operation
+    void initPlayers();
+    Player *getPlayerFromID(int playerID);
+    void addHexWidget(HexWidget *tempHexWidget, int playerID);
+    //function for hexs' operation
+    void initHex();
+    vector<Hex *> hex() const;
+    void setHex(const vector<Hex *> &hex);
 
 signals:
 
-public slots:
+public slots:   
 
 private:
-    vector<Thing*> m_thingData;
-
-};
-
-class ThingMimeData:public QMimeData
-{
-    Q_OBJECT
-public:
-    ThingMimeData():QMimeData()
-    {
-        m_thingDragList = NULL;
-    }
-
-    ~ThingMimeData()
-    {
-        if(m_thingDragList)
-        {
-            delete m_thingDragList;
-        }
-    }
-
-    void setDragDatas(QString mimeType, QList<Thing*> *tempThingList)
-    {
-        m_format << mimeType;
-        m_thingDragList = tempThingList;
-    }
-
-    QStringList formats() const
-    {
-        return m_format;
-    }
-
-    const QList<Thing*>* thingDragData() const
-    {
-        return m_thingDragList;
-    }
-
-protected:
-    QVariant retrieveData(const QString &mimetype, QVariant::Type preferredType) const
-    {
-        if(mimetype == "ThingMimeData")
-        {
-            return m_thingDragList;
-        } else {
-            return QMimeData::retrieveData(mimetype,preferredType);
-        }
-    }
-
-
-private:
-    QStringList             m_format;
-    const QList<Thing*>     *m_thingDragList;
+    vector<Thing*>  m_thingData;
+    vector<Player*> m_playerData;
+    vector<Hex*>    m_hex;
 };
 
 #endif // CONTROL_H

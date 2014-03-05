@@ -45,12 +45,16 @@ public:
     QImage getImage() const;
     void setImage(const QImage &value);
 
+    bool getInRack() const;
+    void setInRack(bool value);
+
 private:
     int ID;
     int attackValue;
     int Type;
     int terrainType;
     int mode;
+    bool inRack;
     QString Name;
     QString Url;
     QImage image;

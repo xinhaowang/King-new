@@ -2,6 +2,7 @@
 #define HEX_H
 
 #include <QString>
+
 using namespace std;
 
 class Hex
@@ -9,25 +10,25 @@ class Hex
 public:
     // ****Hex constructor
     Hex();
-    Hex(int tempID, int tempType, QString tempUrl);
+    Hex(int tempTypeID, QString tempTypeName, QString tempUrl);
 
     // ****Hex accessors
-    // Hex ID accessor
-    int getID() const;
-    void setID(int value);
+    int getTypeID() const;
+    void setTypeID(int value);
 
-    // Hex Type accessor
-    int getType() const;
-    void setType(int value);
+    QString getTypeName() const;
+    void setTypeName(const QString &value);
 
     // Hex Url accessor
     QString getUrl() const;
     void setUrl(const QString &value);
 
+
+
 private:
     //define private member
-    int ID;
-    int Type;
+    int TypeID;
+    QString TypeName;
     QString Url;
 };
 

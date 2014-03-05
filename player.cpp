@@ -3,6 +3,12 @@
 Player::Player()
 {
 }
+
+Player::Player(int tempID)
+{
+    ID = tempID;
+}
+
 int Player::getID() const
 {
     return ID;
@@ -21,51 +27,74 @@ void Player::setGold(int value)
 {
     Gold = value;
 }
-vector<Thing> Player::getPlayerThings() const
+vector<Thing *> Player::getPlayerThings() const
 {
     return playerThings;
 }
 
-void Player::setPlayerThings(const vector<Thing> &value)
+vector<Thing *> Player::getInRackThings() const
+{
+    vector<Thing *> tempThing;
+    for(size_t i = 0; i < playerThings.size(); i++)
+    {
+        if(playerThings[i]->getInRack())
+        {
+            tempThing.push_back(playerThings[i]);
+        }
+    }
+    return tempThing;
+}
+
+void Player::setPlayerThings(const vector<Thing *> &value)
 {
     playerThings = value;
 }
-vector<Building> Player::getPlayerBuildings() const
+vector<Building *> Player::getPlayerBuildings() const
 {
     return playerBuildings;
 }
 
-void Player::setPlayerBuildings(const vector<Building> &value)
+void Player::setPlayerBuildings(const vector<Building *> &value)
 {
     playerBuildings = value;
 }
-vector<EventMagic> Player::getPlayerEVMA() const
+vector<EventMagic *> Player::getPlayerEVMA() const
 {
     return playerEVMA;
 }
 
-void Player::setPlayerEVMA(const vector<EventMagic> &value)
+void Player::setPlayerEVMA(const vector<EventMagic *> &value)
 {
     playerEVMA = value;
 }
-vector<Hero> Player::getPlayerHeros() const
+vector<Hero *> Player::getPlayerHeros() const
 {
     return playerHeros;
 }
 
-void Player::setPlayerHeros(const vector<Hero> &value)
+void Player::setPlayerHeros(const vector<Hero *> &value)
 {
     playerHeros = value;
 }
-vector<Hex> Player::getPlayerHexs() const
+vector<HexWidget *> Player::getPlayerHexs() const
 {
     return playerHexs;
 }
 
-void Player::setPlayerHexs(const vector<Hex> &value)
+void Player::setPlayerHexs(const vector<HexWidget *> &value)
 {
     playerHexs = value;
 }
+
+void Player::setPlayerHex(HexWidget *value)
+{
+    playerHexs.push_back(value);
+}
+
+
+
+
+
 
 
 
