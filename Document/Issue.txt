@@ -1,0 +1,10 @@
+##
+1. mainwindow.cpp
+	getNearHex(int index);
+	/* finish all the other nearby hex */
+
+2. rack widget中的内容如果移到外面需要自动复原 
+
+3. control.cpp
+	getRandomThingFromNum()
+	需要根据things的size进行改变

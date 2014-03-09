@@ -29,9 +29,11 @@ public:
     vector<Thing *> getPlayerThings() const;
     vector<Thing *> getInRackThings() const;
     void setPlayerThings(const vector<Thing *> &value);
+    void setPlayerThing(Thing *value);
 
     vector<Building *> getPlayerBuildings() const;
     void setPlayerBuildings(const vector<Building *> &value);
+    void setPlayerBuilding(Building *value);
 
     vector<EventMagic *> getPlayerEVMA() const;
     void setPlayerEVMA(const vector<EventMagic *> &value);
@@ -43,9 +45,13 @@ public:
     void setPlayerHexs(const vector<HexWidget *> &value);
     void setPlayerHex(HexWidget *value);
 
+    QString getControlMark() const;
+    void setControlMark(const QString &value);
+
 private:
     int ID;                              //Player ID
     int Gold;                            //The Gold that the player currently owned
+    QString controlMark;                 //The control mard url for this player
     vector<Thing*> playerThings;         //The Things that the player owned
     vector<Building*> playerBuildings;   //The Forks that the player controled
     vector<EventMagic*> playerEVMA;      //The Magic and event that the player controled

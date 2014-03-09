@@ -31,7 +31,6 @@ protected:
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
 
-    void resizeEvent(QResizeEvent *event);
     QRect getThingRect(int index);
     void clear();
     void performDrag();
@@ -40,7 +39,7 @@ protected:
     bool isInVector(mylabel *tempThingLabel);
 
 signals:
-
+    void startDragSignal();
 private:
     int                 iconMode;
     vector<mylabel*>    m_thingsLabel;

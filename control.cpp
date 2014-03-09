@@ -10,36 +10,38 @@ Control::~Control()
 
 }
 
-/*
- * General accessor for the Control
- **/
+//get the random number from 1 to range
+int Control::getRandomNumber(int range)
+{
+    int x = rand() % range + 1;
+    return x;
+}
+
 
 /*
  * Accessor for the Thing data
  **/
 void Control::initThings()
 {
-    Thing *tempThing1 = new Thing(1,3,1,1,"hello",":/creatures/image/things/desert/Thing98.jpg");
-    Thing *tempThing2 = new Thing(2,3,1,1,"hello",":/creatures/image/things/desert/Thing99.jpg");
-    Thing *tempThing3 = new Thing(3,3,1,1,"hello",":/creatures/image/things/desert/Thing100.jpg");
-    Thing *tempThing4 = new Thing(4,3,1,1,"hello",":/creatures/image/things/desert/Thing101.jpg");
-    Thing *tempThing5 = new Thing(5,3,1,1,"hello",":/creatures/image/things/desert/Thing102.jpg");
-    Thing *tempThing6 = new Thing(6,3,1,1,"hello",":/creatures/image/things/desert/Thing103.jpg");
-    Thing *tempThing7 = new Thing(7,3,1,1,"hello",":/creatures/image/things/desert/Thing104.jpg");
-    Thing *tempThing8 = new Thing(8,3,1,1,"hello",":/creatures/image/things/desert/Thing105.jpg");
-    Thing *tempThing9 = new Thing(9,3,1,1,"hello",":/creatures/image/things/desert/Thing106.jpg");
-    Thing *tempThing10 = new Thing(10,3,1,1,"hello",":/creatures/image/things/desert/Thing107.jpg");
-    m_thingData.push_back(tempThing1);
-    m_thingData.push_back(tempThing2);
-    m_thingData.push_back(tempThing3);
-    m_thingData.push_back(tempThing4);
-    m_thingData.push_back(tempThing5);
-    m_thingData.push_back(tempThing6);
-    m_thingData.push_back(tempThing7);
-    m_thingData.push_back(tempThing8);
-    m_thingData.push_back(tempThing9);
-    m_thingData.push_back(tempThing10);
+    QFile file(":/ThingsData/test.txt");
+    if(!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::information(0,"error",file.errorString());
+    }
 
+    QTextStream in(&file);
+    while(true)
+    {
+        QString line = in.readLine();
+        if(in.atEnd())
+        {
+            break;
+        }
+        QStringList worlds = line.split(",");
+        Thing *tempThing = new Thing(worlds.at(0).toInt(), worlds.at(1).toInt(), worlds.at(2).toInt(),
+                                     worlds.at(3).toInt(), worlds.at(4), worlds.at(5));
+        m_thingData.push_back(tempThing);
+    }
+    file.close();
 }
 
 void Control::addThing(Thing *tempThing)
@@ -94,6 +96,29 @@ Thing* Control::getThingFromID(int thingID)
     }
 }
 
+vector<Thing *> Control::getRandomThingFromNum(int count)
+{
+    vector<Thing *> temp;
+    while(true)
+    {
+        if(count == 0)
+        {
+            break;
+        } else {
+            int tempNum = getRandomNumber(146) - 1;
+            if(m_thingData.at(tempNum)->getUsed())
+            {
+                //the thing has been used
+            } else {
+                temp.push_back(m_thingData.at(tempNum));
+                m_thingData.at(tempNum)->setUsed(true);
+                count--;
+            }
+        }
+    }
+    return temp;
+}
+
 void Control::changeIconMode(int mode)
 {
     for(size_t i = 0; i < m_thingData.size(); i++)
@@ -115,7 +140,6 @@ Thing *Control::getThing(int index)
     }
 }
 
-
 /*
  * Accessor for the Player data
  **/
@@ -125,13 +149,14 @@ void Control::initPlayers()
     Player *player2 = new Player(2);
     Player *player3 = new Player(3);
     Player *player4 = new Player(4);
+    player1->setControlMark(":/palyer/image/things/player_battle_building/Thing28.jpg");
+    player2->setControlMark(":/palyer/image/things/player_battle_building/Thing27.jpg");
+    player3->setControlMark(":/palyer/image/things/player_battle_building/Thing30.jpg");
+    player4->setControlMark(":/palyer/image/things/player_battle_building/Thing31.jpg");
     m_playerData.push_back(player1);
     m_playerData.push_back(player2);
     m_playerData.push_back(player3);
     m_playerData.push_back(player4);
-
-    //test
-    player1->setPlayerThings(m_thingData);
 }
 
 Player *Control::getPlayerFromID(int playerID)
@@ -156,14 +181,14 @@ void Control::addHexWidget(HexWidget *tempHexWidget, int playerID)
  **/
 void Control::initHex()
 {
-    Hex *hex1 = new Hex(1,"sea",":/hex/image/hex/Sea.png");
-    Hex *hex2 = new Hex(2,"desert",":/hex/image/hex/Desert.png");
-    Hex *hex3 = new Hex(3,"forest",":/hex/image/hex/Forest.png");
-    Hex *hex4 = new Hex(4,"frozen waste",":/hex/image/hex/Frozen_waste.png");
-    Hex *hex5 = new Hex(5,"jungle",":/hex/image/hex/Jungle.png");
-    Hex *hex6 = new Hex(6,"mountain",":/hex/image/hex/Mountain.png");
-    Hex *hex7 = new Hex(7,"plains",":/hex/image/hex/Plains.png");
-    Hex *hex8 = new Hex(8,"swamp",":/hex/image/hex/Swamp.png");
+    Hex *hex1 = new Hex(1,"sea",":/hex/image/hex/Sea.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
+    Hex *hex2 = new Hex(2,"desert",":/hex/image/hex/Desert.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
+    Hex *hex3 = new Hex(3,"forest",":/hex/image/hex/Forest.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
+    Hex *hex4 = new Hex(4,"frozen waste",":/hex/image/hex/Frozen_waste.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
+    Hex *hex5 = new Hex(5,"jungle",":/hex/image/hex/Jungle.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
+    Hex *hex6 = new Hex(6,"mountain",":/hex/image/hex/Mountain.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
+    Hex *hex7 = new Hex(7,"plains",":/hex/image/hex/Plains.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
+    Hex *hex8 = new Hex(8,"swamp",":/hex/image/hex/Swamp.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
     m_hex.push_back(hex1);
     m_hex.push_back(hex2);
     m_hex.push_back(hex3);
@@ -184,3 +209,38 @@ void Control::setHex(const vector<Hex *> &hex)
     m_hex = hex;
 }
 
+/*
+ * Accessor for the Building data
+ **/
+void Control::initBuilding()
+{
+    Building *building1 = new Building(1, 1, ":/buildings/image/things/player_battle_building/Thing41.jpg");
+    Building *building2 = new Building(2, 2, ":/buildings/image/things/player_battle_building/Thing43.jpg");
+    Building *building3 = new Building(3, 3, ":/buildings/image/things/player_battle_building/Thing45.jpg");
+    Building *building4 = new Building(4, 4, ":/buildings/image/things/player_battle_building/Thing47.jpg");
+    m_building.push_back(building1);
+    m_building.push_back(building2);
+    m_building.push_back(building3);
+    m_building.push_back(building4);
+}
+
+vector<Building *> Control::building() const
+{
+    return m_building;
+}
+
+Building* Control::getBuildingFromID(int buildingID) const
+{
+    for(size_t i = 0; i< m_building.size(); i++)
+    {
+        if(m_building.at(i)->getID() == buildingID)
+        {
+            return m_building.at(i);
+        }
+    }
+}
+
+void Control::setBuilding(const vector<Building *> &building)
+{
+    m_building = building;
+}

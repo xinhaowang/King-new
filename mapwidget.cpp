@@ -19,6 +19,16 @@ void MapWidget::initThingToRackSlot(vector<Thing*> tempThings)
         mylabel *tempThingLabel = new mylabel(tempThings[i], this);
         m_thingsLabel.push_back(tempThingLabel);
     }
+    for(size_t i = 0; i < m_thingsLabel.size(); i++)
+    {
+        QRect rect = getThingRect(i);
+        if(i == m_thingsLabel.size() - 1)
+        {
+            this->setMinimumHeight(rect.y() + 80);
+        }
+        m_thingsLabel[i]->setGeometry(rect);
+        m_thingsLabel[i]->show();
+    }
 }
 
 QRect MapWidget::getThingRect(int index)
@@ -37,21 +47,6 @@ QRect MapWidget::getThingRect(int index)
     int xPosn = col*(itemWidth + spacing);
     int yPosn = row*(itemHeight + spacing);
     return QRect(xPosn, yPosn, itemWidth, itemHeight);
-}
-
-void MapWidget::resizeEvent(QResizeEvent *event)
-{
-    //change the layout if the size has changed
-    for(size_t i = 0; i < m_thingsLabel.size(); i++)
-    {
-        QRect rect = getThingRect(i);
-        if(i == m_thingsLabel.size() - 1)
-        {
-            this->setMinimumHeight(rect.y() + 80);
-        }
-        m_thingsLabel[i]->setGeometry(rect);
-    }
-    QWidget::resizeEvent(event);
 }
 
 void MapWidget::mousePressEvent(QMouseEvent *event)
@@ -143,6 +138,8 @@ void MapWidget::performDrag()
     QPixmap pixmap = QPixmap::fromImage(m_selectThingsLabel[0]->getData()->getImage()).scaled(50,50, Qt::IgnoreAspectRatio);
     pDrag->setPixmap(pixmap);
 
+    //inform the mainwindow to show the dragable hex
+    emit(startDragSignal());
     //delete all the selected things when we drage them
     for(size_t a = 0; a < m_selectThingsLabel.size(); a++)
     {

@@ -4,11 +4,13 @@ Hex::Hex()
 {
 }
 
-Hex::Hex(int tempTypeID, QString tempTypeName, QString tempUrl)
+Hex::Hex(int tempTypeID, QString tempTypeName, QString tempUrl, QString tempGreen, QString tempRed)
 {
     TypeID = tempTypeID;
     TypeName = tempTypeName;
     Url = tempUrl;
+    greenUrl = tempGreen;
+    redUrl = tempRed;
 }
 
 QString Hex::getUrl() const
@@ -20,6 +22,26 @@ void Hex::setUrl(const QString &value)
 {
     Url = value;
 }
+QString Hex::getGreenUrl() const
+{
+    return greenUrl;
+}
+
+void Hex::setGreenUrl(const QString &value)
+{
+    greenUrl = value;
+}
+QString Hex::getRedUrl() const
+{
+    return redUrl;
+}
+
+void Hex::setRedUrl(const QString &value)
+{
+    redUrl = value;
+}
+
+
 int Hex::getTypeID() const
 {
     return TypeID;

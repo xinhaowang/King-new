@@ -28,11 +28,10 @@ public:
     QString getUrl() const;
     void setUrl(const QString &value);
 
-
 private:
-    int ID;         //building ID
-    int income;     //building income
-    QString Url;    //building's Url
+    int ID;          //building ID
+    int income;      //building income
+    QString Url;     //building's Url
     
 };
 

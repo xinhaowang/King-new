@@ -1,0 +1,26 @@
+Hex Type:
+1.	Sea
+2.	Desert
+3.	Forest
+4.	Frozen-waste
+5.	Jungle
+6.	Mountain
+7.	Plains
+8.	Swamp
+
+Phase:
+0.	Each player set up their board
+1.	Gold collection(mandartory)
+2.	Recruit heroes(optional)
+3.	Recruit things(mandartory)
+4.	Random events(optional)
+5.	Move army(optianl)
+6.	Combat
+7.	Construction(optional)
+8.	Use special powers(optional)
+9.	Change first player(mandatory)
+
+things type:
+1. normal
+2. triangle
+

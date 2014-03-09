@@ -4,7 +4,7 @@ Player::Player()
 {
 }
 
-Player::Player(int tempID)
+Player::Player(int tempID):playerBuildings(NULL)
 {
     ID = tempID;
 }
@@ -49,6 +49,11 @@ void Player::setPlayerThings(const vector<Thing *> &value)
 {
     playerThings = value;
 }
+
+void Player::setPlayerThing(Thing *value)
+{
+    playerThings.push_back(value);
+}
 vector<Building *> Player::getPlayerBuildings() const
 {
     return playerBuildings;
@@ -57,6 +62,11 @@ vector<Building *> Player::getPlayerBuildings() const
 void Player::setPlayerBuildings(const vector<Building *> &value)
 {
     playerBuildings = value;
+}
+
+void Player::setPlayerBuilding(Building *value)
+{
+    playerBuildings.push_back(value);
 }
 vector<EventMagic *> Player::getPlayerEVMA() const
 {
@@ -90,6 +100,16 @@ void Player::setPlayerHex(HexWidget *value)
 {
     playerHexs.push_back(value);
 }
+QString Player::getControlMark() const
+{
+    return controlMark;
+}
+
+void Player::setControlMark(const QString &value)
+{
+    controlMark = value;
+}
+
 
 
 

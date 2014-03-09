@@ -5,7 +5,7 @@ Thing::Thing()
 }
 
 Thing::Thing(int tempID, int tempAttackValue, int tempType, int tempTerrainType, QString tempName, QString tempUrl):
-    inRack(true)
+    inRack(true),used(false)
 {
     ID = tempID;
     attackValue = tempAttackValue;
@@ -89,6 +89,16 @@ void Thing::setInRack(bool value)
 {
     inRack = value;
 }
+bool Thing::getUsed() const
+{
+    return used;
+}
+
+void Thing::setUsed(bool value)
+{
+    used = value;
+}
+
 
 
 

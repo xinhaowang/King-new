@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <iostream>
 #include "thing.h"
+#include "building.h"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ public:
     void selectThing(){ m_selected = true;  }
     bool selected() { return m_selected; }
     Thing *getData() {  return m_thingData; }
+
 
 protected:
     void resizeEvent(QResizeEvent *event);

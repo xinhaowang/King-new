@@ -48,6 +48,9 @@ public:
     bool getInRack() const;
     void setInRack(bool value);
 
+    bool getUsed() const;
+    void setUsed(bool value);
+
 private:
     int ID;
     int attackValue;
@@ -55,6 +58,7 @@ private:
     int terrainType;
     int mode;
     bool inRack;
+    bool used;
     QString Name;
     QString Url;
     QImage image;

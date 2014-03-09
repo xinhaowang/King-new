@@ -3,9 +3,11 @@
 
 #include <QObject>
 #include <QFile>
+#include <QList>
 #include <vector>
 #include <QMimeData>
 #include <QDebug>
+#include <QMessageBox>
 #include "thing.h"
 #include "hex.h"
 #include "player.h"
@@ -28,6 +30,7 @@ public:
     vector<Thing*> getAllThings();
     Thing *getThing(int index);
     Thing *getThingFromID(int thingID);
+    vector<Thing*> getRandomThingFromNum(int count);
     //function for players' operation
     void initPlayers();
     Player *getPlayerFromID(int playerID);
@@ -36,15 +39,22 @@ public:
     void initHex();
     vector<Hex *> hex() const;
     void setHex(const vector<Hex *> &hex);
+    //function for buildings' operation
+    void initBuilding();
+    vector<Building *> building() const;
+    void setBuilding(const vector<Building *> &building);
+    Building *getBuildingFromID(int buildingID) const;
 
 signals:
 
 public slots:   
 
 private:
-    vector<Thing*>  m_thingData;
-    vector<Player*> m_playerData;
-    vector<Hex*>    m_hex;
+    vector<Thing*>      m_thingData;
+    vector<Player*>     m_playerData;
+    vector<Hex*>        m_hex;
+    vector<Building*>   m_building;
+    int getRandomNumber(int range);
 };
 
 #endif // CONTROL_H

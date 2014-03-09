@@ -156,6 +156,8 @@
         <file>image/hex/Plains.png</file>
         <file>image/hex/Sea.png</file>
         <file>image/hex/Swamp.png</file>
+        <file>image/hex/green.jpg</file>
+        <file>image/hex/red.jpg</file>
     </qresource>
     <qresource prefix="/heros">
         <file>image/things/special_character/Thing49.jpg</file>
@@ -242,5 +244,9 @@
     </qresource>
     <qresource prefix="/background">
         <file>image/background/background.jpg</file>
+        <file>image/background/white.jpg</file>
+    </qresource>
+    <qresource prefix="/ThingsData">
+        <file>test.txt</file>
     </qresource>
 </RCC>
