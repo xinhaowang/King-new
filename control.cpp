@@ -244,3 +244,29 @@ void Control::setBuilding(const vector<Building *> &building)
 {
     m_building = building;
 }
+
+/*
+ * Accessor for the hero data
+ **/
+void Control::initHero()
+{
+    QFile file(":/ThingsData/hero.txt");
+    if(!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::information(0,"error",file.errorString());
+    }
+
+    QTextStream in(&file);
+    while(true)
+    {
+        QString line = in.readLine();
+        if(in.atEnd())
+        {
+            break;
+        }
+        QStringList worlds = line.split(",");
+        Hero *tempHero = new Hero(worlds.at(0).toInt(), worlds.at(1).toInt(), worlds.at(2).toInt(),
+                                    worlds.at(3), worlds.at(4));
+        m_heroData.push_back(tempHero);
+    }
+    file.close();
+}

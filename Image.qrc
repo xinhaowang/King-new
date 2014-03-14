@@ -245,8 +245,17 @@
     <qresource prefix="/background">
         <file>image/background/background.jpg</file>
         <file>image/background/white.jpg</file>
+        <file>image/background/dice.png</file>
+        <file>image/background/dice_roll.gif</file>
+        <file>image/background/dice1.gif</file>
+        <file>image/background/dice2.gif</file>
+        <file>image/background/dice3.gif</file>
+        <file>image/background/dice4.gif</file>
+        <file>image/background/dice5.gif</file>
+        <file>image/background/dice6.gif</file>
     </qresource>
     <qresource prefix="/ThingsData">
         <file>test.txt</file>
+        <file>hero.txt</file>
     </qresource>
 </RCC>

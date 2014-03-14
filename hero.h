@@ -2,6 +2,7 @@
 #define HERO_H
 
 #include <QString>
+#include "thing.h"
 using namespace std;
 
 class Hero
@@ -34,10 +35,14 @@ public:
     void setUrl(const QString &value);
 
 // private members
+    int getMode() const;
+    void setMode(int value);
+
 private:
     int ID;
     int attackValue;
     int Type;
+    int mode;
     QString Name;
     QString Url;
 };

@@ -62,15 +62,7 @@ void Thing::setUrl(const QString &value)
 {
     Url = value;
 }
-int Thing::getMode() const
-{
-    return mode;
-}
 
-void Thing::setMode(int value)
-{
-    mode = value;
-}
 QImage Thing::getImage() const
 {
     return image;
@@ -98,6 +90,28 @@ void Thing::setUsed(bool value)
 {
     used = value;
 }
+
+int Thing::getType() const
+{
+    return Type;
+}
+
+void Thing::setType(int value)
+{
+    Type = value;
+}
+int Thing::getMode() const
+{
+    return mode;
+}
+
+void Thing::setMode(int value)
+{
+    mode = value;
+}
+
+
+
 
 
 

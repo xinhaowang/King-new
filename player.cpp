@@ -4,9 +4,10 @@ Player::Player()
 {
 }
 
-Player::Player(int tempID):playerBuildings(NULL)
+Player::Player(int tempID)
 {
     ID = tempID;
+    Gold = 0;
 }
 
 int Player::getID() const
@@ -68,15 +69,7 @@ void Player::setPlayerBuilding(Building *value)
 {
     playerBuildings.push_back(value);
 }
-vector<EventMagic *> Player::getPlayerEVMA() const
-{
-    return playerEVMA;
-}
 
-void Player::setPlayerEVMA(const vector<EventMagic *> &value)
-{
-    playerEVMA = value;
-}
 vector<Hero *> Player::getPlayerHeros() const
 {
     return playerHeros;

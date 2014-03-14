@@ -6,7 +6,7 @@ HexWidget::HexWidget(QWidget *parent) :
 }
 
 HexWidget::HexWidget(QWidget *parent, Hex *tempHex) :
-    QWidget(parent), m_hexData(tempHex)
+    QWidget(parent), m_hexData(tempHex), m_building(NULL), m_heroLabel(NULL)
 {
     this->setStyleSheet("border-image: url(:/background/image/background/white.jpg)");
     oldStyle = this->styleSheet();
@@ -48,6 +48,26 @@ void HexWidget::refreshMyLabel()
         }
     }
     this->repaint();
+}
+
+HeroLabel *HexWidget::heroLabel() const
+{
+    return m_heroLabel;
+}
+
+void HexWidget::setHeroLabel(HeroLabel *heroLabel)
+{
+    m_heroLabel = heroLabel;
+}
+
+Hex *HexWidget::hexData() const
+{
+    return m_hexData;
+}
+
+void HexWidget::setHexData(Hex *hexData)
+{
+    m_hexData = hexData;
 }
 
 int HexWidget::getID() const
@@ -117,6 +137,16 @@ void HexWidget::setBuilding(Building *building)
 {
     m_building = building;
 }
+
+vector<mylabel *> HexWidget::thingsLabel() const
+{
+    return m_thingsLabel;
+}
+
+void HexWidget::setThingsLabel(const vector<mylabel *> &thingsLabel)
+{
+    m_thingsLabel = thingsLabel;
+}
 /********************************************************************
  *
  * protected
@@ -138,7 +168,7 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
             this->setSelectState(2);
             this->setIsEnabledClick(false);
             emit(hexHasChangedSignal(this));
-        } else if (this->objectName() == "1" && isEnabledClick) {
+        } else if (this->objectName() == "1" && isEnabledClick && phase == 0) {
             //set up the building for this hex
             //emit the signal to the mainwindow
             emit(setBulidngSingal(this));
@@ -212,6 +242,10 @@ void HexWidget::setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase)
     playerID = tempPlayerID;
     phase = tempPhase;
 }
+
+
+
+
 
 
 

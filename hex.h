@@ -2,6 +2,7 @@
 #define HEX_H
 
 #include <QString>
+#include "thing.h"
 
 using namespace std;
 

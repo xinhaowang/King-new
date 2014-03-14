@@ -38,10 +38,6 @@ public:
     QString getUrl() const;
     void setUrl(const QString &value);
 
-    // private members
-    int getMode() const;
-    void setMode(int value);
-
     QImage getImage() const;
     void setImage(const QImage &value);
 
@@ -50,6 +46,13 @@ public:
 
     bool getUsed() const;
     void setUsed(bool value);
+
+    int getType() const;
+    void setType(int value);
+
+    //things mode : big and small
+    int getMode() const;
+    void setMode(int value);
 
 private:
     int ID;

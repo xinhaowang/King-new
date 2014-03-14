@@ -8,7 +8,6 @@
 #include "thing.h"
 #include "hexwidget.h"
 #include "building.h"
-#include "eventmagic.h"
 #include "hero.h"
 
 using namespace std;
@@ -35,9 +34,6 @@ public:
     void setPlayerBuildings(const vector<Building *> &value);
     void setPlayerBuilding(Building *value);
 
-    vector<EventMagic *> getPlayerEVMA() const;
-    void setPlayerEVMA(const vector<EventMagic *> &value);
-
     vector<Hero *> getPlayerHeros() const;
     void setPlayerHeros(const vector<Hero *> &value);
 
@@ -54,7 +50,6 @@ private:
     QString controlMark;                 //The control mard url for this player
     vector<Thing*> playerThings;         //The Things that the player owned
     vector<Building*> playerBuildings;   //The Forks that the player controled
-    vector<EventMagic*> playerEVMA;      //The Magic and event that the player controled
     vector<Hero*> playerHeros;           //The Heros that the player controled
     vector<HexWidget*> playerHexs;       //The Hexs that the player controled
 };

@@ -1,0 +1,22 @@
+0,4,1,desert_master,:/heros/image/things/special_character/Thing49.jpg
+1,5,2,sir_lance_a_lot,:/heros/image/things/special_character/Thing50.jpg
+2,4,1,forest king,:/heros/image/things/special_character/Thing51.jpg
+3,5,1,dwarf_king,:/heros/image/things/special_character/Thing52.jpg
+4,4,1,master_thief,:/heros/image/things/special_character/Thing53.jpg
+5,6,3,arch_mage,:/heros/image/things/special_character/Thing54.jpg
+6,5,3,arch_cleric,:/heros/image/things/special_character/Thing55.jpg
+7,4,1,assassin_primus,:/heros/image/things/special_character/Thing56.jpg
+8,6,4,elf_lord,:/heros/image/things/special_character/Thing57.jpg
+9,4,1,mountain_king,:/heros/image/things/special_character/Thing58.jpg
+10,4,1,grand_duke,:/heros/image/things/special_character/Thing59.jpg
+11,4,1,baron_mounchausen,:/heros/image/things/special_character_back/Thing60.jpg
+12,4,1,swamp_king,:/heros/image/things/special_character_back/Thing61.jpg
+13,5,5,marksman,:/heros/image/things/special_character_back/Thing62.jpg
+14,5,1,warlord,:/heros/image/things/special_character_back/Thing63.jpg
+15,5,6,lord_of_the_eagles,:/heros/image/things/special_character_back/Thing64.jpg
+16,6,6,ghaog_2,:/heros/image/things/special_character_back/Thing65.jpg
+17,4,1,jungle_lord,:/heros/image/things/special_character_back/Thing66.jpg
+18,4,1,deerhunter,:/heros/image/things/special_character_back/Thing67.jpg
+19,4,1,ice_lord,:/heros/image/things/special_character_back/Thing68.jpg
+20,4,7,swordmaster,:/heros/image/things/special_character_back/Thing69.jpg
+21,4,1,plains_lord,:/heros/image/things/special_character_back/Thing70.jpg

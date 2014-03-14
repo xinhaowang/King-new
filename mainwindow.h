@@ -4,8 +4,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPushButton>
-#include <stdio.h>
-#include <windows.h>
+#include <QTime>
 #include "mapwidget.h"
 #include "hexwidget.h"
 #include "control.h"
@@ -36,6 +35,8 @@ public:
     QRect getMapRect(int index);
     QList<int> getNearHex(int index);
     void initThing();
+    void startCollectGold(int count);
+    void refreshPlayerGold();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void getRequirePlayerIDnPhaseSlot();
@@ -48,6 +49,8 @@ public slots:
     void initThingSlot();
     void confirmThingSlot();
     void startDragSlot();
+
+    void collectGoldSLOT();
 
 signals:
     void initThingToRackSignal(vector<Thing*> m_thingData);
@@ -65,6 +68,7 @@ private:
     int getRandomNumber(int range);
     void popMessageBox(int index);
     void disableMapClick();
+    void refreshWidget();
 };
 
 #endif // MAINWINDOW_H

@@ -8,6 +8,7 @@
 #include "hex.h"
 #include "mylabel.h"
 #include "building.h"
+#include "herolabel.h"
 
 class HexWidget : public QWidget
 {
@@ -32,6 +33,15 @@ public:
     Building *building() const;
     void setBuilding(Building *building);
 
+    vector<mylabel *> thingsLabel() const;
+    void setThingsLabel(const vector<mylabel *> &thingsLabel);
+
+    Hex *hexData() const;
+    void setHexData(Hex *hexData);
+
+    HeroLabel *heroLabel() const;
+    void setHeroLabel(HeroLabel *heroLabel);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
@@ -55,8 +65,9 @@ private:
     bool                isEnabledClick;
     QString             oldStyle;
     Hex                 *m_hexData;
-    vector<mylabel*>    m_thingsLabel;
-    Building*           m_building;
+    vector<mylabel *>   m_thingsLabel;
+    Building            *m_building;
+    HeroLabel           *m_heroLabel;
 };
 
 #endif // HEXWIDGET_H

@@ -22,7 +22,6 @@ mylabel::mylabel(Thing *thingData, QWidget *parent):m_thingData(thingData),QLabe
         pixmap = QPixmap::fromImage(m_thingData->getImage().scaled(QSize(30,30),
                                                                    Qt::IgnoreAspectRatio));
         imageSize = pixmap.size();
-        m_thingImage->setFixedSize(imageSize);
         m_thingImage->setPixmap(pixmap);
         this->setFixedSize(QSize(imageSize.width(),imageSize.height()));
     }

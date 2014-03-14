@@ -39,10 +39,39 @@ MainWindow::~MainWindow()
 //there are four hex that the first player can choose
 void MainWindow::startInitMap()
 {
-    m_hexWidget[4]->setIsEnabledClick(true);
-    m_hexWidget[8]->setIsEnabledClick(true);
-    m_hexWidget[31]->setIsEnabledClick(true);
-    m_hexWidget[35]->setIsEnabledClick(true);
+    if(GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs().size() == 0)
+    {
+        if(m_hexWidget[4]->objectName() == "0")
+        {
+            m_hexWidget[4]->setIsEnabledClick(true);
+        }
+        if(m_hexWidget[8]->objectName() == "0")
+        {
+            m_hexWidget[8]->setIsEnabledClick(true);
+        }
+        if(m_hexWidget[31]->objectName() == "0")
+        {
+            m_hexWidget[31]->setIsEnabledClick(true);
+        }
+        if(m_hexWidget[35]->objectName() == "0")
+        {
+            m_hexWidget[35]->setIsEnabledClick(true);
+        }
+    } else {
+        vector<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+        for(size_t i = 0; i < temp.size(); i++)
+        {
+            QList<int> temp2 = getNearHex(temp.at(i)->getID());
+            for(size_t j = 0; j < temp2.size(); j++)
+            {
+                m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
+            }
+        }
+        for(size_t i = 0; i < temp.size(); i++)
+        {
+            temp.at(i)->setIsEnabledClick(false);
+        }
+    }
 }
 
 void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
@@ -57,17 +86,9 @@ void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
     controlMark->setGeometry(42,35,30,30);
     controlMark->setPixmap(pixmap);
     controlMark->show();
-    //enable the nearby Hex
-    int tempHexID = tempHexWidget->getID();
-    QList<int> temp = getNearHex(tempHexID);
-    for(size_t i = 0; i < temp.size(); i++)
-    {
-        m_hexWidget[temp.at(i)]->setIsEnabledClick(true);
-    }
     //show the warning message
     //and call the next player
     popMessageBox(1);
-    tempHexWidget->setSelectState(0);
     //check for next step
     int count = 0;
     for(int i = 1; i < 5; i++)
@@ -83,15 +104,17 @@ void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
     {
         //init the gold and tower
         this->initGlodnTower();
+    } else {
+        startInitMap();
     }
 }
 
 void MainWindow::initGlodnTower()
 {
-    this->disableMapClick();
     int playerID = getPlayerTurn();
     //set up the gold
     GameData->getPlayerFromID(playerID)->setGold(10);
+    refreshPlayerGold();
     //set up the building to the player
     GameData->getPlayerFromID(playerID)->setPlayerBuilding(GameData->getBuildingFromID(1));
     //set the tower
@@ -117,7 +140,7 @@ void MainWindow::initThingSlot()
     vector<Thing *> temp = GameData->getRandomThingFromNum(10);
     //set the thing to the player
     GameData->getPlayerFromID(getPlayerTurn())->setPlayerThings(temp);
-    emit(initThingToRackSignal(GameData->getPlayerFromID(getPlayerTurn())->getPlayerThings()));
+    refreshWidget();
     disconnect(button,SIGNAL(clicked()),this,SLOT(initThingSlot()));
     button->setText("Next");
     connect(button,SIGNAL(clicked()),this,SLOT(confirmThingSlot()));
@@ -129,8 +152,6 @@ void MainWindow::confirmThingSlot()
     disconnect(button,SIGNAL(clicked()),this,SLOT(confirmThingSlot()));
     //change next player
     popMessageBox(1);
-    disableMapClick();
-    Things_rack->hide();
 
     int count = 0;
     for(size_t i = 0; i < 4; i++)
@@ -143,6 +164,7 @@ void MainWindow::confirmThingSlot()
     if(count == 4)
     {
         //go to another phase
+        setPhaseTurn(1);
     } else {
         initThing();
     }
@@ -179,8 +201,6 @@ void MainWindow::setBuildingToHexSlot(HexWidget *tempHexWidget)
     building->show();
     //pass the building to the hex
     tempHexWidget->setBuilding(GameData->getPlayerFromID(getPlayerTurn())->getPlayerBuildings().at(0));
-    //disable the click for hex
-    disableMapClick();
     //delete the button of the mainwindow
     disconnect(button,SIGNAL(clicked()),this,SLOT(buttonSlot()));
     button->setStyleSheet("");
@@ -189,49 +209,82 @@ void MainWindow::setBuildingToHexSlot(HexWidget *tempHexWidget)
     popMessageBox(2);
 }
 
-//popup message box change next player
-void MainWindow::popMessageBox(int index)
-{
-    QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, "Next Player", "Next player Turn");
-    message->setIconPixmap(QPixmap(":/palyer/image/things/player_battle_building/Thing26.jpg"));
-    switch (index) {
-    case 1:
-        connect(message, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(changePlayerTurnSlot(QAbstractButton*)));
-        break;
-    case 2:
-        connect(message, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(changePlayerTurnSlot2(QAbstractButton*)));
-        break;
-    default:
-        break;
-    }
-    message->exec();
-}
+/*********************************************************
+ *
+ * phase 1 function : collect gold
+ *
+ * *******************************************************/
 
-void MainWindow::changePlayerTurnSlot(QAbstractButton*)
+void MainWindow::startCollectGold(int count)
 {
-    setPlayerTurn(getPlayerTurn()%4 + 1);
-}
-
-void MainWindow::changePlayerTurnSlot2(QAbstractButton *)
-{
-    setPlayerTurn(getPlayerTurn()%4 + 1);
-    //if every one set the tower then system divide things
-    int count = 0;
-    for(int i = 0; i < 4; i++)
-    {
-        if(GameData->getPlayerFromID(i+1)->getPlayerBuildings().size() == 1)
-        {
-            count++;
-        }
-    }
     if(count == 4)
     {
-        //go to the next step
-        initThing();
+        //start next phase
+        setPhaseTurn(2);
     } else {
-        this->initGlodnTower();
+        button->setText("Collect");
+        button->setObjectName(QString::number(count));
+        connect(button, SIGNAL(clicked()), this, SLOT(collectGoldSLOT()));
+        button->show();
     }
 }
+
+void MainWindow::collectGoldSLOT()
+{
+    button->hide();
+    disconnect(button, SIGNAL(clicked()), this, SLOT(collectGoldSLOT()));
+    int amount = GameData->getPlayerFromID(getPlayerTurn())->getGold();
+    //hex you control
+    vector<HexWidget *> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    amount += tempHex.size();
+    qDebug() << amount;
+    //combat value of forks
+    for(size_t i = 0; i < tempHex.size(); i++)
+    {
+        Building *tempBuilding = tempHex.at(i)->building();
+        if(tempBuilding != NULL)
+        {
+            amount += tempBuilding->getIncome();
+            qDebug() << amount;
+        }
+    }
+    //special income and hero
+    for(size_t i = 0; i < tempHex.size(); i++)
+    {
+        vector<mylabel *> tempLabel = tempHex.at(i)->thingsLabel();
+        for(size_t j = 0; j < tempLabel.size(); i++)
+        {
+            //Things is special income and map the terrain
+            if(tempLabel[j]->getData()->getType() == 7 &&
+                    (tempLabel[j]->getData()->getTerrainType() == tempHex.at(i)->hexData()->getTypeID() ||
+                     tempLabel[j]->getData()->getTerrainType() == 0))
+            {
+                amount += tempLabel[j]->getData()->getAttackValue();
+                qDebug() << amount;
+            }
+        }
+        //hero
+        HeroLabel *tempHero = tempHex.at(i)->heroLabel();
+        if(tempHero != NULL)
+        {
+            amount += 1;
+            qDebug() << amount;
+        }
+    }
+    //set the new gold
+    GameData->getPlayerFromID(getPlayerTurn())->setGold(amount);
+    refreshPlayerGold();
+    //change next player
+    popMessageBox(1);
+    startCollectGold(button->objectName().toInt() + 1);
+}
+
+/*********************************************************
+ *
+ * phase 2 function : hero
+ *
+ * *******************************************************/
+
 
 /*********************************************************
  *
@@ -276,6 +329,7 @@ void MainWindow::setPlayerTurn(int value)
     QString temp = "Player : " + QString::number(value) + " turn.";
     ui->label->setText(temp);
     ui->label->setStyleSheet("background-color: white;");
+    refreshWidget();
 }
 
 int MainWindow::getPhaseTurn() const
@@ -293,6 +347,9 @@ void MainWindow::setPhaseTurn(int value)
     case 0:
         startInitMap();
         break;
+    case 1:
+        startCollectGold(0);
+    case 2:
     default:
         break;
     }
@@ -303,6 +360,7 @@ void MainWindow::disableMapClick()
     for(size_t i = 0; i < m_hexWidget.size(); i++)
     {
         m_hexWidget[i]->setIsEnabledClick(false);
+        m_hexWidget[i]->setIsEnableDrag(false);
     }
 }
 
@@ -314,8 +372,73 @@ void MainWindow::getRequirePlayerIDnPhaseSlot()
 //get the random number from 1 to range
 int MainWindow::getRandomNumber(int range)
 {
-    int x = rand() % range + 1;
+    int x = qrand() % range + 1;
     return x;
+}
+void MainWindow::refreshWidget()
+{
+    Things_rack->show();
+    emit(initThingToRackSignal(GameData->getPlayerFromID(getPlayerTurn())->getInRackThings()));
+}
+
+void MainWindow::refreshPlayerGold()
+{
+    int player1 = GameData->getPlayerFromID(1)->getGold();
+    int player2 = GameData->getPlayerFromID(2)->getGold();
+    int player3 = GameData->getPlayerFromID(3)->getGold();
+    int player4 = GameData->getPlayerFromID(4)->getGold();
+    ui->Player1_Gold->setText(QString::number(player1));
+    ui->Player2_Gold->setText(QString::number(player2));
+    ui->Player3_Gold->setText(QString::number(player3));
+    ui->Player4_Gold->setText(QString::number(player4));
+}
+
+//popup message box change next player
+void MainWindow::popMessageBox(int index)
+{
+    disableMapClick();
+    Things_rack->hide();
+    QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, "Next Player", "Next player Turn");
+    message->setIconPixmap(QPixmap(":/palyer/image/things/player_battle_building/Thing26.jpg"));
+    switch (index) {
+    case 1:
+        connect(message, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(changePlayerTurnSlot(QAbstractButton*)));
+        break;
+    case 2:
+        connect(message, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(changePlayerTurnSlot2(QAbstractButton*)));
+        break;
+    default:
+        break;
+    }
+    message->exec();
+}
+
+void MainWindow::changePlayerTurnSlot(QAbstractButton*)
+{
+    setPlayerTurn(getPlayerTurn()%4 + 1);
+    refreshWidget();
+    refreshPlayerGold();
+}
+
+void MainWindow::changePlayerTurnSlot2(QAbstractButton *)
+{
+    setPlayerTurn(getPlayerTurn()%4 + 1);
+    //if every one set the tower then system divide things
+    int count = 0;
+    for(int i = 0; i < 4; i++)
+    {
+        if(GameData->getPlayerFromID(i+1)->getPlayerBuildings().size() == 1)
+        {
+            count++;
+        }
+    }
+    if(count == 4)
+    {
+        //go to the next step
+        initThing();
+    } else {
+        this->initGlodnTower();
+    }
 }
 
 /*********************************************************
@@ -337,6 +460,8 @@ void MainWindow::initData()
     GameData->initPlayers();
     GameData->initHex();
     GameData->initBuilding();
+    GameData->initHero();
+    refreshPlayerGold();
 }
 //initial all the Hex in the map
 void MainWindow::initMap()

@@ -4,6 +4,15 @@ Hero::Hero()
 {
 }
 
+Hero::Hero(int tempID, int tempAttackValue, int tempType, QString tempName, QString tempUrl)
+{
+    ID = tempID;
+    attackValue = tempAttackValue;
+    Type = tempType;
+    Name = tempName;
+    Url = tempUrl;
+}
+
 int Hero::getID() const
 {
     return ID;
@@ -49,6 +58,16 @@ void Hero::setUrl(const QString &value)
 {
     Url = value;
 }
+int Hero::getMode() const
+{
+    return mode;
+}
+
+void Hero::setMode(int value)
+{
+    mode = value;
+}
+
 
 
 

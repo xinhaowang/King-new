@@ -11,6 +11,7 @@
 #include "thing.h"
 #include "hex.h"
 #include "player.h"
+#include "hero.h"
 
 using namespace std;
 
@@ -44,6 +45,8 @@ public:
     vector<Building *> building() const;
     void setBuilding(const vector<Building *> &building);
     Building *getBuildingFromID(int buildingID) const;
+    //fucntion for heros' operation
+    void initHero();
 
 signals:
 
@@ -54,6 +57,8 @@ private:
     vector<Player*>     m_playerData;
     vector<Hex*>        m_hex;
     vector<Building*>   m_building;
+    vector<Hero*>       m_heroData;
+
     int getRandomNumber(int range);
 };
 

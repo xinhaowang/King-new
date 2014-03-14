@@ -18,27 +18,29 @@ SOURCES += main.cpp\
     thing.cpp \
     building.cpp \
     hex.cpp \
-    eventmagic.cpp \
     hero.cpp \
     control.cpp \
     combat.cpp \
     mylabel.cpp \
     mapwidget.cpp \
-    hexwidget.cpp
+    hexwidget.cpp \
+    herolabel.cpp \
+    dicewidget.cpp
 
 HEADERS  += mainwindow.h \
     player.h \
     thing.h \
     building.h \
     hex.h \
-    eventmagic.h \
     hero.h \
     control.h \
     combat.h \
     mylabel.h \
     mapwidget.h \
     hexwidget.h \
-    ThingMimeData.h
+    ThingMimeData.h \
+    herolabel.h \
+    dicewidget.h
 
 FORMS    += mainwindow.ui \
     combat.ui
