@@ -172,6 +172,8 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
             //set up the building for this hex
             //emit the signal to the mainwindow
             emit(setBulidngSingal(this));
+        } else if (isEnabledClick && phase == 2) {
+            emit(setHeroSignal(this));
         }
     }
 }

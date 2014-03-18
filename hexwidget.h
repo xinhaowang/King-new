@@ -52,6 +52,7 @@ signals:
     void hexHasChangedSignal(HexWidget *tempHexWidget);
     void requirePlayerIDnPhaseSignal();
     void setBulidngSingal(HexWidget*);
+    void setHeroSignal(HexWidget*);
 
 public slots:
     void setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase);

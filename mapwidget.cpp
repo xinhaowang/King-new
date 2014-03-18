@@ -140,7 +140,7 @@ void MapWidget::performDrag()
 
     //inform the mainwindow to show the dragable hex
     emit(startDragSignal());
-    //delete all the selected things when we drage them
+    //delete all the selected things when we drag them
     for(size_t a = 0; a < m_selectThingsLabel.size(); a++)
     {
         for(vector<mylabel*>::iterator iter = m_thingsLabel.begin(); iter != m_thingsLabel.end();)

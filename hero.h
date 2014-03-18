@@ -34,7 +34,7 @@ public:
     QString getUrl() const;
     void setUrl(const QString &value);
 
-// private members
+    // private members
     int getMode() const;
     void setMode(int value);
 

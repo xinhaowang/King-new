@@ -8,3 +8,6 @@
 3. control.cpp
 	getRandomThingFromNum()
 	需要根据things的size进行改变
+
+4. choose hero phase: 
+	可以使用gold来修改roll

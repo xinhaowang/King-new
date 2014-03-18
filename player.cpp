@@ -75,6 +75,11 @@ vector<Hero *> Player::getPlayerHeros() const
     return playerHeros;
 }
 
+void Player::setPlayerHero(Hero *value)
+{
+    playerHeros.push_back(value);
+}
+
 void Player::setPlayerHeros(const vector<Hero *> &value)
 {
     playerHeros = value;

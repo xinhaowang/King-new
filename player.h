@@ -35,6 +35,7 @@ public:
     void setPlayerBuilding(Building *value);
 
     vector<Hero *> getPlayerHeros() const;
+    void setPlayerHero(Hero *value);
     void setPlayerHeros(const vector<Hero *> &value);
 
     vector<HexWidget *> getPlayerHexs() const;

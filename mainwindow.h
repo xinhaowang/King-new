@@ -6,8 +6,11 @@
 #include <QPushButton>
 #include <QTime>
 #include "mapwidget.h"
+#include "herowidget.h"
 #include "hexwidget.h"
 #include "control.h"
+#include "dicewidget.h"
+#include "selectgoldwidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -36,7 +39,13 @@ public:
     QList<int> getNearHex(int index);
     void initThing();
     void startCollectGold(int count);
-    void refreshPlayerGold();
+    void refreshPlayerGold();    
+    void refreshThingWidget();
+    void startChooseHero(int count);
+    void setHeroWidget();
+    void checkOwnHero(int dicevalue);
+    void enablePlayerMapClick();
+    void Message(QString title, QString body);
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void getRequirePlayerIDnPhaseSlot();
@@ -51,16 +60,28 @@ public slots:
     void startDragSlot();
 
     void collectGoldSLOT();
+    void chooseHeroSLOT();
 
+    void heroConfirmSlot(Hero *tempHero);
+    void updateDiceValueSlot(int tempdiceValue);
+    void setHeroSlot(HexWidget *tempHexWidget);
+    void getSelectedGoldSlot(int gold);
 signals:
     void initThingToRackSignal(vector<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
+    void initHeroToWidget(QList<Hero*> herolist);
 
 private:
     Ui::MainWindow       *ui;
-    MapWidget            *Things_rack;
     Control              *GameData;
+
+    Hero                 *temp_hero;
+    int                  temp_selectedGold = 0;
+    MapWidget            *Things_rack;
     QPushButton          *button;
+    DiceWidget           *dice;
+    SelectGoldWidget     *selectedGold;
+    HeroWidget           *Hero_widget;
     vector<HexWidget*>   m_hexWidget;
     int                  playerTurn;
     int                  PhaseTurn;
@@ -68,7 +89,6 @@ private:
     int getRandomNumber(int range);
     void popMessageBox(int index);
     void disableMapClick();
-    void refreshWidget();
 };
 
 #endif // MAINWINDOW_H

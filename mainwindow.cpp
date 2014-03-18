@@ -10,6 +10,32 @@ MainWindow::MainWindow(QWidget *parent) :
     setBackground();
     this->setWindowTitle("King and Thing");
     setThingsRack();
+    setHeroWidget();
+
+    //set up the function button
+    button = new QPushButton(this);
+    button->setGeometry(900,190,80,80);
+    button->hide();
+    //set up the dice
+    dice = new DiceWidget(this);
+    dice->setGeometry(900,180,100,100);
+    dice->hide();
+
+    //update dice value
+    connect(dice, SIGNAL(updateDiceValueSignal(int)), this, SLOT(updateDiceValueSlot(int)));
+
+    //send data to the player's rack
+    connect(this, SIGNAL(initThingToRackSignal(vector<Thing*>)),
+            Things_rack, SLOT(initThingToRackSlot(vector<Thing*>)));
+    connect(Things_rack, SIGNAL(startDragSignal()),
+            this, SLOT(startDragSlot()));
+
+    //send data to the hero widget
+    connect(this, SIGNAL(initHeroToWidget(QList<Hero*>)),
+            Hero_widget, SLOT(initHeroToWidgetSlot(QList<Hero*>)));
+    connect(Hero_widget, SIGNAL(heroConfirmSignal(Hero*)),
+            this, SLOT(heroConfirmSlot(Hero*)));
+
 
     //game start, set player turn and initial the board
     initData();
@@ -17,12 +43,6 @@ MainWindow::MainWindow(QWidget *parent) :
     //start to play
     setPlayerTurn(1);
     setPhaseTurn(0);
-
-    //send data to the player's rack
-    connect(this, SIGNAL(initThingToRackSignal(vector<Thing*>)),
-            Things_rack, SLOT(initThingToRackSlot(vector<Thing*>)));
-    connect(Things_rack, SIGNAL(startDragSignal()),
-            this, SLOT(startDragSlot()));
 }
 
 MainWindow::~MainWindow()
@@ -118,8 +138,6 @@ void MainWindow::initGlodnTower()
     //set up the building to the player
     GameData->getPlayerFromID(playerID)->setPlayerBuilding(GameData->getBuildingFromID(1));
     //set the tower
-    button = new QPushButton(this);
-    button->setGeometry(900,250,80,80);
     connect(button,SIGNAL(clicked()),this,SLOT(buttonSlot()));
     QString tempBuidlingUrl = GameData->getPlayerFromID(playerID)->getPlayerBuildings().at(0)->getUrl();
     QString temp = "border-image: url(" +  tempBuidlingUrl + ");";
@@ -140,7 +158,7 @@ void MainWindow::initThingSlot()
     vector<Thing *> temp = GameData->getRandomThingFromNum(10);
     //set the thing to the player
     GameData->getPlayerFromID(getPlayerTurn())->setPlayerThings(temp);
-    refreshWidget();
+    refreshThingWidget();
     disconnect(button,SIGNAL(clicked()),this,SLOT(initThingSlot()));
     button->setText("Next");
     connect(button,SIGNAL(clicked()),this,SLOT(confirmThingSlot()));
@@ -181,11 +199,7 @@ void MainWindow::startDragSlot()
 
 void MainWindow::buttonSlot()
 {
-    vector<HexWidget*> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
-    for(size_t i = 0; i < temp.size(); i++)
-    {
-        temp[i]->setIsEnabledClick(true);
-    }
+    enablePlayerMapClick();
 }
 
 void MainWindow::setBuildingToHexSlot(HexWidget *tempHexWidget)
@@ -237,7 +251,6 @@ void MainWindow::collectGoldSLOT()
     //hex you control
     vector<HexWidget *> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
     amount += tempHex.size();
-    qDebug() << amount;
     //combat value of forks
     for(size_t i = 0; i < tempHex.size(); i++)
     {
@@ -245,7 +258,6 @@ void MainWindow::collectGoldSLOT()
         if(tempBuilding != NULL)
         {
             amount += tempBuilding->getIncome();
-            qDebug() << amount;
         }
     }
     //special income and hero
@@ -260,7 +272,6 @@ void MainWindow::collectGoldSLOT()
                      tempLabel[j]->getData()->getTerrainType() == 0))
             {
                 amount += tempLabel[j]->getData()->getAttackValue();
-                qDebug() << amount;
             }
         }
         //hero
@@ -268,7 +279,6 @@ void MainWindow::collectGoldSLOT()
         if(tempHero != NULL)
         {
             amount += 1;
-            qDebug() << amount;
         }
     }
     //set the new gold
@@ -279,9 +289,93 @@ void MainWindow::collectGoldSLOT()
     startCollectGold(button->objectName().toInt() + 1);
 }
 
+
 /*********************************************************
  *
- * phase 2 function : hero
+ * phase 2 function : choose hero
+ *
+ * *******************************************************/
+void MainWindow::startChooseHero(int count)
+{
+    if(count == 4)
+    {
+        //start next phase
+    } else {
+        emit(initHeroToWidget(GameData->get10heroData()));
+        Hero_widget->show();
+        button->setText("confirm");
+        button->setObjectName(QString::number(count));
+    }
+}
+
+void MainWindow::heroConfirmSlot(Hero *tempHero)
+{
+    connect(button, SIGNAL(clicked()), this, SLOT(chooseHeroSLOT()));
+    temp_hero = tempHero;
+    selectedGold = new SelectGoldWidget(this, GameData->getPlayerFromID(getPlayerTurn())->getGold());
+    connect(selectedGold, SIGNAL(selectedGoldSignal(int)), this, SLOT(getSelectedGoldSlot(int)));
+    selectedGold->move(800,180);
+    selectedGold->show();
+    button->show();
+}
+
+void MainWindow::getSelectedGoldSlot(int gold)
+{
+    temp_selectedGold = gold;
+}
+
+void MainWindow::chooseHeroSLOT()
+{
+    selectedGold->hide();
+    button->hide();
+    //decrease the player gold;
+    GameData->getPlayerFromID(getPlayerTurn())->setGold(
+                GameData->getPlayerFromID(getPlayerTurn())->getGold() - temp_selectedGold);
+    refreshPlayerGold();
+    disconnect(button, SIGNAL(clicked()), this, SLOT(chooseHeroSLOT()));
+    dice->refreshLabel();
+    dice->show();
+}
+
+void MainWindow::checkOwnHero(int dicevalue)
+{
+    int additionDice = temp_selectedGold/5;
+    if(dicevalue + additionDice >= temp_hero->getAttackValue())
+    {
+        GameData->getPlayerFromID(getPlayerTurn())->setPlayerHero(temp_hero);
+        Message("Message", "Win a Hero");
+        enablePlayerMapClick();
+    } else {
+        Message("Message", "Lose");
+        popMessageBox(1);
+        startChooseHero(button->objectName().toInt() + 1);
+    }
+
+    Hero_widget->hide();
+    dice->hide();
+}
+
+void MainWindow::setHeroSlot(HexWidget* tempHexWidget)
+{
+    //reduce from the controller
+    GameData->removeHeroFromID(temp_hero->getID());
+    //set up the hero on the hex
+    temp_hero->setMode(SmallIcon_Mode);
+    HeroLabel *tempHero = new HeroLabel(temp_hero, tempHexWidget);
+    tempHexWidget->setHeroLabel(tempHero);
+    tempHero->setGeometry(12,35,30,30);
+    tempHero->show();
+    disableMapClick();
+    Hero_widget->hide();
+    popMessageBox(1);
+    startChooseHero(button->objectName().toInt() + 1);
+}
+
+
+
+/*********************************************************
+ *
+ * phase 3 function : recruit things
  *
  * *******************************************************/
 
@@ -329,7 +423,7 @@ void MainWindow::setPlayerTurn(int value)
     QString temp = "Player : " + QString::number(value) + " turn.";
     ui->label->setText(temp);
     ui->label->setStyleSheet("background-color: white;");
-    refreshWidget();
+    refreshThingWidget();
 }
 
 int MainWindow::getPhaseTurn() const
@@ -349,9 +443,21 @@ void MainWindow::setPhaseTurn(int value)
         break;
     case 1:
         startCollectGold(0);
+        break;
     case 2:
+        startChooseHero(0);
+        break;
     default:
         break;
+    }
+}
+
+void MainWindow::enablePlayerMapClick()
+{
+    vector<HexWidget*> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    for(size_t i = 0; i < temp.size(); i++)
+    {
+        temp[i]->setIsEnabledClick(true);
     }
 }
 
@@ -375,7 +481,7 @@ int MainWindow::getRandomNumber(int range)
     int x = qrand() % range + 1;
     return x;
 }
-void MainWindow::refreshWidget()
+void MainWindow::refreshThingWidget()
 {
     Things_rack->show();
     emit(initThingToRackSignal(GameData->getPlayerFromID(getPlayerTurn())->getInRackThings()));
@@ -391,6 +497,21 @@ void MainWindow::refreshPlayerGold()
     ui->Player2_Gold->setText(QString::number(player2));
     ui->Player3_Gold->setText(QString::number(player3));
     ui->Player4_Gold->setText(QString::number(player4));
+}
+
+void MainWindow::updateDiceValueSlot(int tempdiceValue)
+{
+    if(getPhaseTurn() == 2)
+    {
+        checkOwnHero(tempdiceValue);
+    }
+}
+
+void MainWindow::Message(QString title, QString body)
+{
+    QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, title, body);
+    message->setIconPixmap(QPixmap(":/palyer/image/things/player_battle_building/Thing26.jpg"));
+    message->exec();
 }
 
 //popup message box change next player
@@ -416,7 +537,7 @@ void MainWindow::popMessageBox(int index)
 void MainWindow::changePlayerTurnSlot(QAbstractButton*)
 {
     setPlayerTurn(getPlayerTurn()%4 + 1);
-    refreshWidget();
+    refreshThingWidget();
     refreshPlayerGold();
 }
 
@@ -459,8 +580,11 @@ void MainWindow::initData()
     GameData->initThings();
     GameData->initPlayers();
     GameData->initHex();
+    GameData->init37hex();
     GameData->initBuilding();
     GameData->initHero();
+    GameData->chooseTenRandomHeros();
+
     refreshPlayerGold();
 }
 //initial all the Hex in the map
@@ -469,7 +593,7 @@ void MainWindow::initMap()
     for(size_t i = 0; i < 37; i++)
     {
         HexWidget *tempHexWidget = new HexWidget(this->centralWidget(),
-                                                 GameData->hex()[(getRandomNumber(8) - 1)]);
+                                                 GameData->get37hex().at(i));
         connect(tempHexWidget, SIGNAL(hexHasChangedSignal(HexWidget*)),
                 this, SLOT(hexHasChangedSlot(HexWidget*)));
         connect(tempHexWidget, SIGNAL(requirePlayerIDnPhaseSignal()),
@@ -478,6 +602,8 @@ void MainWindow::initMap()
                 tempHexWidget, SLOT(setPlayerIDnPhaseSlot(int, int)));
         connect(tempHexWidget, SIGNAL(setBulidngSingal(HexWidget*)),
                 this, SLOT(setBuildingToHexSlot(HexWidget*)));
+        connect(tempHexWidget, SIGNAL(setHeroSignal(HexWidget*)),
+                this, SLOT(setHeroSlot(HexWidget*)));
         //show that this widget is unowned
         tempHexWidget->setObjectName("0");
         tempHexWidget->setID(i);
@@ -614,8 +740,10 @@ void MainWindow::setThingsRack()
     Things_rack->setFixedSize(500, 240);
     Things_rack->move(700, 520);
 }
-
-
-
-
-
+//set up the special character widget
+void MainWindow::setHeroWidget()
+{
+    Hero_widget = new HeroWidget(this);
+    Hero_widget->setFixedSize(500, 240);
+    Hero_widget->move(700, 280);
+}

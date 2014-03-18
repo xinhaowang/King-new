@@ -8,6 +8,7 @@ Hero::Hero(int tempID, int tempAttackValue, int tempType, QString tempName, QStr
 {
     ID = tempID;
     attackValue = tempAttackValue;
+    mode = BigIcon_Mode;
     Type = tempType;
     Name = tempName;
     Url = tempUrl;

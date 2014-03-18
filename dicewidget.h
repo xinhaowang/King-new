@@ -2,6 +2,7 @@
 #define DICEWIDGET_H
 
 #include <QWidget>
+#include <QDebug>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -16,6 +17,10 @@ class DiceWidget : public QWidget
 public:
     explicit DiceWidget(QWidget *parent = 0);
     ~DiceWidget();
+
+    void refreshLabel();
+signals:
+    void updateDiceValueSignal(int diceValue);
 
 private slots:
     void roll();

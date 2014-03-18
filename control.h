@@ -8,6 +8,7 @@
 #include <QMimeData>
 #include <QDebug>
 #include <QMessageBox>
+#include <QTime>
 #include "thing.h"
 #include "hex.h"
 #include "player.h"
@@ -39,7 +40,10 @@ public:
     //function for hexs' operation
     void initHex();
     vector<Hex *> hex() const;
-    void setHex(const vector<Hex *> &hex);
+    void setHex(const vector<Hex *> &hex);    
+    vector<Hex *> get37hex() const;
+    void set37hex(const vector<Hex *> &temp37hex);
+    void init37hex();
     //function for buildings' operation
     void initBuilding();
     vector<Building *> building() const;
@@ -47,17 +51,25 @@ public:
     Building *getBuildingFromID(int buildingID) const;
     //fucntion for heros' operation
     void initHero();
+    QList<Hero *> heroData() const;
+    void setHeroData(const QList<Hero *> &heroData);
+    void chooseTenRandomHeros();
+    QList<Hero *> get10heroData() const;
+    void set10heroData(const QList<Hero *> &temp10heroData);
+    void removeHeroFromID(int heroID);
 
 signals:
 
 public slots:   
 
 private:
-    vector<Thing*>      m_thingData;
-    vector<Player*>     m_playerData;
-    vector<Hex*>        m_hex;
-    vector<Building*>   m_building;
-    vector<Hero*>       m_heroData;
+    vector<Thing *>      m_thingData;
+    vector<Player *>     m_playerData;
+    vector<Hex *>        m_hex;
+    vector<Hex *>        m_37hex;
+    vector<Building *>   m_building;
+    QList<Hero *>        m_heroData;
+    QList<Hero *>        m_10heroData;
 
     int getRandomNumber(int range);
 };

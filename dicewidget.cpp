@@ -17,6 +17,12 @@ DiceWidget::DiceWidget(QWidget *parent) :
     connect(rollButton, SIGNAL(clicked()), this, SLOT(roll()));
 }
 
+void DiceWidget::refreshLabel()
+{
+    bgfile = ":/background/image/background/dice.png";
+    diceLabel->setPixmap(QPixmap(bgfile));
+}
+
 DiceWidget::~DiceWidget(){
     delete bgMovie;
     delete diceLabel;
@@ -37,7 +43,9 @@ void DiceWidget::roll(){
         diceLabel->setMovie(bgMovie);
         bgMovie->stop();
         int k = qrand() % 6 + 1;
-        bgfile.replace(34, 5, QChar(k));
+        QString tempReplace = QString::number(k) + ".gif";
+        bgfile.replace(34, 5, tempReplace);
         diceLabel->setPixmap(bgfile);
+        emit(updateDiceValueSignal(k));
     }
 }

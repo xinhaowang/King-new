@@ -25,7 +25,9 @@ SOURCES += main.cpp\
     mapwidget.cpp \
     hexwidget.cpp \
     herolabel.cpp \
-    dicewidget.cpp
+    dicewidget.cpp \
+    herowidget.cpp \
+    selectgoldwidget.cpp
 
 HEADERS  += mainwindow.h \
     player.h \
@@ -40,7 +42,9 @@ HEADERS  += mainwindow.h \
     hexwidget.h \
     ThingMimeData.h \
     herolabel.h \
-    dicewidget.h
+    dicewidget.h \
+    herowidget.h \
+    selectgoldwidget.h
 
 FORMS    += mainwindow.ui \
     combat.ui

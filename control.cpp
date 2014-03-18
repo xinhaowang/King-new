@@ -13,7 +13,7 @@ Control::~Control()
 //get the random number from 1 to range
 int Control::getRandomNumber(int range)
 {
-    int x = rand() % range + 1;
+    int x = qrand() % range + 1;
     return x;
 }
 
@@ -209,6 +209,23 @@ void Control::setHex(const vector<Hex *> &hex)
     m_hex = hex;
 }
 
+vector<Hex *> Control::get37hex() const
+{
+    return m_37hex;
+}
+
+void Control::set37hex(const vector<Hex *> &temp37hex)
+{
+    m_37hex = temp37hex;
+}
+
+void Control::init37hex()
+{
+    for(int i = 0; i < 37; i++)
+    {
+        m_37hex.push_back(m_hex.at(getRandomNumber(8) - 1));
+    }
+}
 /*
  * Accessor for the Building data
  **/
@@ -270,3 +287,70 @@ void Control::initHero()
     }
     file.close();
 }
+QList<Hero *> Control::heroData() const
+{
+    return m_heroData;
+}
+
+void Control::setHeroData(const QList<Hero *> &heroData)
+{
+    m_heroData = heroData;
+}
+
+void Control::chooseTenRandomHeros()
+{
+    QList<Hero *> temp = m_heroData;
+    QList<int> tempint;
+    while(true){
+        int random = getRandomNumber(22) - 1;
+        if(tempint.empty())
+        {
+            tempint.push_back(random);
+            continue;
+        }
+        bool same = false;
+        for(size_t i = 0; i < tempint.size(); i++)
+        {
+            if(random == tempint.at(i))
+            {
+                same = true;
+            }
+        }
+        if(same)
+        {
+            continue;
+        } else {
+            tempint.push_back(random);
+            if(tempint.size() == 10)
+            {
+                break;
+            }
+        }
+    }
+    for(size_t i = 0; i < tempint.size(); i++)
+    {
+        m_10heroData.push_back(temp.at(tempint.at(i)));
+    }
+}
+QList<Hero *> Control::get10heroData() const
+{
+    return m_10heroData;
+}
+
+void Control::removeHeroFromID(int heroID)
+{
+    for(int i = 0; i < m_10heroData.size();)
+    {
+        if(heroID == m_10heroData.at(i)->getID())
+        {
+            m_10heroData.removeAt(i);
+            break;
+        }
+    }
+}
+
+void Control::set10heroData(const QList<Hero *> &temp10heroData)
+{
+    m_10heroData = temp10heroData;
+}
+
