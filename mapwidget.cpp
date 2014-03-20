@@ -121,6 +121,11 @@ void MapWidget::dragMoveEvent(QDragMoveEvent *event)
     event->accept();
 }
 
+void MapWidget::dragLeaveEvent(QDragLeaveEvent *event)
+{
+
+}
+
 void MapWidget::performDrag()
 {
     QDrag *pDrag = new QDrag(this);

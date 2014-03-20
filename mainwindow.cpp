@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
+    QMainWindow(parent), temp_selectedGold(0),
     ui(new Ui::MainWindow)
 {
     //initial the all the widget and background
@@ -300,6 +300,7 @@ void MainWindow::startChooseHero(int count)
     if(count == 4)
     {
         //start next phase
+        setPhaseTurn(3);
     } else {
         emit(initHeroToWidget(GameData->get10heroData()));
         Hero_widget->show();
@@ -324,22 +325,27 @@ void MainWindow::getSelectedGoldSlot(int gold)
     temp_selectedGold = gold;
 }
 
+int MainWindow::getselectedGold() const
+{
+    return temp_selectedGold;
+}
+
 void MainWindow::chooseHeroSLOT()
 {
     selectedGold->hide();
+    disconnect(button, SIGNAL(clicked()), this, SLOT(chooseHeroSLOT()));
     button->hide();
     //decrease the player gold;
     GameData->getPlayerFromID(getPlayerTurn())->setGold(
-                GameData->getPlayerFromID(getPlayerTurn())->getGold() - temp_selectedGold);
+                GameData->getPlayerFromID(getPlayerTurn())->getGold() - getselectedGold());
     refreshPlayerGold();
-    disconnect(button, SIGNAL(clicked()), this, SLOT(chooseHeroSLOT()));
     dice->refreshLabel();
     dice->show();
 }
 
 void MainWindow::checkOwnHero(int dicevalue)
 {
-    int additionDice = temp_selectedGold/5;
+    int additionDice = getselectedGold()/5;
     if(dicevalue + additionDice >= temp_hero->getAttackValue())
     {
         GameData->getPlayerFromID(getPlayerTurn())->setPlayerHero(temp_hero);
@@ -350,7 +356,6 @@ void MainWindow::checkOwnHero(int dicevalue)
         popMessageBox(1);
         startChooseHero(button->objectName().toInt() + 1);
     }
-
     Hero_widget->hide();
     dice->hide();
 }
@@ -371,14 +376,70 @@ void MainWindow::setHeroSlot(HexWidget* tempHexWidget)
     startChooseHero(button->objectName().toInt() + 1);
 }
 
-
-
 /*********************************************************
  *
  * phase 3 function : recruit things
  *
  * *******************************************************/
 
+void MainWindow::startRecruitThings(int count)
+{
+    if(count == 4)
+    {
+        //start next phase
+    } else {
+
+    }
+}
+
+//free recruits
+void MainWindow::freeRecruitThings()
+{
+    int count = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs().size()/2 + 1;
+    vector<Thing *> temp = GameData->getRandomThingFromNum(count);
+    for(int i = 0; i < temp.size(); i++)
+    {
+        GameData->getPlayerFromID(getPlayerTurn())->setPlayerThing(temp.at(i));
+    }
+    refreshThingWidget();
+    paidRecruitThings();
+    temp.clear();
+}
+
+//paid recruits
+void MainWindow::paidRecruitThings()
+{
+    //get the selected gold
+    selectedGold = new SelectGoldWidget(this, GameData->getPlayerFromID(getPlayerTurn())->getGold());
+    connect(selectedGold, SIGNAL(selectedGoldSignal(int)), this, SLOT(getSelectedGoldSlot(int)));
+    selectedGold->move(800,180);
+    selectedGold->show();
+    //up to five paid recruits
+    int count = getselectedGold()/5;
+    if(count > 5)
+    {
+        Message("Warning","Up to 25 gold");
+        paidRecruitThings();
+    } else {
+        vector<Thing *> temp = GameData->getRandomThingFromNum();
+        for(int i = 0; i < temp.size(); i++)
+        {
+            GameData->getPlayerFromID(getPlayerTurn())->setPlayerThing(temp.at(i));
+        }
+        refreshThingWidget();
+        //decrease the player gold
+        int preGold = GameData->getPlayerFromID(getPlayerTurn())->getGold();
+        GameData->getPlayerFromID(getPlayerTurn())->setGold(preGold - getselectedGold());
+        refreshPlayerGold();
+        selectedGold->hide();
+    }
+}
+
+//trades
+void MainWindow::tradeThings()
+{
+
+}
 
 /*********************************************************
  *
@@ -446,6 +507,9 @@ void MainWindow::setPhaseTurn(int value)
         break;
     case 2:
         startChooseHero(0);
+        break;
+    case 3:
+        startRecruitThings(0);
         break;
     default:
         break;
@@ -737,13 +801,14 @@ QRect MainWindow::getMapRect(int index)
 void MainWindow::setThingsRack()
 {
     Things_rack = new MapWidget(this);
-    Things_rack->setFixedSize(500, 240);
-    Things_rack->move(700, 520);
+    //height = 240
+    Things_rack->setFixedWidth(500);
+    Things_rack->move(700, 440);
 }
 //set up the special character widget
 void MainWindow::setHeroWidget()
 {
     Hero_widget = new HeroWidget(this);
-    Hero_widget->setFixedSize(500, 240);
-    Hero_widget->move(700, 280);
+    Hero_widget->setFixedWidth(500);
+    Hero_widget->move(700, 190);
 }

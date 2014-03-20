@@ -24,7 +24,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     void setBackground();
     ~MainWindow();
-
     int getPlayerTurn() const;
     void setPlayerTurn(int value);
     int getPhaseTurn() const;
@@ -34,7 +33,6 @@ public:
     void initMap();
     void initGlodnTower();
     void startInitMap();
-
     QRect getMapRect(int index);
     QList<int> getNearHex(int index);
     void initThing();
@@ -46,22 +44,23 @@ public:
     void checkOwnHero(int dicevalue);
     void enablePlayerMapClick();
     void Message(QString title, QString body);
+    void startRecruitThings(int count);
+    void freeRecruitThings();
+    void paidRecruitThings();
+    int getselectedGold() const;
+    void tradeThings();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void getRequirePlayerIDnPhaseSlot();
     void changePlayerTurnSlot(QAbstractButton *);
     void changePlayerTurnSlot2(QAbstractButton *);
-
     void buttonSlot();
-    void setBuildingToHexSlot(HexWidget *tempHexWidget);    
-
+    void setBuildingToHexSlot(HexWidget *tempHexWidget);
     void initThingSlot();
     void confirmThingSlot();
     void startDragSlot();
-
     void collectGoldSLOT();
     void chooseHeroSLOT();
-
     void heroConfirmSlot(Hero *tempHero);
     void updateDiceValueSlot(int tempdiceValue);
     void setHeroSlot(HexWidget *tempHexWidget);
@@ -74,18 +73,16 @@ signals:
 private:
     Ui::MainWindow       *ui;
     Control              *GameData;
-
     Hero                 *temp_hero;
-    int                  temp_selectedGold = 0;
     MapWidget            *Things_rack;
     QPushButton          *button;
     DiceWidget           *dice;
     SelectGoldWidget     *selectedGold;
+    int                  temp_selectedGold;
     HeroWidget           *Hero_widget;
     vector<HexWidget*>   m_hexWidget;
     int                  playerTurn;
     int                  PhaseTurn;
-
     int getRandomNumber(int range);
     void popMessageBox(int index);
     void disableMapClick();
