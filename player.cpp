@@ -51,6 +51,27 @@ void Player::setPlayerThings(const vector<Thing *> &value)
     playerThings = value;
 }
 
+void Player::deletePlayerThings(QList<Thing *> value)
+{
+    for(int i = 0; i < value.size(); i++)
+    {
+        value.at(i)->setUsed(false);
+        value.at(i)->setInRack(true);
+        for(vector<Thing*>::iterator iter = playerThings.begin();
+            iter != playerThings.end();)
+        {
+            if(value.at(i) == *iter)
+            {
+                qDebug() << 1;
+                playerThings.erase(iter);
+            } else {
+                iter++;
+            }
+        }
+    }
+    qDebug() << playerThings.size();
+}
+
 void Player::setPlayerThing(Thing *value)
 {
     playerThings.push_back(value);

@@ -28,6 +28,7 @@ public:
     vector<Thing *> getPlayerThings() const;
     vector<Thing *> getInRackThings() const;
     void setPlayerThings(const vector<Thing *> &value);
+    void deletePlayerThings(QList<Thing *> value);
     void setPlayerThing(Thing *value);
 
     vector<Building *> getPlayerBuildings() const;

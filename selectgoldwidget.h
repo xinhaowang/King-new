@@ -12,10 +12,9 @@ class SelectGoldWidget : public QWidget
     Q_OBJECT
 public:
     explicit SelectGoldWidget(QWidget *parent = 0);
-    SelectGoldWidget(QWidget *parent = 0, int MaxGold = 0);
 
     void initQlabel();
-    void initQComboBox(int MaxGold);
+    void refreshGoldValue(int MaxGold);
 
 signals:
     void selectedGoldSignal(int gold);

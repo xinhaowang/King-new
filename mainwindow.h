@@ -11,6 +11,7 @@
 #include "control.h"
 #include "dicewidget.h"
 #include "selectgoldwidget.h"
+#include "thingsdropwidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -49,6 +50,7 @@ public:
     void paidRecruitThings();
     int getselectedGold() const;
     void tradeThings();
+    void initAllWidget();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void getRequirePlayerIDnPhaseSlot();
@@ -65,6 +67,11 @@ public slots:
     void updateDiceValueSlot(int tempdiceValue);
     void setHeroSlot(HexWidget *tempHexWidget);
     void getSelectedGoldSlot(int gold);
+    void dropboxSlot(QList<Thing *> tempThings);
+    void tradeboxSlot(QList<Thing *> tempThings);
+    void tradeAndDropThingsSlot();
+    void confirmPaidRecruitThingsSlot();
+    void skipRecruitHeroSlot();
 signals:
     void initThingToRackSignal(vector<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
@@ -78,9 +85,11 @@ private:
     QPushButton          *button;
     DiceWidget           *dice;
     SelectGoldWidget     *selectedGold;
-    int                  temp_selectedGold;
     HeroWidget           *Hero_widget;
     vector<HexWidget*>   m_hexWidget;
+    ThingsDropWidget     *DropBoxWidget;
+    ThingsDropWidget     *TradeBoxWidget;
+    int                  temp_selectedGold;
     int                  playerTurn;
     int                  PhaseTurn;
     int getRandomNumber(int range);

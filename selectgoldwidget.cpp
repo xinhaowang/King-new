@@ -3,19 +3,16 @@
 SelectGoldWidget::SelectGoldWidget(QWidget *parent) :
     QWidget(parent)
 {
-}
-
-SelectGoldWidget::SelectGoldWidget(QWidget *parent, int MaxGold) :
-    QWidget(parent)
-{
+    this->setFixedWidth(80);
     initQlabel();
-    initQComboBox(MaxGold);
+    //initQComboBox(MaxGold);
+    input = new QComboBox(this);
+    input->move(0,20);
 }
 
-void SelectGoldWidget::initQComboBox(int MaxGold)
+void SelectGoldWidget::refreshGoldValue(int MaxGold)
 {
-    input = new QComboBox(this);
-    input->setGeometry(0,20,80,20);
+    input->clear();
     int count = MaxGold / 5;
     for(int i = 0; i <= count; i++)
     {
@@ -27,6 +24,7 @@ void SelectGoldWidget::initQComboBox(int MaxGold)
 void SelectGoldWidget::setSelectedGoldSlot(QString temp)
 {
     selectedGold = temp.toInt();
+    input->clear();
     emit(selectedGoldSignal(selectedGold));
 }
 

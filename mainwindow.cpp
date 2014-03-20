@@ -11,31 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowTitle("King and Thing");
     setThingsRack();
     setHeroWidget();
-
-    //set up the function button
-    button = new QPushButton(this);
-    button->setGeometry(900,190,80,80);
-    button->hide();
-    //set up the dice
-    dice = new DiceWidget(this);
-    dice->setGeometry(900,180,100,100);
-    dice->hide();
-
-    //update dice value
-    connect(dice, SIGNAL(updateDiceValueSignal(int)), this, SLOT(updateDiceValueSlot(int)));
-
-    //send data to the player's rack
-    connect(this, SIGNAL(initThingToRackSignal(vector<Thing*>)),
-            Things_rack, SLOT(initThingToRackSlot(vector<Thing*>)));
-    connect(Things_rack, SIGNAL(startDragSignal()),
-            this, SLOT(startDragSlot()));
-
-    //send data to the hero widget
-    connect(this, SIGNAL(initHeroToWidget(QList<Hero*>)),
-            Hero_widget, SLOT(initHeroToWidgetSlot(QList<Hero*>)));
-    connect(Hero_widget, SIGNAL(heroConfirmSignal(Hero*)),
-            this, SLOT(heroConfirmSlot(Hero*)));
-
+    initAllWidget();
 
     //game start, set player turn and initial the board
     initData();
@@ -44,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setPlayerTurn(1);
     setPhaseTurn(0);
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -82,7 +59,7 @@ void MainWindow::startInitMap()
         for(size_t i = 0; i < temp.size(); i++)
         {
             QList<int> temp2 = getNearHex(temp.at(i)->getID());
-            for(size_t j = 0; j < temp2.size(); j++)
+            for(int j = 0; j < temp2.size(); j++)
             {
                 m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
             }
@@ -304,30 +281,32 @@ void MainWindow::startChooseHero(int count)
     } else {
         emit(initHeroToWidget(GameData->get10heroData()));
         Hero_widget->show();
-        button->setText("confirm");
+        //skip the recuit if player don't want to recruit hero
+        connect(button, SIGNAL(clicked()), this, SLOT(skipRecruitHeroSlot()));
+        button->setText("skip");
         button->setObjectName(QString::number(count));
+        button->show();
     }
+}
+
+void MainWindow::skipRecruitHeroSlot()
+{
+    button->hide();
+    disconnect(button, SIGNAL(clicked()), this, SLOT(skipRecruitHeroSlot()));
+    Hero_widget->hide();
+    popMessageBox(1);
+    startChooseHero(button->objectName().toInt() + 1);
 }
 
 void MainWindow::heroConfirmSlot(Hero *tempHero)
 {
+    button->setText("Confirm");
     connect(button, SIGNAL(clicked()), this, SLOT(chooseHeroSLOT()));
+    button->show();
     temp_hero = tempHero;
-    selectedGold = new SelectGoldWidget(this, GameData->getPlayerFromID(getPlayerTurn())->getGold());
-    connect(selectedGold, SIGNAL(selectedGoldSignal(int)), this, SLOT(getSelectedGoldSlot(int)));
-    selectedGold->move(800,180);
+    selectedGold->refreshGoldValue(GameData->getPlayerFromID(getPlayerTurn())->getGold());
     selectedGold->show();
     button->show();
-}
-
-void MainWindow::getSelectedGoldSlot(int gold)
-{
-    temp_selectedGold = gold;
-}
-
-int MainWindow::getselectedGold() const
-{
-    return temp_selectedGold;
 }
 
 void MainWindow::chooseHeroSLOT()
@@ -388,7 +367,8 @@ void MainWindow::startRecruitThings(int count)
     {
         //start next phase
     } else {
-
+        button->setObjectName(QString::number(count));
+        freeRecruitThings();
     }
 }
 
@@ -397,7 +377,7 @@ void MainWindow::freeRecruitThings()
 {
     int count = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs().size()/2 + 1;
     vector<Thing *> temp = GameData->getRandomThingFromNum(count);
-    for(int i = 0; i < temp.size(); i++)
+    for(size_t i = 0; i < temp.size(); i++)
     {
         GameData->getPlayerFromID(getPlayerTurn())->setPlayerThing(temp.at(i));
     }
@@ -410,10 +390,19 @@ void MainWindow::freeRecruitThings()
 void MainWindow::paidRecruitThings()
 {
     //get the selected gold
-    selectedGold = new SelectGoldWidget(this, GameData->getPlayerFromID(getPlayerTurn())->getGold());
-    connect(selectedGold, SIGNAL(selectedGoldSignal(int)), this, SLOT(getSelectedGoldSlot(int)));
-    selectedGold->move(800,180);
+    selectedGold->refreshGoldValue(GameData->getPlayerFromID(getPlayerTurn())->getGold());
     selectedGold->show();
+    //comfirm button
+    button->setText("Confirm");
+    connect(button, SIGNAL(clicked()), this, SLOT(confirmPaidRecruitThingsSlot()));
+    button->show();
+}
+
+void MainWindow::confirmPaidRecruitThingsSlot()
+{
+    button->hide();
+    selectedGold->hide();
+    disconnect(button, SIGNAL(clicked()), this, SLOT(confirmPaidRecruitThingsSlot()));
     //up to five paid recruits
     int count = getselectedGold()/5;
     if(count > 5)
@@ -421,8 +410,8 @@ void MainWindow::paidRecruitThings()
         Message("Warning","Up to 25 gold");
         paidRecruitThings();
     } else {
-        vector<Thing *> temp = GameData->getRandomThingFromNum();
-        for(int i = 0; i < temp.size(); i++)
+        vector<Thing *> temp = GameData->getRandomThingFromNum(count);
+        for(size_t i = 0; i < temp.size(); i++)
         {
             GameData->getPlayerFromID(getPlayerTurn())->setPlayerThing(temp.at(i));
         }
@@ -431,15 +420,64 @@ void MainWindow::paidRecruitThings()
         int preGold = GameData->getPlayerFromID(getPlayerTurn())->getGold();
         GameData->getPlayerFromID(getPlayerTurn())->setGold(preGold - getselectedGold());
         refreshPlayerGold();
-        selectedGold->hide();
+        //treade things
+        tradeThings();
     }
 }
 
-//trades
+//trade and drop Things
 void MainWindow::tradeThings()
-{
+{    
+    DropBoxWidget->show();
+    TradeBoxWidget->show();
 
+    //set up the confirm button
+    button->setText("Finished");
+    connect(button, SIGNAL(clicked()), this, SLOT(tradeAndDropThingsSlot()));
+    button->show();
 }
+
+void MainWindow::tradeAndDropThingsSlot()
+{
+    //check the player rack is within 10 things
+    if(GameData->getPlayerFromID(getPlayerTurn())->getInRackThings().size() > 10){
+        Message("Warning", "Rack over 10 Things");
+    } else {
+        DropBoxWidget->hide();
+        TradeBoxWidget->hide();
+        button->hide();
+        disconnect(button, SIGNAL(clicked()), this, SLOT(tradeAndDropThingsSlot()));
+        popMessageBox(1);
+        startRecruitThings(button->objectName().toInt() + 1);
+    }
+}
+
+//dropbox slot
+void MainWindow::dropboxSlot(QList<Thing *> tempThings)
+{
+    //delete the things in the player
+    GameData->getPlayerFromID(getPlayerTurn())->deletePlayerThings(tempThings);
+}
+
+void MainWindow::tradeboxSlot(QList<Thing *> tempThings)
+{
+    //delete the things in the player
+    GameData->getPlayerFromID(getPlayerTurn())->deletePlayerThings(tempThings);
+    //send player new things
+    int count = tempThings.size()/2;
+    vector<Thing *> tempThing = GameData->getRandomThingFromNum(count);
+    for(size_t i = 0; i < tempThing.size(); i++)
+    {
+        GameData->getPlayerFromID(getPlayerTurn())->setPlayerThing(tempThing.at(i));
+    }
+    refreshThingWidget();
+}
+
+/*********************************************************
+ *
+ * phase 5 function : movement phase
+ *
+ * *******************************************************/
 
 /*********************************************************
  *
@@ -563,6 +601,16 @@ void MainWindow::refreshPlayerGold()
     ui->Player4_Gold->setText(QString::number(player4));
 }
 
+void MainWindow::getSelectedGoldSlot(int gold)
+{
+    temp_selectedGold = gold;
+}
+
+int MainWindow::getselectedGold() const
+{
+    return temp_selectedGold;
+}
+
 void MainWindow::updateDiceValueSlot(int tempdiceValue)
 {
     if(getPhaseTurn() == 2)
@@ -576,6 +624,7 @@ void MainWindow::Message(QString title, QString body)
     QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, title, body);
     message->setIconPixmap(QPixmap(":/palyer/image/things/player_battle_building/Thing26.jpg"));
     message->exec();
+    delete message;
 }
 
 //popup message box change next player
@@ -596,6 +645,7 @@ void MainWindow::popMessageBox(int index)
         break;
     }
     message->exec();
+    delete message;
 }
 
 void MainWindow::changePlayerTurnSlot(QAbstractButton*)
@@ -804,11 +854,53 @@ void MainWindow::setThingsRack()
     //height = 240
     Things_rack->setFixedWidth(500);
     Things_rack->move(700, 440);
+    //send data to the player's rack
+    connect(this, SIGNAL(initThingToRackSignal(vector<Thing*>)),
+            Things_rack, SLOT(initThingToRackSlot(vector<Thing*>)));
+    connect(Things_rack, SIGNAL(startDragSignal()),
+            this, SLOT(startDragSlot()));
 }
 //set up the special character widget
 void MainWindow::setHeroWidget()
 {
     Hero_widget = new HeroWidget(this);
-    Hero_widget->setFixedWidth(500);
-    Hero_widget->move(700, 190);
+    Hero_widget->setFixedSize(500,240);
+    Hero_widget->move(700, 230);
+    //send data to the hero widget
+    connect(this, SIGNAL(initHeroToWidget(QList<Hero*>)),
+            Hero_widget, SLOT(initHeroToWidgetSlot(QList<Hero*>)));
+    connect(Hero_widget, SIGNAL(heroConfirmSignal(Hero*)),
+            this, SLOT(heroConfirmSlot(Hero*)));
+}
+
+void MainWindow::initAllWidget()
+{
+    //set up the function button
+    button = new QPushButton(this);
+    button->setGeometry(900,150,80,80);
+    button->hide();
+    //set up the dice
+    dice = new DiceWidget(this);
+    dice->setGeometry(900,140,100,100);
+    dice->hide();
+    connect(dice, SIGNAL(updateDiceValueSignal(int)), this, SLOT(updateDiceValueSlot(int)));
+    //set up the selected gold widget
+    selectedGold = new SelectGoldWidget(this);
+    connect(selectedGold, SIGNAL(selectedGoldSignal(int)), this, SLOT(getSelectedGoldSlot(int)));
+    selectedGold->move(800,140);
+    selectedGold->hide();
+    //set up the dropbox
+    DropBoxWidget = new ThingsDropWidget(this);
+    DropBoxWidget->setGeometry(800,300,100,100);
+    DropBoxWidget->setDropBox();
+    connect(DropBoxWidget, SIGNAL(tradeThingsSignal(QList<Thing*>)),
+            this, SLOT(dropboxSlot(QList<Thing*>)));
+    DropBoxWidget->hide();
+    //set up the tradebox
+    TradeBoxWidget = new ThingsDropWidget(this);
+    TradeBoxWidget->setGeometry(950,300,100,100);
+    TradeBoxWidget->setTradeBox();
+    connect(TradeBoxWidget, SIGNAL(tradeThingsSignal(QList<Thing*>)),
+            this, SLOT(tradeboxSlot(QList<Thing*>)));
+    TradeBoxWidget->hide();
 }

@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     herolabel.cpp \
     dicewidget.cpp \
     herowidget.cpp \
-    selectgoldwidget.cpp
+    selectgoldwidget.cpp \
+    thingsdropwidget.cpp
 
 HEADERS  += mainwindow.h \
     player.h \
@@ -44,7 +45,8 @@ HEADERS  += mainwindow.h \
     herolabel.h \
     dicewidget.h \
     herowidget.h \
-    selectgoldwidget.h
+    selectgoldwidget.h \
+    thingsdropwidget.h
 
 FORMS    += mainwindow.ui \
     combat.ui
