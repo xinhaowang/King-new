@@ -62,11 +62,13 @@ void MainWindow::startInitMap()
             for(int j = 0; j < temp2.size(); j++)
             {
                 m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
+                m_hexWidget.at(temp2.at(j))->setIsEnableDrag(true);
             }
         }
         for(size_t i = 0; i < temp.size(); i++)
         {
             temp.at(i)->setIsEnabledClick(false);
+            temp.at(i)->setIsEnableDrag(false);
         }
     }
 }
@@ -135,6 +137,7 @@ void MainWindow::initThingSlot()
     vector<Thing *> temp = GameData->getRandomThingFromNum(10);
     //set the thing to the player
     GameData->getPlayerFromID(getPlayerTurn())->setPlayerThings(temp);
+    //refresh the thingWidget
     refreshThingWidget();
     disconnect(button,SIGNAL(clicked()),this,SLOT(initThingSlot()));
     button->setText("Next");
@@ -165,7 +168,7 @@ void MainWindow::confirmThingSlot()
     }
 }
 
-void MainWindow::startDragSlot()
+void MainWindow::startDragSlot(QList<mylabel*> tempLabel)
 {
     vector<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
     for(size_t i = 0; i < temp.size(); i++)
@@ -241,12 +244,11 @@ void MainWindow::collectGoldSLOT()
     for(size_t i = 0; i < tempHex.size(); i++)
     {
         vector<mylabel *> tempLabel = tempHex.at(i)->thingsLabel();
-        for(size_t j = 0; j < tempLabel.size(); i++)
+        for(size_t j = 0; j < tempLabel.size(); j++)
         {
             //Things is special income and map the terrain
-            if(tempLabel[j]->getData()->getType() == 7 &&
-                    (tempLabel[j]->getData()->getTerrainType() == tempHex.at(i)->hexData()->getTypeID() ||
-                     tempLabel[j]->getData()->getTerrainType() == 0))
+            if(tempLabel.at(j)->getData()->getType() == 7 &&
+                    tempLabel.at(j)->getData()->getTerrainType() == tempHex.at(i)->hexData()->getTypeID())
             {
                 amount += tempLabel[j]->getData()->getAttackValue();
             }
@@ -258,6 +260,7 @@ void MainWindow::collectGoldSLOT()
             amount += 1;
         }
     }
+    tempHex.clear();
     //set the new gold
     GameData->getPlayerFromID(getPlayerTurn())->setGold(amount);
     refreshPlayerGold();
@@ -281,6 +284,7 @@ void MainWindow::startChooseHero(int count)
     } else {
         emit(initHeroToWidget(GameData->get10heroData()));
         Hero_widget->show();
+        Things_rack->hide();
         //skip the recuit if player don't want to recruit hero
         connect(button, SIGNAL(clicked()), this, SLOT(skipRecruitHeroSlot()));
         button->setText("skip");
@@ -300,6 +304,8 @@ void MainWindow::skipRecruitHeroSlot()
 
 void MainWindow::heroConfirmSlot(Hero *tempHero)
 {
+    disconnect(button, SIGNAL(clicked()), this, SLOT(skipRecruitHeroSlot()));
+    button->hide();
     button->setText("Confirm");
     connect(button, SIGNAL(clicked()), this, SLOT(chooseHeroSLOT()));
     button->show();
@@ -328,28 +334,32 @@ void MainWindow::checkOwnHero(int dicevalue)
     if(dicevalue + additionDice >= temp_hero->getAttackValue())
     {
         GameData->getPlayerFromID(getPlayerTurn())->setPlayerHero(temp_hero);
+        //reduce from the controller
+        GameData->removeHeroFromID(temp_hero->getID());
         Message("Message", "Win a Hero");
-        enablePlayerMapClick();
+        enablePlayerMapClick();        
+        Hero_widget->hide();
     } else {
         Message("Message", "Lose");
         popMessageBox(1);
+        Hero_widget->hide();
         startChooseHero(button->objectName().toInt() + 1);
     }
-    Hero_widget->hide();
     dice->hide();
 }
 
 void MainWindow::setHeroSlot(HexWidget* tempHexWidget)
 {
-    //reduce from the controller
-    GameData->removeHeroFromID(temp_hero->getID());
-    //set up the hero on the hex
+    //show the hero on the hex
     temp_hero->setMode(SmallIcon_Mode);
     HeroLabel *tempHero = new HeroLabel(temp_hero, tempHexWidget);
-    tempHexWidget->setHeroLabel(tempHero);
     tempHero->setGeometry(12,35,30,30);
     tempHero->show();
-    disableMapClick();
+    //set up the hero on the hex
+    tempHexWidget->setHeroLabel(tempHero);
+    tempHero->clear();
+    //change next player
+    disableMapClickandDrag();
     Hero_widget->hide();
     popMessageBox(1);
     startChooseHero(button->objectName().toInt() + 1);
@@ -366,6 +376,7 @@ void MainWindow::startRecruitThings(int count)
     if(count == 4)
     {
         //start next phase
+        setPhaseTurn(5);
     } else {
         button->setObjectName(QString::number(count));
         freeRecruitThings();
@@ -475,10 +486,81 @@ void MainWindow::tradeboxSlot(QList<Thing *> tempThings)
 
 /*********************************************************
  *
- * phase 5 function : movement phase
+ * phase 5 function : movement phases
  *
  * *******************************************************/
+void MainWindow::startMovement(int count)
+{
+    if(count == 4)
+    {
+        //next phase
+    } else {
+        button->setObjectName(QString::number(count));
+        button->setText("Finished");
+        connect(button,SIGNAL(clicked()),this,SLOT(finishedMovementSlot()));
+        button->show();
+        //hide the movement widget
+        MovementWidget->hide();
+        //disable the click of the things rack
+        Things_rack->hide();
+        //enable the hex click for this player
+        enablePlayerMapClick();
+    }
+}
 
+void MainWindow::finishedMovementSlot()
+{
+    //diable all the hex click and drag
+    disableMapClickandDrag();
+    button->hide();
+    disconnect(button,SIGNAL(clicked()),this,SLOT(finishedMovementSlot()));
+    popMessageBox(1);
+    startMovement(button->objectName().toInt());
+}
+
+void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
+{
+    //show the move widget
+    QRect temp = getMapRect(tempHex->getID());
+    MovementWidget->move(temp.x()+114,temp.y());
+    vector<mylabel*> tempThingsLabel = tempHex->thingsLabel();
+    vector<Thing*> tempThings;
+    for(size_t i = 0; i < tempThingsLabel.size(); i++)
+    {
+        tempThings.push_back(tempThingsLabel.at(i)->getData());
+    }
+    emit(initThingsToMovementWidget(tempThings));
+    MovementWidget->show();
+    //disable all the hex drag
+    disableMapDrag();
+    //enable the nearby hex drag
+    enableNearHexDrag(tempHex->getID());
+    //set the selected hex
+    selectedHex = tempHex;
+}
+
+void MainWindow::movePhaseStartDragSlot(QList<mylabel*> tempLabel)
+{
+    //hidden the widget
+    MovementWidget->hide();
+    //delete the ThingsLabel data in the previous Hex
+    selectedHex->deleteThingsLabel(tempLabel);
+}
+
+void MainWindow::sendbackThingToHexSlot(const QList<Thing *> *tempThing)
+{
+    //set the things back to the hex because there are too many things in
+    //the hex
+    if(tempThing)
+    {
+        for(int i = 0; i < tempThing->size(); i++)
+        {
+            tempThing->at(i)->setMode(SmallIcon_Mode);
+            mylabel *tempLabel = new mylabel(tempThing->at(i), selectedHex);
+            selectedHex->setThingsLabel(tempLabel);
+        }
+    }
+}
 /*********************************************************
  *
  * general function
@@ -493,17 +575,113 @@ QList<int> MainWindow::getNearHex(int index)
     case 0:
         temp << 1 << 2 << 3;
         break;
+    case 1:
+        temp << 0 << 2 << 4 << 5;
+        break;
+    case 2:
+        temp << 0 << 1 << 5 << 6 << 7 << 3;
+        break;
+    case 3:
+        temp << 0 << 2 << 7 << 8;
+        break;
     case 4:
-        temp << 1 << 5 << 9 << 10;
+        temp << 9 << 10 << 5 << 1;
+        break;
+    case 5:
+        temp << 1 << 4 << 10 << 11 << 6 << 2;
+        break;
+    case 6:
+        temp << 2 << 5 << 11 << 12 << 13 << 7;
+        break;
+    case 7:
+        temp << 3 << 2 << 6 << 13 << 14 << 8;
         break;
     case 8:
         temp << 3 << 7 << 14 << 15;
         break;
+    case 9:
+        temp << 16 << 10 << 4;
+        break;
+    case 10:
+        temp << 4 << 9 << 16 << 17 << 11 << 5;
+        break;
+    case 11:
+        temp << 5 << 10 << 17 << 18 << 12 << 6;
+        break;
+    case 12:
+        temp << 6 << 11 << 18 << 19 << 20 << 13;
+        break;
+    case 13:
+        temp << 7 << 6 << 12 << 20 << 21 << 14;
+        break;
+    case 14:
+        temp << 8 << 7 << 13 << 21 << 22 << 15;
+        break;
+    case 15:
+        temp << 8 << 14 << 22;
+        break;
+    case 16:
+        temp << 9 << 10 << 17 << 23;
+        break;
+    case 17:
+        temp << 10 << 16 << 23 << 24 << 18 << 11;
+        break;
+    case 18:
+        temp << 11 << 17 << 24 << 25 << 19 << 12;
+        break;
+    case 19:
+        temp << 12 << 18 << 25 << 26 << 27 << 20;
+        break;
+    case 20:
+        temp << 13 << 12 << 19 << 27 << 28 << 21;
+        break;
+    case 21:
+        temp << 14 << 13 << 20 << 28 << 29 << 22;
+        break;
+    case 22:
+        temp << 15 << 14 << 21 << 29;
+        break;
+    case 23:
+        temp << 16 << 17 << 24 << 30;
+        break;
+    case 24:
+        temp << 17 << 23 << 30 << 31 << 25 << 18;
+        break;
+    case 25:
+        temp << 18 << 24 << 31 << 32 << 26 << 19;
+        break;
+    case 26:
+        temp << 19 << 25 << 32 << 33 << 34 << 27;
+        break;
+    case 27:
+        temp << 20 << 19 << 26 << 34 << 35 << 28;
+        break;
+    case 28:
+        temp << 21 << 20 << 27 << 35 << 36 << 29;
+        break;
+    case 29:
+        temp << 22 << 21 << 28 << 36;
+        break;
+    case 30:
+        temp << 23 << 24 << 31;
+        break;
     case 31:
         temp << 30 << 24 << 25 << 32;
         break;
+    case 32:
+        temp << 31 << 25 << 26 << 33;
+        break;
+    case 33:
+        temp << 32 << 26 << 34;
+        break;
+    case 34:
+        temp << 33 << 26 << 27 << 35;
+        break;
     case 35:
-        temp << 34 << 28 << 27 << 36;
+        temp << 34 << 27 << 28 << 36;
+        break;
+    case 36:
+        temp << 35 << 28 << 29;
         break;
     default:
         break;
@@ -514,6 +692,15 @@ QList<int> MainWindow::getNearHex(int index)
 int MainWindow::getPlayerTurn() const
 {
     return playerTurn;
+}
+
+void MainWindow::enableNearHexDrag(int hexID)
+{
+    QList<int> temp2 = getNearHex(hexID);
+    for(int j = 0; j < temp2.size(); j++)
+    {
+        m_hexWidget.at(temp2.at(j))->setIsEnableDrag(true);
+    }
 }
 
 void MainWindow::setPlayerTurn(int value)
@@ -549,6 +736,9 @@ void MainWindow::setPhaseTurn(int value)
     case 3:
         startRecruitThings(0);
         break;
+    case 5:
+        startMovement(0);
+        break;
     default:
         break;
     }
@@ -563,11 +753,28 @@ void MainWindow::enablePlayerMapClick()
     }
 }
 
-void MainWindow::disableMapClick()
+void MainWindow::enablePlayerMapDrag()
+{
+    vector<HexWidget*> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    for(size_t i = 0; i < temp.size(); i++)
+    {
+        temp[i]->setIsEnableDrag(true);
+    }
+}
+
+void MainWindow::disableMapClickandDrag()
 {
     for(size_t i = 0; i < m_hexWidget.size(); i++)
     {
         m_hexWidget[i]->setIsEnabledClick(false);
+        m_hexWidget[i]->setIsEnableDrag(false);
+    }
+}
+
+void MainWindow::disableMapDrag()
+{
+    for(size_t i = 0; i < m_hexWidget.size(); i++)
+    {
         m_hexWidget[i]->setIsEnableDrag(false);
     }
 }
@@ -585,8 +792,8 @@ int MainWindow::getRandomNumber(int range)
 }
 void MainWindow::refreshThingWidget()
 {
-    Things_rack->show();
     emit(initThingToRackSignal(GameData->getPlayerFromID(getPlayerTurn())->getInRackThings()));
+    Things_rack->show();
 }
 
 void MainWindow::refreshPlayerGold()
@@ -619,6 +826,15 @@ void MainWindow::updateDiceValueSlot(int tempdiceValue)
     }
 }
 
+void MainWindow::sendbackThingToRackSlot(const QList<Thing*> *pList)
+{
+    for(int i = 0; i < pList->size(); i++)
+    {
+        pList->at(i)->setInRack(true);
+    }
+    refreshThingWidget();
+}
+
 void MainWindow::Message(QString title, QString body)
 {
     QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, title, body);
@@ -630,7 +846,7 @@ void MainWindow::Message(QString title, QString body)
 //popup message box change next player
 void MainWindow::popMessageBox(int index)
 {
-    disableMapClick();
+    disableMapClickandDrag();
     Things_rack->hide();
     QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, "Next Player", "Next player Turn");
     message->setIconPixmap(QPixmap(":/palyer/image/things/player_battle_building/Thing26.jpg"));
@@ -718,6 +934,12 @@ void MainWindow::initMap()
                 this, SLOT(setBuildingToHexSlot(HexWidget*)));
         connect(tempHexWidget, SIGNAL(setHeroSignal(HexWidget*)),
                 this, SLOT(setHeroSlot(HexWidget*)));
+        connect(tempHexWidget, SIGNAL(setThingsToMoveWidgetSignal(HexWidget*)),
+                this, SLOT(getHexForMoveWidgetSlot(HexWidget*)));
+        connect(tempHexWidget, SIGNAL(sendbackThingSignal(const QList<Thing*>*)),
+                this, SLOT(sendbackThingToRackSlot(const QList<Thing*>*)));
+        connect(tempHexWidget, SIGNAL(sendThingsBackToHex(const QList<Thing*>*)),
+                this, SLOT(sendbackThingToHexSlot(const QList<Thing*>*)));
         //show that this widget is unowned
         tempHexWidget->setObjectName("0");
         tempHexWidget->setID(i);
@@ -854,18 +1076,20 @@ void MainWindow::setThingsRack()
     //height = 240
     Things_rack->setFixedWidth(500);
     Things_rack->move(700, 440);
+    Things_rack->hide();
     //send data to the player's rack
     connect(this, SIGNAL(initThingToRackSignal(vector<Thing*>)),
             Things_rack, SLOT(initThingToRackSlot(vector<Thing*>)));
-    connect(Things_rack, SIGNAL(startDragSignal()),
-            this, SLOT(startDragSlot()));
+    connect(Things_rack, SIGNAL(startDragSignal(QList<mylabel*>)),
+            this, SLOT(startDragSlot(QList<mylabel*>)));
 }
 //set up the special character widget
 void MainWindow::setHeroWidget()
 {
     Hero_widget = new HeroWidget(this);
     Hero_widget->setFixedSize(500,240);
-    Hero_widget->move(700, 230);
+    Hero_widget->move(700, 440);
+    Hero_widget->hide();
     //send data to the hero widget
     connect(this, SIGNAL(initHeroToWidget(QList<Hero*>)),
             Hero_widget, SLOT(initHeroToWidgetSlot(QList<Hero*>)));
@@ -903,4 +1127,13 @@ void MainWindow::initAllWidget()
     connect(TradeBoxWidget, SIGNAL(tradeThingsSignal(QList<Thing*>)),
             this, SLOT(tradeboxSlot(QList<Thing*>)));
     TradeBoxWidget->hide();
+    //set up the movement widget
+    MovementWidget = new MapWidget(this);
+    MovementWidget->setFixedSize(500,240);
+    MovementWidget->hide();
+    MovementWidget->setStyleSheet("background-color:white");
+    connect(this,SIGNAL(initThingsToMovementWidget(vector<Thing*>)),
+            MovementWidget, SLOT(initThingToRackSlot(vector<Thing*>)));
+    connect(MovementWidget,SIGNAL(startDragSignal(QList<mylabel*>)),
+            this,SLOT(movePhaseStartDragSlot(QList<mylabel*>)));
 }

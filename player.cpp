@@ -62,14 +62,12 @@ void Player::deletePlayerThings(QList<Thing *> value)
         {
             if(value.at(i) == *iter)
             {
-                qDebug() << 1;
                 playerThings.erase(iter);
             } else {
                 iter++;
             }
         }
     }
-    qDebug() << playerThings.size();
 }
 
 void Player::setPlayerThing(Thing *value)

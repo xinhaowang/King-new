@@ -28,7 +28,9 @@ mylabel::mylabel(Thing *thingData, QWidget *parent):m_thingData(thingData),QLabe
 
 }
 
-mylabel::~mylabel() {}
+mylabel::~mylabel() {
+    this->clear();
+}
 
 void mylabel::resizeEvent(QResizeEvent *event)
 {

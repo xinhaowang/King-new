@@ -40,7 +40,8 @@ protected:
     bool isInVector(mylabel *tempThingLabel);
 
 signals:
-    void startDragSignal();
+    void startDragSignal(QList<mylabel*>);
+
 private:
     int                 iconMode;
     vector<mylabel*>    m_thingsLabel;

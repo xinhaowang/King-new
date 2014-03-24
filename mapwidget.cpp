@@ -16,6 +16,7 @@ void MapWidget::initThingToRackSlot(vector<Thing*> tempThings)
     clear();
     for(size_t i = 0; i < tempThings.size(); i++)
     {
+        tempThings.at(i)->setMode(BigIcon_Mode);
         mylabel *tempThingLabel = new mylabel(tempThings[i], this);
         m_thingsLabel.push_back(tempThingLabel);
     }
@@ -96,7 +97,6 @@ void MapWidget::clear()
 {
     qDeleteAll(m_thingsLabel);
     m_thingsLabel.clear();
-    qDeleteAll(m_selectThingsLabel);
     m_selectThingsLabel.clear();
 }
 
@@ -134,7 +134,6 @@ void MapWidget::performDrag()
     for(size_t i = 0; i < m_selectThingsLabel.size(); i++)
     {
         pList->append(m_selectThingsLabel[i]->getData());
-        m_selectThingsLabel[i]->getData()->setInRack(false);
     }
 
     pData->setDragDatas("ThingMimeData",pList);
@@ -144,7 +143,12 @@ void MapWidget::performDrag()
     pDrag->setPixmap(pixmap);
 
     //inform the mainwindow to show the dragable hex
-    emit(startDragSignal());
+    QList<mylabel*> templabel;
+    for(size_t i = 0; i < m_selectThingsLabel.size(); i++)
+    {
+        templabel.push_back(m_selectThingsLabel.at(i));
+    }
+    emit(startDragSignal(templabel));
     //delete all the selected things when we drag them
     for(size_t a = 0; a < m_selectThingsLabel.size(); a++)
     {
@@ -152,12 +156,13 @@ void MapWidget::performDrag()
         {
             if(*iter == m_selectThingsLabel[a])
             {
-                iter = m_thingsLabel.erase(iter);
+                m_thingsLabel.erase(iter);
             } else {
                 iter++;
             }
         }
     }
+    //delete all the label in the things rack
     qDeleteAll(m_selectThingsLabel);
     m_selectThingsLabel.clear();
 

@@ -51,6 +51,10 @@ public:
     int getselectedGold() const;
     void tradeThings();
     void initAllWidget();
+    void startMovement(int count);
+    void enableNearHexDrag(int hexID);
+    void enablePlayerMapDrag();
+    void disableMapDrag();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void getRequirePlayerIDnPhaseSlot();
@@ -60,7 +64,7 @@ public slots:
     void setBuildingToHexSlot(HexWidget *tempHexWidget);
     void initThingSlot();
     void confirmThingSlot();
-    void startDragSlot();
+    void startDragSlot(QList<mylabel *> tempLabel);
     void collectGoldSLOT();
     void chooseHeroSLOT();
     void heroConfirmSlot(Hero *tempHero);
@@ -72,21 +76,31 @@ public slots:
     void tradeAndDropThingsSlot();
     void confirmPaidRecruitThingsSlot();
     void skipRecruitHeroSlot();
+    void getHexForMoveWidgetSlot(HexWidget *tempHex);
+    void movePhaseStartDragSlot(QList<mylabel *> tempLabel);
+    void sendbackThingToRackSlot(const QList<Thing *> *pList);
+    void finishedMovementSlot();
+    void sendbackThingToHexSlot(const QList<Thing *> *tempThing);
+
+
 signals:
     void initThingToRackSignal(vector<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
     void initHeroToWidget(QList<Hero*> herolist);
+    void initThingsToMovementWidget(vector<Thing*>);
 
 private:
     Ui::MainWindow       *ui;
     Control              *GameData;
     Hero                 *temp_hero;
     MapWidget            *Things_rack;
+    MapWidget            *MovementWidget;
     QPushButton          *button;
     DiceWidget           *dice;
     SelectGoldWidget     *selectedGold;
     HeroWidget           *Hero_widget;
     vector<HexWidget*>   m_hexWidget;
+    HexWidget            *selectedHex;
     ThingsDropWidget     *DropBoxWidget;
     ThingsDropWidget     *TradeBoxWidget;
     int                  temp_selectedGold;
@@ -94,7 +108,7 @@ private:
     int                  PhaseTurn;
     int getRandomNumber(int range);
     void popMessageBox(int index);
-    void disableMapClick();
+    void disableMapClickandDrag();
 };
 
 #endif // MAINWINDOW_H

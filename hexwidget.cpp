@@ -58,6 +58,7 @@ HeroLabel *HexWidget::heroLabel() const
 void HexWidget::setHeroLabel(HeroLabel *heroLabel)
 {
     m_heroLabel = heroLabel;
+
 }
 
 Hex *HexWidget::hexData() const
@@ -143,9 +144,28 @@ vector<mylabel *> HexWidget::thingsLabel() const
     return m_thingsLabel;
 }
 
-void HexWidget::setThingsLabel(const vector<mylabel *> &thingsLabel)
+void HexWidget::setThingsLabel(mylabel* thingsLabel)
 {
-    m_thingsLabel = thingsLabel;
+    m_thingsLabel.push_back(thingsLabel);
+    refreshMyLabel();
+}
+
+void HexWidget::deleteThingsLabel(QList<mylabel *> tempthingsLabel)
+{
+    for(int i = 0; i < tempthingsLabel.size(); i++)
+    {
+        for(vector<mylabel *>::iterator iter = m_thingsLabel.begin();
+            iter != m_thingsLabel.end();)
+        {
+            if(tempthingsLabel.at(i)->getData()->getID() == (*iter)->getData()->getID())
+            {
+                delete *iter;
+                iter = m_thingsLabel.erase(iter);
+            } else {
+                iter++;
+            }
+        }
+    }
 }
 /********************************************************************
  *
@@ -174,6 +194,9 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
             emit(setBulidngSingal(this));
         } else if (isEnabledClick && phase == 2) {
             emit(setHeroSignal(this));
+        } else if (isEnabledClick && phase == 5) {
+            //movement phase
+            emit(setThingsToMoveWidgetSignal(this));
         }
     }
 }
@@ -221,15 +244,32 @@ void HexWidget::dropEvent(QDropEvent *event)
     emit(requirePlayerIDnPhaseSignal());
     const ThingMimeData *pMimeData = (const ThingMimeData*)event->mimeData();
     const QList<Thing*>* pList = pMimeData->thingDragData();
-    if(pList)
+    //check the total things should be no more than 10
+    if(m_thingsLabel.size() + pList->size() > 10)
     {
-        for(int i = 0; i < pList->size(); i++)
+        QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, "Warning", "Too many things");
+        message->setIconPixmap(QPixmap(":/palyer/image/things/player_battle_building/Thing26.jpg"));
+        message->exec();
+        if(phase == 5)
         {
-            pList->at(i)->setMode(SmallIcon_Mode);
-            mylabel *tempLabel = new mylabel(pList->at(i), this);
-            m_thingsLabel.push_back(tempLabel);
+            emit(sendThingsBackToHex(pList));
+        } else {
+        //send back the qlist            
+            emit(sendbackThingSignal(pList));
         }
-        event->accept();
+        delete message;
+    } else {
+        if(pList)
+        {
+            for(int i = 0; i < pList->size(); i++)
+            {
+                pList->at(i)->setMode(SmallIcon_Mode);
+                pList->at(i)->setInRack(false);
+                mylabel *tempLabel = new mylabel(pList->at(i), this);
+                m_thingsLabel.push_back(tempLabel);
+            }
+            event->accept();
+        }
     }
     refreshMyLabel();
 }

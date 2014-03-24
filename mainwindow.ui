@@ -46,8 +46,11 @@
       <x>800</x>
       <y>80</y>
       <width>80</width>
-      <height>80</height>
+      <height>21</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: white;</string>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -59,8 +62,11 @@
       <x>1100</x>
       <y>80</y>
       <width>80</width>
-      <height>80</height>
+      <height>21</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: white;</string>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -72,8 +78,11 @@
       <x>1000</x>
       <y>80</y>
       <width>80</width>
-      <height>80</height>
+      <height>21</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: white;</string>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -85,8 +94,11 @@
       <x>900</x>
       <y>80</y>
       <width>80</width>
-      <height>80</height>
+      <height>21</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: white;</string>
     </property>
     <property name="text">
      <string>TextLabel</string>
@@ -99,7 +111,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>23</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

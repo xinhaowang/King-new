@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QStyleOption>
 #include <QPainter>
+#include <QMessageBox>
 #include "ThingMimeData.h"
 #include "hex.h"
 #include "mylabel.h"
@@ -34,7 +35,8 @@ public:
     void setBuilding(Building *building);
 
     vector<mylabel *> thingsLabel() const;
-    void setThingsLabel(const vector<mylabel *> &thingsLabel);
+    void setThingsLabel(mylabel *thingsLabel);
+    void deleteThingsLabel(QList<mylabel *> tempthingsLabel);
 
     Hex *hexData() const;
     void setHexData(Hex *hexData);
@@ -53,6 +55,9 @@ signals:
     void requirePlayerIDnPhaseSignal();
     void setBulidngSingal(HexWidget*);
     void setHeroSignal(HexWidget*);
+    void setThingsToMoveWidgetSignal(HexWidget*);
+    void sendThingsBackToHex(const QList<Thing*>*);
+    void sendbackThingSignal(const QList<Thing*>*);
 
 public slots:
     void setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase);
