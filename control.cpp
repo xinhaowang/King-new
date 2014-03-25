@@ -54,11 +54,11 @@ void Control::addThing(Thing *tempThing)
 
 void Control::deleteThing(int thingID)
 {
-   for(size_t i = 0; i < m_thingData.size(); i++)
+   for(int i = 0; i < m_thingData.size(); i++)
    {
         if(m_thingData[i]->getID() == thingID)
         {
-            vector<Thing*>::iterator it = m_thingData.begin();
+            QList<Thing*>::iterator it = m_thingData.begin();
             it = it + i;
             m_thingData.erase(it);
             break;
@@ -70,7 +70,7 @@ void Control::deleteThing(Thing *tempThing)
 {
     if(tempThing)
     {
-        vector<Thing*>::iterator it = m_thingData.begin();
+        QList<Thing*>::iterator it = m_thingData.begin();
         for(it; it != m_thingData.end(); ++it)
         {
             if(tempThing == *it)
@@ -86,7 +86,7 @@ Thing* Control::getThingFromID(int thingID)
 {
     if(thingID)
     {
-        for(size_t i = 0; i < m_thingData.size(); i++)
+        for(int i = 0; i < m_thingData.size(); i++)
         {
             if(thingID == m_thingData[i]->getID())
             {
@@ -96,9 +96,9 @@ Thing* Control::getThingFromID(int thingID)
     }
 }
 
-vector<Thing *> Control::getRandomThingFromNum(int count)
+QList<Thing *> Control::getRandomThingFromNum(int count)
 {
-    vector<Thing *> temp;
+    QList<Thing *> temp;
     while(true)
     {
         if(count == 0)
@@ -121,13 +121,13 @@ vector<Thing *> Control::getRandomThingFromNum(int count)
 
 void Control::changeIconMode(int mode)
 {
-    for(size_t i = 0; i < m_thingData.size(); i++)
+    for(int i = 0; i < m_thingData.size(); i++)
     {
         m_thingData[i]->setMode(mode);
     }
 }
 
-vector<Thing *> Control::getAllThings()
+QList<Thing *> Control::getAllThings()
 {
     return m_thingData;
 }
@@ -161,7 +161,7 @@ void Control::initPlayers()
 
 Player *Control::getPlayerFromID(int playerID)
 {
-    for(size_t i = 0; i < m_playerData.size(); i++)
+    for(int i = 0; i < m_playerData.size(); i++)
     {
         if(playerID == m_playerData[i]->getID())
         {
@@ -199,22 +199,22 @@ void Control::initHex()
     m_hex.push_back(hex8);
 }
 
-vector<Hex *> Control::hex() const
+QList<Hex *> Control::hex() const
 {
     return m_hex;
 }
 
-void Control::setHex(const vector<Hex *> &hex)
+void Control::setHex(const QList<Hex *> &hex)
 {
     m_hex = hex;
 }
 
-vector<Hex *> Control::get37hex() const
+QList<Hex *> Control::get37hex() const
 {
     return m_37hex;
 }
 
-void Control::set37hex(const vector<Hex *> &temp37hex)
+void Control::set37hex(const QList<Hex *> &temp37hex)
 {
     m_37hex = temp37hex;
 }
@@ -241,14 +241,14 @@ void Control::initBuilding()
     m_building.push_back(building4);
 }
 
-vector<Building *> Control::building() const
+QList<Building *> Control::building() const
 {
     return m_building;
 }
 
 Building* Control::getBuildingFromID(int buildingID) const
 {
-    for(size_t i = 0; i< m_building.size(); i++)
+    for(int i = 0; i< m_building.size(); i++)
     {
         if(m_building.at(i)->getID() == buildingID)
         {
@@ -257,7 +257,7 @@ Building* Control::getBuildingFromID(int buildingID) const
     }
 }
 
-void Control::setBuilding(const vector<Building *> &building)
+void Control::setBuilding(const QList<Building *> &building)
 {
     m_building = building;
 }
@@ -309,7 +309,7 @@ void Control::chooseTenRandomHeros()
             continue;
         }
         bool same = false;
-        for(size_t i = 0; i < tempint.size(); i++)
+        for(int i = 0; i < tempint.size(); i++)
         {
             if(random == tempint.at(i))
             {
@@ -327,7 +327,7 @@ void Control::chooseTenRandomHeros()
             }
         }
     }
-    for(size_t i = 0; i < tempint.size(); i++)
+    for(int i = 0; i < tempint.size(); i++)
     {
         m_10heroData.push_back(temp.at(tempint.at(i)));
     }

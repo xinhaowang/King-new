@@ -28,15 +28,15 @@ void Player::setGold(int value)
 {
     Gold = value;
 }
-vector<Thing *> Player::getPlayerThings() const
+QList<Thing *> Player::getPlayerThings() const
 {
     return playerThings;
 }
 
-vector<Thing *> Player::getInRackThings() const
+QList<Thing *> Player::getInRackThings() const
 {
-    vector<Thing *> tempThing;
-    for(size_t i = 0; i < playerThings.size(); i++)
+    QList<Thing *> tempThing;
+    for(int i = 0; i < playerThings.size(); i++)
     {
         if(playerThings[i]->getInRack())
         {
@@ -46,7 +46,7 @@ vector<Thing *> Player::getInRackThings() const
     return tempThing;
 }
 
-void Player::setPlayerThings(const vector<Thing *> &value)
+void Player::setPlayerThings(const QList<Thing *> &value)
 {
     playerThings = value;
 }
@@ -57,14 +57,11 @@ void Player::deletePlayerThings(QList<Thing *> value)
     {
         value.at(i)->setUsed(false);
         value.at(i)->setInRack(true);
-        for(vector<Thing*>::iterator iter = playerThings.begin();
-            iter != playerThings.end();)
+        for(int i = 0; i < playerThings.size(); i++)
         {
-            if(value.at(i) == *iter)
+            if(value.at(i) == playerThings.at(i))
             {
-                playerThings.erase(iter);
-            } else {
-                iter++;
+                playerThings.removeAt(i);
             }
         }
     }
@@ -82,12 +79,12 @@ void Player::setAllThingsMovementCount(int count)
         playerThings.at(i)->setMovementCount(count);
     }
 }
-vector<Building *> Player::getPlayerBuildings() const
+QList<Building *> Player::getPlayerBuildings() const
 {
     return playerBuildings;
 }
 
-void Player::setPlayerBuildings(const vector<Building *> &value)
+void Player::setPlayerBuildings(const QList<Building *> &value)
 {
     playerBuildings = value;
 }
@@ -97,7 +94,7 @@ void Player::setPlayerBuilding(Building *value)
     playerBuildings.push_back(value);
 }
 
-vector<Hero *> Player::getPlayerHeros() const
+QList<Hero *> Player::getPlayerHeros() const
 {
     return playerHeros;
 }
@@ -107,16 +104,16 @@ void Player::setPlayerHero(Hero *value)
     playerHeros.push_back(value);
 }
 
-void Player::setPlayerHeros(const vector<Hero *> &value)
+void Player::setPlayerHeros(const QList<Hero *> &value)
 {
     playerHeros = value;
 }
-vector<HexWidget *> Player::getPlayerHexs() const
+QList<HexWidget *> Player::getPlayerHexs() const
 {
     return playerHexs;
 }
 
-void Player::setPlayerHexs(const vector<HexWidget *> &value)
+void Player::setPlayerHexs(const QList<HexWidget *> &value)
 {
     playerHexs = value;
 }

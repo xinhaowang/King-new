@@ -13,12 +13,12 @@ HeroWidget::~HeroWidget()
 void HeroWidget::initHeroToWidgetSlot(QList<Hero *> tempHeros)
 {
     clear();    
-    for(size_t i = 0; i < tempHeros.size(); i++)
+    for(int i = 0; i < tempHeros.size(); i++)
     {
         HeroLabel *tempHeroLabel = new HeroLabel(tempHeros.at(i), this);
         m_heroLabel.push_back(tempHeroLabel);
     }
-    for(size_t i = 0; i < m_heroLabel.size(); i++)
+    for(int i = 0; i < m_heroLabel.size(); i++)
     {
         QRect rect = getHeroRect(i);
         m_heroLabel.at(i)->setGeometry(rect);
@@ -31,14 +31,14 @@ void HeroWidget::mousePressEvent(QMouseEvent *event)
     if(Qt::LeftButton == event->button())
     {
         bool chooseFlag = false;
-        for(size_t i = 0; i < m_heroLabel.size(); i++)
+        for(int i = 0; i < m_heroLabel.size(); i++)
         {
             if(m_heroLabel.at(i)->selected())
             {
                 chooseFlag = true;
             }
         }
-        for(size_t i = 0; i < m_heroLabel.size(); i++)
+        for(int i = 0; i < m_heroLabel.size(); i++)
         {
             QRect rect = getHeroRect(i);
             if(rect.contains(event->pos()))
@@ -88,7 +88,7 @@ void HeroWidget::clear()
 
 void HeroWidget::reLayoutIconSlot()
 {
-    for(size_t i = 0; i < m_heroLabel.size(); i++)
+    for(int i = 0; i < m_heroLabel.size(); i++)
     {
         QRect rect = getHeroRect(i);
         m_heroLabel.at(i)->setGeometry(rect);

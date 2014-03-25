@@ -2,7 +2,7 @@
 #define BUILDING_H
 
 #include <QString>
-#include <vector>
+#include <QList>
 #include <QDebug>
 
 using namespace std;

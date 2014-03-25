@@ -19,7 +19,7 @@ public:
     ~MapWidget();
 
 public slots:
-    void initThingToRackSlot(vector<Thing*> tempThings);
+    void initThingToRackSlot(QList<Thing*> tempThings);
 
 private slots:
     void reLayoutIconSlot();
@@ -37,15 +37,15 @@ protected:
     void performDrag();
     void selectThing();
     void unSelectThing();
-    bool isInVector(mylabel *tempThingLabel);
+    bool isInQList(mylabel *tempThingLabel);
 
 signals:
     void startDragSignal(QList<mylabel*>);
 
 private:
     int                 iconMode;
-    vector<mylabel*>    m_thingsLabel;
-    vector<mylabel*>    m_selectThingsLabel;
+    QList<mylabel*>    m_thingsLabel;
+    QList<mylabel*>    m_selectThingsLabel;
     QPoint              m_mousePressPosn;
     QPoint              m_mousePosn;
 

@@ -59,8 +59,8 @@ void MainWindow::startInitMap()
             m_hexWidget[35]->setSelectState(4);
         }
     } else {
-        vector<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
-        for(size_t i = 0; i < temp.size(); i++)
+        QList<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+        for(int i = 0; i < temp.size(); i++)
         {
             QList<int> temp2 = getNearHex(temp.at(i)->getID());
             for(int j = 0; j < temp2.size(); j++)
@@ -70,7 +70,7 @@ void MainWindow::startInitMap()
                 m_hexWidget.at(temp2.at(j))->setSelectState(4);
             }
         }
-        for(size_t i = 0; i < temp.size(); i++)
+        for(int i = 0; i < temp.size(); i++)
         {
             temp.at(i)->setIsEnabledClick(false);
             temp.at(i)->setIsEnableDrag(false);
@@ -104,7 +104,7 @@ void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
     if(count == 4)
     {
         //show up all the other hex
-        for(size_t i = 0; i < m_hexWidget.size(); i++)
+        for(int i = 0; i < m_hexWidget.size(); i++)
         {
             if(m_hexWidget.at(i)->objectName() == "0")
             {
@@ -151,7 +151,7 @@ void MainWindow::initThing()
 
 void MainWindow::initThingSlot()
 {
-    vector<Thing *> temp = GameData->getRandomThingFromNum(10);
+    QList<Thing *> temp = GameData->getRandomThingFromNum(10);
     //set the thing to the player
     GameData->getPlayerFromID(getPlayerTurn())->setPlayerThings(temp);
     //refresh the thingWidget
@@ -169,7 +169,7 @@ void MainWindow::confirmThingSlot()
     popMessageBox(1);
 
     int count = 0;
-    for(size_t i = 0; i < 4; i++)
+    for(int i = 0; i < 4; i++)
     {
         if(GameData->getPlayerFromID(i+1)->getPlayerThings().size() != 0)
         {
@@ -187,8 +187,8 @@ void MainWindow::confirmThingSlot()
 
 void MainWindow::startDragSlot(QList<mylabel*>)
 {
-    vector<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
-    for(size_t i = 0; i < temp.size(); i++)
+    QList<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    for(int i = 0; i < temp.size(); i++)
     {
         temp.at(i)->setIsEnableDrag(true);
     }
@@ -246,10 +246,10 @@ void MainWindow::collectGoldSLOT()
     disconnect(button, SIGNAL(clicked()), this, SLOT(collectGoldSLOT()));
     int amount = GameData->getPlayerFromID(getPlayerTurn())->getGold();
     //hex you control
-    vector<HexWidget *> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    QList<HexWidget *> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
     amount += tempHex.size();
     //combat value of forks
-    for(size_t i = 0; i < tempHex.size(); i++)
+    for(int i = 0; i < tempHex.size(); i++)
     {
         Building *tempBuilding = tempHex.at(i)->building();
         if(tempBuilding != NULL)
@@ -258,10 +258,10 @@ void MainWindow::collectGoldSLOT()
         }
     }
     //special income and hero
-    for(size_t i = 0; i < tempHex.size(); i++)
+    for(int i = 0; i < tempHex.size(); i++)
     {
-        vector<mylabel *> tempLabel = tempHex.at(i)->thingsLabel();
-        for(size_t j = 0; j < tempLabel.size(); j++)
+        QList<mylabel *> tempLabel = tempHex.at(i)->thingsLabel();
+        for(int j = 0; j < tempLabel.size(); j++)
         {
             //Things is special income and map the terrain
             if(tempLabel.at(j)->getData()->getType() == 7 &&
@@ -404,8 +404,8 @@ void MainWindow::startRecruitThings(int count)
 void MainWindow::freeRecruitThings()
 {
     int count = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs().size()/2 + 1;
-    vector<Thing *> temp = GameData->getRandomThingFromNum(count);
-    for(size_t i = 0; i < temp.size(); i++)
+    QList<Thing *> temp = GameData->getRandomThingFromNum(count);
+    for(int i = 0; i < temp.size(); i++)
     {
         GameData->getPlayerFromID(getPlayerTurn())->setPlayerThing(temp.at(i));
     }
@@ -438,8 +438,8 @@ void MainWindow::confirmPaidRecruitThingsSlot()
         Message("Warning","Up to 25 gold");
         paidRecruitThings();
     } else {
-        vector<Thing *> temp = GameData->getRandomThingFromNum(count);
-        for(size_t i = 0; i < temp.size(); i++)
+        QList<Thing *> temp = GameData->getRandomThingFromNum(count);
+        for(int i = 0; i < temp.size(); i++)
         {
             GameData->getPlayerFromID(getPlayerTurn())->setPlayerThing(temp.at(i));
         }
@@ -493,8 +493,8 @@ void MainWindow::tradeboxSlot(QList<Thing *> tempThings)
     GameData->getPlayerFromID(getPlayerTurn())->deletePlayerThings(tempThings);
     //send player new things
     int count = tempThings.size()/2;
-    vector<Thing *> tempThing = GameData->getRandomThingFromNum(count);
-    for(size_t i = 0; i < tempThing.size(); i++)
+    QList<Thing *> tempThing = GameData->getRandomThingFromNum(count);
+    for(int i = 0; i < tempThing.size(); i++)
     {
         GameData->getPlayerFromID(getPlayerTurn())->setPlayerThing(tempThing.at(i));
     }
@@ -541,7 +541,7 @@ void MainWindow::finishedMovementSlot()
 
 void MainWindow::deleteAllSeaHex()
 {
-    for(size_t i = 0; i < m_hexWidget.size(); i++)
+    for(int i = 0; i < m_hexWidget.size(); i++)
     {
         //if the hex is sea , delete all the things
         if(m_hexWidget.at(i)->hexData()->getTypeID() == 1)
@@ -557,9 +557,9 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
     QRect temp = getMapRect(tempHex->getID());
     MovementWidget->move(temp.x()+114,temp.y());
     //get the things that belong to this player
-    vector<mylabel*> tempThingsLabel = tempHex->getPlayerThingsLabel(getPlayerTurn());
-    vector<Thing*> tempThings;
-    for(size_t i = 0; i < tempThingsLabel.size(); i++)
+    QList<mylabel*> tempThingsLabel = tempHex->getPlayerThingsLabel(getPlayerTurn());
+    QList<Thing*> tempThings;
+    for(int i = 0; i < tempThingsLabel.size(); i++)
     {
         //special income can't move
         if(tempThingsLabel.at(i)->getData()->getType() != 7)
@@ -593,8 +593,8 @@ void MainWindow::refreshClickStateSlot()
     //enable hex owned click
     enablePlayerMapClick();
     //enable the near sea click
-    vector<HexWidget*> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
-    for(size_t i = 0; i < tempHex.size(); i++)
+    QList<HexWidget*> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    for(int i = 0; i < tempHex.size(); i++)
     {
         QList<int> temp = getNearHex(tempHex.at(i)->getID());
         for(int j = 0; j < temp.size(); j++)
@@ -819,8 +819,8 @@ void MainWindow::setPhaseTurn(int value)
 
 void MainWindow::enablePlayerMapClick()
 {
-    vector<HexWidget*> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
-    for(size_t i = 0; i < temp.size(); i++)
+    QList<HexWidget*> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    for(int i = 0; i < temp.size(); i++)
     {
         temp[i]->setIsEnabledClick(true);
     }
@@ -828,8 +828,8 @@ void MainWindow::enablePlayerMapClick()
 
 void MainWindow::enablePlayerMapDrag()
 {
-    vector<HexWidget*> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
-    for(size_t i = 0; i < temp.size(); i++)
+    QList<HexWidget*> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    for(int i = 0; i < temp.size(); i++)
     {
         temp[i]->setIsEnableDrag(true);
     }
@@ -837,7 +837,7 @@ void MainWindow::enablePlayerMapDrag()
 
 void MainWindow::disableMapClickandDrag()
 {
-    for(size_t i = 0; i < m_hexWidget.size(); i++)
+    for(int i = 0; i < m_hexWidget.size(); i++)
     {
         m_hexWidget[i]->setIsEnabledClick(false);
         m_hexWidget[i]->setIsEnableDrag(false);
@@ -846,7 +846,7 @@ void MainWindow::disableMapClickandDrag()
 
 void MainWindow::disableMapDrag()
 {
-    for(size_t i = 0; i < m_hexWidget.size(); i++)
+    for(int i = 0; i < m_hexWidget.size(); i++)
     {
         m_hexWidget[i]->setIsEnableDrag(false);
     }
@@ -1000,7 +1000,7 @@ void MainWindow::initData()
 //initial all the Hex in the map
 void MainWindow::initMap()
 {
-    for(size_t i = 0; i < 37; i++)
+    for(int i = 0; i < 37; i++)
     {
         HexWidget *tempHexWidget = new HexWidget(this->centralWidget(),
                                                  GameData->get37hex().at(i));
@@ -1162,8 +1162,8 @@ void MainWindow::setThingsRack()
     Things_rack->move(700, 440);
     Things_rack->hide();
     //send data to the player's rack
-    connect(this, SIGNAL(initThingToRackSignal(vector<Thing*>)),
-            Things_rack, SLOT(initThingToRackSlot(vector<Thing*>)));
+    connect(this, SIGNAL(initThingToRackSignal(QList<Thing*>)),
+            Things_rack, SLOT(initThingToRackSlot(QList<Thing*>)));
     connect(Things_rack, SIGNAL(startDragSignal(QList<mylabel*>)),
             this, SLOT(startDragSlot(QList<mylabel*>)));
 }
@@ -1185,7 +1185,7 @@ void MainWindow::initAllWidget()
 {
     //set up the function button
     button = new QPushButton(this);
-    button->setGeometry(900,150,80,80);
+    button->setGeometry(1000,150,80,80);
     button->hide();
     //set up the dice
     dice = new DiceWidget(this);
@@ -1215,8 +1215,8 @@ void MainWindow::initAllWidget()
     MovementWidget = new MapWidget(this);
     MovementWidget->setFixedSize(500,240);
     MovementWidget->hide();
-    connect(this,SIGNAL(initThingsToMovementWidget(vector<Thing*>)),
-            MovementWidget, SLOT(initThingToRackSlot(vector<Thing*>)));
+    connect(this,SIGNAL(initThingsToMovementWidget(QList<Thing*>)),
+            MovementWidget, SLOT(initThingToRackSlot(QList<Thing*>)));
     connect(MovementWidget,SIGNAL(startDragSignal(QList<mylabel*>)),
             this,SLOT(movePhaseStartDragSlot(QList<mylabel*>)));
 

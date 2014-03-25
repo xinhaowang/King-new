@@ -86,10 +86,10 @@ public slots:
     void sendbackOneThingToHexSlot(Thing *tempThing);
     void refreshClickStateSlot();
 signals:
-    void initThingToRackSignal(vector<Thing*> m_thingData);
+    void initThingToRackSignal(QList<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
     void initHeroToWidget(QList<Hero*> herolist);
-    void initThingsToMovementWidget(vector<Thing*>);
+    void initThingsToMovementWidget(QList<Thing*>);
 
 private:
     Ui::MainWindow       *ui;
@@ -101,7 +101,7 @@ private:
     DiceWidget           *dice;
     SelectGoldWidget     *selectedGold;
     HeroWidget           *Hero_widget;
-    vector<HexWidget*>   m_hexWidget;
+    QList<HexWidget*>   m_hexWidget;
     HexWidget            *selectedHex;
     ThingsDropWidget     *DropBoxWidget;
     ThingsDropWidget     *TradeBoxWidget;

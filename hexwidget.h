@@ -34,7 +34,7 @@ public:
     Building *building() const;
     void setBuilding(Building *building);
 
-    vector<mylabel *> thingsLabel() const;
+    QList<mylabel *> thingsLabel() const;
     void setThingsLabel(mylabel *thingsLabel);
     void deleteThingsLabel(QList<mylabel *> tempthingsLabel);
     void returnAllThings();
@@ -46,7 +46,7 @@ public:
     void setHeroLabel(HeroLabel *heroLabel);
 
     void Message(QString title, QString body);
-    vector<mylabel *> getPlayerThingsLabel(int playerID);
+    QList<mylabel *> getPlayerThingsLabel(int playerID);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -77,7 +77,7 @@ private:
     bool                isEnabledClick;
     bool                battle;
     Hex                 *m_hexData;
-    vector<mylabel *>   m_thingsLabel;
+    QList<mylabel *>   m_thingsLabel;
     Building            *m_building;
     HeroLabel           *m_heroLabel;
 };

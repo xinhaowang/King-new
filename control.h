@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QFile>
 #include <QList>
-#include <vector>
+#include <QList>
 #include <QMimeData>
 #include <QDebug>
 #include <QMessageBox>
@@ -29,25 +29,25 @@ public:
     void deleteThing(Thing* tempThing);
     void changeIconMode(int mode);
     size_t getSize() {  return m_thingData.size(); }
-    vector<Thing*> getAllThings();
+    QList<Thing*> getAllThings();
     Thing *getThing(int index);
     Thing *getThingFromID(int thingID);
-    vector<Thing*> getRandomThingFromNum(int count);
+    QList<Thing*> getRandomThingFromNum(int count);
     //function for players' operation
     void initPlayers();
     Player *getPlayerFromID(int playerID);
     void addHexWidget(HexWidget *tempHexWidget, int playerID);
     //function for hexs' operation
     void initHex();
-    vector<Hex *> hex() const;
-    void setHex(const vector<Hex *> &hex);    
-    vector<Hex *> get37hex() const;
-    void set37hex(const vector<Hex *> &temp37hex);
+    QList<Hex *> hex() const;
+    void setHex(const QList<Hex *> &hex);
+    QList<Hex *> get37hex() const;
+    void set37hex(const QList<Hex *> &temp37hex);
     void init37hex();
     //function for buildings' operation
     void initBuilding();
-    vector<Building *> building() const;
-    void setBuilding(const vector<Building *> &building);
+    QList<Building *> building() const;
+    void setBuilding(const QList<Building *> &building);
     Building *getBuildingFromID(int buildingID) const;
     //fucntion for heros' operation
     void initHero();
@@ -63,11 +63,11 @@ signals:
 public slots:   
 
 private:
-    vector<Thing *>      m_thingData;
-    vector<Player *>     m_playerData;
-    vector<Hex *>        m_hex;
-    vector<Hex *>        m_37hex;
-    vector<Building *>   m_building;
+    QList<Thing *>      m_thingData;
+    QList<Player *>     m_playerData;
+    QList<Hex *>        m_hex;
+    QList<Hex *>        m_37hex;
+    QList<Building *>   m_building;
     QList<Hero *>        m_heroData;
     QList<Hero *>        m_10heroData;
 

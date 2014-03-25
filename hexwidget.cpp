@@ -23,7 +23,7 @@ HexWidget::HexWidget(QWidget *parent, Hex *tempHex) :
 void HexWidget::refreshMyLabel()
 {
     //draw the label
-    for(size_t i = 0; i < m_thingsLabel.size(); i++)
+    for(int i = 0; i < m_thingsLabel.size(); i++)
     {
         switch (playerID) {
         case 1:
@@ -138,17 +138,17 @@ void HexWidget::setBuilding(Building *building)
     m_building = building;
 }
 
-vector<mylabel *> HexWidget::thingsLabel() const
+QList<mylabel *> HexWidget::thingsLabel() const
 {
     return m_thingsLabel;
 }
 
-vector<mylabel *> HexWidget::getPlayerThingsLabel(int playerID)
+QList<mylabel *> HexWidget::getPlayerThingsLabel(int playerID)
 {
-    vector<mylabel *> temp;
+    QList<mylabel *> temp;
     switch (playerID) {
     case 1:
-        for(size_t i = 0; i < m_thingsLabel.size(); i++)
+        for(int i = 0; i < m_thingsLabel.size(); i++)
         {
             if(m_thingsLabel.at(i)->geometry().contains(30,15))
             {
@@ -157,7 +157,7 @@ vector<mylabel *> HexWidget::getPlayerThingsLabel(int playerID)
         }
         break;
     case 2:
-        for(size_t i = 0; i < m_thingsLabel.size(); i++)
+        for(int i = 0; i < m_thingsLabel.size(); i++)
         {
             if(m_thingsLabel.at(i)->geometry().contains(65,15))
             {
@@ -166,7 +166,7 @@ vector<mylabel *> HexWidget::getPlayerThingsLabel(int playerID)
         }
         break;
     case 3:
-        for(size_t i = 0; i < m_thingsLabel.size(); i++)
+        for(int i = 0; i < m_thingsLabel.size(); i++)
         {
             if(m_thingsLabel.at(i)->geometry().contains(25,65))
             {
@@ -175,7 +175,7 @@ vector<mylabel *> HexWidget::getPlayerThingsLabel(int playerID)
         }
         break;
     case 4:
-        for(size_t i = 0; i < m_thingsLabel.size(); i++)
+        for(int i = 0; i < m_thingsLabel.size(); i++)
         {
             if(m_thingsLabel.at(i)->geometry().contains(65,65))
             {
@@ -199,7 +199,7 @@ void HexWidget::deleteThingsLabel(QList<mylabel *> tempthingsLabel)
 {
     for(int i = 0; i < tempthingsLabel.size(); i++)
     {
-        for(vector<mylabel *>::iterator iter = m_thingsLabel.begin();
+        for(QList<mylabel *>::iterator iter = m_thingsLabel.begin();
             iter != m_thingsLabel.end();)
         {
             if(tempthingsLabel.at(i)->getData()->getID() == (*iter)->getData()->getID())
@@ -395,7 +395,7 @@ void HexWidget::dropEvent(QDropEvent *event)
         {
             //check if the hex have hero or special income
             bool checkHeroSpecial = false;
-            for(size_t i = 0; i < m_thingsLabel.size(); i++)
+            for(int i = 0; i < m_thingsLabel.size(); i++)
             {
                 if(m_thingsLabel.at(i)->getData()->getType() == 7)
                 {

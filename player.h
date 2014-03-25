@@ -2,7 +2,7 @@
 #define PLAYER_H
 
 #include <QString>
-#include <vector>
+#include <QList>
 #include <QDebug>
 
 #include "thing.h"
@@ -25,23 +25,23 @@ public:
     int getGold() const;
     void setGold(int value);
 
-    vector<Thing *> getPlayerThings() const;
-    vector<Thing *> getInRackThings() const;
-    void setPlayerThings(const vector<Thing *> &value);
+    QList<Thing *> getPlayerThings() const;
+    QList<Thing *> getInRackThings() const;
+    void setPlayerThings(const QList<Thing *> &value);
     void deletePlayerThings(QList<Thing *> value);
     void setPlayerThing(Thing *value);
     void setAllThingsMovementCount(int count);
 
-    vector<Building *> getPlayerBuildings() const;
-    void setPlayerBuildings(const vector<Building *> &value);
+    QList<Building *> getPlayerBuildings() const;
+    void setPlayerBuildings(const QList<Building *> &value);
     void setPlayerBuilding(Building *value);
 
-    vector<Hero *> getPlayerHeros() const;
+    QList<Hero *> getPlayerHeros() const;
     void setPlayerHero(Hero *value);
-    void setPlayerHeros(const vector<Hero *> &value);
+    void setPlayerHeros(const QList<Hero *> &value);
 
-    vector<HexWidget *> getPlayerHexs() const;
-    void setPlayerHexs(const vector<HexWidget *> &value);
+    QList<HexWidget *> getPlayerHexs() const;
+    void setPlayerHexs(const QList<HexWidget *> &value);
     void setPlayerHex(HexWidget *value);
 
     QString getControlMark() const;
@@ -51,10 +51,10 @@ private:
     int ID;                              //Player ID
     int Gold;                            //The Gold that the player currently owned
     QString controlMark;                 //The control mard url for this player
-    vector<Thing*> playerThings;         //The Things that the player owned
-    vector<Building*> playerBuildings;   //The Forks that the player controled
-    vector<Hero*> playerHeros;           //The Heros that the player controled
-    vector<HexWidget*> playerHexs;       //The Hexs that the player controled
+    QList<Thing*> playerThings;         //The Things that the player owned
+    QList<Building*> playerBuildings;   //The Forks that the player controled
+    QList<Hero*> playerHeros;           //The Heros that the player controled
+    QList<HexWidget*> playerHexs;       //The Hexs that the player controled
 };
 
 #endif // PLAYER_H
