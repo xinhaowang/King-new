@@ -22,25 +22,33 @@ HexWidget::HexWidget(QWidget *parent, Hex *tempHex) :
  * ******************************************************************/
 void HexWidget::refreshMyLabel()
 {
-    //draw the label
+    QList<mylabel*> tempLabel;
     for(int i = 0; i < m_thingsLabel.size(); i++)
+    {
+        if(m_thingsLabel.at(i)->pos() == QPoint(0,0))
+        {
+            tempLabel.push_back(m_thingsLabel.at(i));
+        }
+    }
+    //draw the label
+    for(int i = 0; i < tempLabel.size(); i++)
     {
         switch (playerID) {
         case 1:
-            m_thingsLabel[i]->setGeometry(20,10,80,80);
-            m_thingsLabel[i]->show();
+            tempLabel[i]->setGeometry(15,5,30,30);
+            tempLabel[i]->show();
             break;
         case 2:
-            m_thingsLabel[i]->setGeometry(60,10,80,80);
-            m_thingsLabel[i]->show();
+            tempLabel[i]->setGeometry(65,5,30,30);
+            tempLabel[i]->show();
             break;
         case 3:
-            m_thingsLabel[i]->setGeometry(20,60,80,80);
-            m_thingsLabel[i]->show();
+            tempLabel[i]->setGeometry(15,65,30,30);
+            tempLabel[i]->show();
             break;
         case 4:
-            m_thingsLabel[i]->setGeometry(60,60,80,80);
-            m_thingsLabel[i]->show();
+            tempLabel[i]->setGeometry(65,65,30,30);
+            tempLabel[i]->show();
             break;
         default:
             break;
@@ -337,7 +345,7 @@ void HexWidget::dropEvent(QDropEvent *event)
             }
         }
         //check the total things should be no more than 10
-        if(m_thingsLabel.size() + pList.size() > 10)
+        if(getPlayerThingsLabel(playerID).size() + pList.size() > 10)
         {
             Message("Warning", "Too many things");
             emit(sendThingsBackToHex(pList));
@@ -389,7 +397,7 @@ void HexWidget::dropEvent(QDropEvent *event)
                 event->accept();
             }
         }
-        emit(refreshMapClickState());
+        emit(refreshMapClickState(this));
     } else {
         if(tempList)
         {
@@ -454,6 +462,16 @@ void HexWidget::setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase)
     playerID = tempPlayerID;
     phase = tempPhase;
 }
+bool HexWidget::getBattle() const
+{
+    return battle;
+}
+
+void HexWidget::setBattle(bool value)
+{
+    battle = value;
+}
+
 
 
 

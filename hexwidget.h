@@ -48,6 +48,9 @@ public:
     void Message(QString title, QString body);
     QList<mylabel *> getPlayerThingsLabel(int playerID);
 
+    bool getBattle() const;
+    void setBattle(bool value);
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void dragEnterEvent(QDragEnterEvent *event);
@@ -63,7 +66,7 @@ signals:
     void sendThingsBackToHex(const QList<Thing*>);
     void sendbackThingSignal(Thing *tempThing);
     void sendbackOneThingSignal(Thing*);
-    void refreshMapClickState();
+    void refreshMapClickState(HexWidget*);
 
 public slots:
     void setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase);

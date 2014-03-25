@@ -86,6 +86,7 @@ void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
     QImage tempImage = QImage(GameData->getPlayerFromID(playerID)->getControlMark());
     QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
     QLabel *controlMark = new QLabel(tempHexWidget);
+    controlMark->setObjectName(QString::number(playerID));
     controlMark->setFixedSize(30,30);
     controlMark->setGeometry(42,35,30,30);
     controlMark->setPixmap(pixmap);
@@ -527,9 +528,10 @@ void MainWindow::startMovement(int count)
 
 void MainWindow::finishedMovementSlot()
 {
+    //conquer enemy hex
     //return all the things in the sea
     deleteAllSeaHex();
-    //diable all the hex click and drag
+    //disable all the hex click and drag
     disableMapClickandDrag();
     button->hide();
     disconnect(button,SIGNAL(clicked()),this,SLOT(finishedMovementSlot()));
@@ -557,18 +559,74 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
     QRect temp = getMapRect(tempHex->getID());
     MovementWidget->move(temp.x()+114,temp.y());
     //get the things that belong to this player
-    QList<mylabel*> tempThingsLabel = tempHex->getPlayerThingsLabel(getPlayerTurn());
+    QWidget *controlMark = tempHex->childAt(57,50);
+    int ownPlayer = controlMark->objectName().toInt();
     QList<Thing*> tempThings;
-    for(int i = 0; i < tempThingsLabel.size(); i++)
+
+    if(ownPlayer == getPlayerTurn())
     {
-        //special income can't move
-        if(tempThingsLabel.at(i)->getData()->getType() != 7)
+        QList<mylabel*> tempThingsLabel = tempHex->getPlayerThingsLabel(getPlayerTurn());
+        for(int i = 0; i < tempThingsLabel.size(); i++)
         {
-            tempThings.push_back(tempThingsLabel.at(i)->getData());
+            //special income can't move
+            if(tempThingsLabel.at(i)->getData()->getType() != 7)
+            {
+                tempThings.push_back(tempThingsLabel.at(i)->getData());
+            }
+        }
+    } else {
+        if(tempHex->getPlayerThingsLabel(ownPlayer).size() != 0)
+        {
+            QList<mylabel*> turnPlayerLabel = tempHex->getPlayerThingsLabel(getPlayerTurn());
+            QList<mylabel*> ownPlayerLabel = tempHex->getPlayerThingsLabel(ownPlayer);
+            //calculate the flying creature that the ownPlayer has
+            int ownFlyCreatureCount = 0;
+            for(int i = 0; i < ownPlayerLabel.size(); i++)
+            {
+                if(ownPlayerLabel.at(i)->getData()->getType() == 2)
+                {
+                    ownFlyCreatureCount++;
+                }
+            }
+            //decrease the flying creature in the turnplayer
+            int turnFlyCreatureCount = 0;
+            for(int i = 0; i < turnPlayerLabel.size(); i++)
+            {
+                if(turnPlayerLabel.at(i)->getData()->getType() == 2)
+                {
+                    turnFlyCreatureCount++;
+                }
+            }
+            int count = turnFlyCreatureCount-ownFlyCreatureCount;
+            for(int i = 0; i < turnPlayerLabel.size(); i++)
+            {
+                if(count <= 0)
+                {
+                    break;
+                }
+                if(turnPlayerLabel.at(i)->getData()->getType() == 2)
+                {
+                    tempThings.push_back(turnPlayerLabel.at(i)->getData());
+                    count--;
+                }
+            }
+        } else {
+            QList<mylabel*> tempThingsLabel = tempHex->getPlayerThingsLabel(getPlayerTurn());
+            for(int i = 0; i < tempThingsLabel.size(); i++)
+            {
+                //special income can't move
+                if(tempThingsLabel.at(i)->getData()->getType() != 7)
+                {
+                    tempThings.push_back(tempThingsLabel.at(i)->getData());
+                }
+            }
         }
     }
-    emit(initThingsToMovementWidget(tempThings));
-    MovementWidget->show();
+    if(tempThings.size() != 0)
+    {
+        emit(initThingsToMovementWidget(tempThings));
+        MovementWidget->show();
+    }
     //disable all the hex drag
     disableMapDrag();
     //set the selected hex
@@ -583,13 +641,52 @@ void MainWindow::movePhaseStartDragSlot(QList<mylabel*> tempLabel)
     MovementWidget->hide();
     //delete the ThingsLabel data in the previous Hex
     selectedHex->deleteThingsLabel(tempLabel);
+    if(selectedHex->thingsLabel().size() == 0)
+    {
+        //delete the battle icon
+        if(selectedHex->childAt(57,80))
+        {
+            delete selectedHex->childAt(57,80);
+        }
+    }
 }
 
 //finish the drag behaviour
-void MainWindow::refreshClickStateSlot()
+void MainWindow::refreshClickStateSlot(HexWidget *tempwidget)
 {
+    //check if we should put battle mark on the hex
+    if(tempwidget->childAt(57,50))
+    {
+        //the control mark is not belongs to the player
+        QWidget *controlmark = tempwidget->childAt(57,50);
+        int ownPlayer = controlmark->objectName().toInt();
+        if(ownPlayer != getPlayerTurn())
+        {
+            //the hex contain other player things
+            if(tempwidget->getPlayerThingsLabel(getPlayerTurn()).size() != tempwidget->thingsLabel().size())
+            {
+                //set the battle mark on the hex, this hex is uncontrolled
+                QImage tempImage = QImage(":/palyer/image/things/player_battle_building/Thing26.jpg");
+                QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+                QLabel *battle = new QLabel(tempwidget);
+                battle->setPixmap(pixmap);
+                battle->setGeometry(42,65,30,30);
+                battle->show();
+            }
+            //enable the click of this hex
+            tempwidget->setIsEnabledClick(true);
+        }
+    } else {
+        //set the battle mark on the hex, this hex is uncontrolled
+        QImage tempImage = QImage(":/palyer/image/things/player_battle_building/Thing26.jpg");
+        QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+        QLabel *battle = new QLabel(tempwidget);
+        battle->setPixmap(pixmap);
+        battle->setGeometry(42,65,30,30);
+        battle->show();
+    }
     //disable all the hex drag
-    disableMapClickandDrag();
+    disableMapDrag();
     //enable hex owned click
     enablePlayerMapClick();
     //enable the near sea click
@@ -1022,8 +1119,8 @@ void MainWindow::initMap()
                 this, SLOT(sendbackThingToHexSlot(const QList<Thing*>)));
         connect(tempHexWidget, SIGNAL(sendbackOneThingSignal(Thing*)),
                 this, SLOT(sendbackOneThingToHexSlot(Thing*)));
-        connect(tempHexWidget, SIGNAL(refreshMapClickState()),
-                this, SLOT(refreshClickStateSlot()));
+        connect(tempHexWidget, SIGNAL(refreshMapClickState(HexWidget*)),
+                this, SLOT(refreshClickStateSlot(HexWidget*)));
         //show that this widget is unowned
         tempHexWidget->setObjectName("0");
         tempHexWidget->setID(i);

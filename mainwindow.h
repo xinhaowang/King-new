@@ -84,7 +84,7 @@ public slots:
     void finishedMovementSlot();
     void sendbackThingToHexSlot(const QList<Thing *> tempThing);
     void sendbackOneThingToHexSlot(Thing *tempThing);
-    void refreshClickStateSlot();
+    void refreshClickStateSlot(HexWidget *tempwidget);
 signals:
     void initThingToRackSignal(QList<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
