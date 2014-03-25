@@ -23,7 +23,7 @@ Phase:
 
 things type:
 1. normal
-2. triangle
+2. triangle(flying)
 3. C
 4. R
 5. star
@@ -32,6 +32,7 @@ things type:
 8. triangle and star
 9. star and R
 10. magic
+11. random event
 
 things id:
 0-145 : creatures

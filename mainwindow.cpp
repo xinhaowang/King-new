@@ -41,18 +41,22 @@ void MainWindow::startInitMap()
         if(m_hexWidget[4]->objectName() == "0")
         {
             m_hexWidget[4]->setIsEnabledClick(true);
+            m_hexWidget[4]->setSelectState(4);
         }
         if(m_hexWidget[8]->objectName() == "0")
         {
             m_hexWidget[8]->setIsEnabledClick(true);
+            m_hexWidget[8]->setSelectState(4);
         }
         if(m_hexWidget[31]->objectName() == "0")
         {
             m_hexWidget[31]->setIsEnabledClick(true);
+            m_hexWidget[31]->setSelectState(4);
         }
         if(m_hexWidget[35]->objectName() == "0")
         {
             m_hexWidget[35]->setIsEnabledClick(true);
+            m_hexWidget[35]->setSelectState(4);
         }
     } else {
         vector<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
@@ -63,6 +67,7 @@ void MainWindow::startInitMap()
             {
                 m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
                 m_hexWidget.at(temp2.at(j))->setIsEnableDrag(true);
+                m_hexWidget.at(temp2.at(j))->setSelectState(4);
             }
         }
         for(size_t i = 0; i < temp.size(); i++)
@@ -85,9 +90,6 @@ void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
     controlMark->setGeometry(42,35,30,30);
     controlMark->setPixmap(pixmap);
     controlMark->show();
-    //show the warning message
-    //and call the next player
-    popMessageBox(1);
     //check for next step
     int count = 0;
     for(int i = 1; i < 5; i++)
@@ -101,9 +103,24 @@ void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
     //set up the gold and one tower
     if(count == 4)
     {
-        //init the gold and tower
-        this->initGlodnTower();
+        //show up all the other hex
+        for(size_t i = 0; i < m_hexWidget.size(); i++)
+        {
+            if(m_hexWidget.at(i)->objectName() == "0")
+            {
+                m_hexWidget.at(i)->setObjectName("1");
+                m_hexWidget.at(i)->setSelectState(0);
+            }
+        }
+        //show the warning message
+        //and call the next player
+        popMessageBox(1);
+        //init the gold and tower        
+        initGlodnTower();
     } else {
+        //show the warning message
+        //and call the next player
+        popMessageBox(1);
         startInitMap();
     }
 }
@@ -168,7 +185,7 @@ void MainWindow::confirmThingSlot()
     }
 }
 
-void MainWindow::startDragSlot(QList<mylabel*> tempLabel)
+void MainWindow::startDragSlot(QList<mylabel*>)
 {
     vector<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
     for(size_t i = 0; i < temp.size(); i++)
@@ -510,12 +527,28 @@ void MainWindow::startMovement(int count)
 
 void MainWindow::finishedMovementSlot()
 {
+    //return all the things in the sea
+    deleteAllSeaHex();
     //diable all the hex click and drag
     disableMapClickandDrag();
     button->hide();
     disconnect(button,SIGNAL(clicked()),this,SLOT(finishedMovementSlot()));
+    //reset all the things movment count
+    resetAllThingMovementCount();
     popMessageBox(1);
-    startMovement(button->objectName().toInt());
+    startMovement(button->objectName().toInt()+1);
+}
+
+void MainWindow::deleteAllSeaHex()
+{
+    for(size_t i = 0; i < m_hexWidget.size(); i++)
+    {
+        //if the hex is sea , delete all the things
+        if(m_hexWidget.at(i)->hexData()->getTypeID() == 1)
+        {
+            m_hexWidget.at(i)->returnAllThings();
+        }
+    }
 }
 
 void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
@@ -523,44 +556,84 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
     //show the move widget
     QRect temp = getMapRect(tempHex->getID());
     MovementWidget->move(temp.x()+114,temp.y());
-    vector<mylabel*> tempThingsLabel = tempHex->thingsLabel();
+    //get the things that belong to this player
+    vector<mylabel*> tempThingsLabel = tempHex->getPlayerThingsLabel(getPlayerTurn());
     vector<Thing*> tempThings;
     for(size_t i = 0; i < tempThingsLabel.size(); i++)
     {
-        tempThings.push_back(tempThingsLabel.at(i)->getData());
+        //special income can't move
+        if(tempThingsLabel.at(i)->getData()->getType() != 7)
+        {
+            tempThings.push_back(tempThingsLabel.at(i)->getData());
+        }
     }
     emit(initThingsToMovementWidget(tempThings));
     MovementWidget->show();
     //disable all the hex drag
     disableMapDrag();
-    //enable the nearby hex drag
-    enableNearHexDrag(tempHex->getID());
     //set the selected hex
     selectedHex = tempHex;
 }
 
 void MainWindow::movePhaseStartDragSlot(QList<mylabel*> tempLabel)
 {
+    //enable the nearby hex drag
+    enableNearHexDrag(selectedHex->getID());
     //hidden the widget
     MovementWidget->hide();
     //delete the ThingsLabel data in the previous Hex
     selectedHex->deleteThingsLabel(tempLabel);
 }
 
-void MainWindow::sendbackThingToHexSlot(const QList<Thing *> *tempThing)
+//finish the drag behaviour
+void MainWindow::refreshClickStateSlot()
+{
+    //disable all the hex drag
+    disableMapClickandDrag();
+    //enable hex owned click
+    enablePlayerMapClick();
+    //enable the near sea click
+    vector<HexWidget*> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    for(size_t i = 0; i < tempHex.size(); i++)
+    {
+        QList<int> temp = getNearHex(tempHex.at(i)->getID());
+        for(int j = 0; j < temp.size(); j++)
+        {
+            if(m_hexWidget.at(temp.at(j))->hexData()->getTypeID() == 1)
+            {
+                m_hexWidget.at(temp.at(j))->setIsEnabledClick(true);
+            }
+        }
+    }
+}
+
+void MainWindow::sendbackThingToHexSlot(const QList<Thing *> tempThing)
 {
     //set the things back to the hex because there are too many things in
     //the hex
-    if(tempThing)
+    if(tempThing.size() != 0)
     {
-        for(int i = 0; i < tempThing->size(); i++)
+        for(int i = 0; i < tempThing.size(); i++)
         {
-            tempThing->at(i)->setMode(SmallIcon_Mode);
-            mylabel *tempLabel = new mylabel(tempThing->at(i), selectedHex);
+            tempThing.at(i)->setMode(SmallIcon_Mode);
+            mylabel *tempLabel = new mylabel(tempThing.at(i), selectedHex);
             selectedHex->setThingsLabel(tempLabel);
         }
     }
 }
+
+void MainWindow::sendbackOneThingToHexSlot(Thing* tempThing)
+{
+    tempThing->setMode(SmallIcon_Mode);
+    mylabel *tempLabel = new mylabel(tempThing, selectedHex);
+    selectedHex->setThingsLabel(tempLabel);
+}
+
+void MainWindow::resetAllThingMovementCount()
+{
+    GameData->getPlayerFromID(getPlayerTurn())->setAllThingsMovementCount(4);
+}
+
 /*********************************************************
  *
  * general function
@@ -826,12 +899,9 @@ void MainWindow::updateDiceValueSlot(int tempdiceValue)
     }
 }
 
-void MainWindow::sendbackThingToRackSlot(const QList<Thing*> *pList)
+void MainWindow::sendbackThingToRackSlot(Thing *tempThing)
 {
-    for(int i = 0; i < pList->size(); i++)
-    {
-        pList->at(i)->setInRack(true);
-    }
+    tempThing->setInRack(true);
     refreshThingWidget();
 }
 
@@ -847,6 +917,16 @@ void MainWindow::Message(QString title, QString body)
 void MainWindow::popMessageBox(int index)
 {
     disableMapClickandDrag();
+    if(PhaseTurn == 0)
+    {
+        for(int i = 0; i < m_hexWidget.size(); i++)
+        {
+            if(m_hexWidget.at(i)->objectName() == "0")
+            {
+                m_hexWidget.at(i)->setSelectState(3);
+            }
+        }
+    }
     Things_rack->hide();
     QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, "Next Player", "Next player Turn");
     message->setIconPixmap(QPixmap(":/palyer/image/things/player_battle_building/Thing26.jpg"));
@@ -936,10 +1016,14 @@ void MainWindow::initMap()
                 this, SLOT(setHeroSlot(HexWidget*)));
         connect(tempHexWidget, SIGNAL(setThingsToMoveWidgetSignal(HexWidget*)),
                 this, SLOT(getHexForMoveWidgetSlot(HexWidget*)));
-        connect(tempHexWidget, SIGNAL(sendbackThingSignal(const QList<Thing*>*)),
-                this, SLOT(sendbackThingToRackSlot(const QList<Thing*>*)));
-        connect(tempHexWidget, SIGNAL(sendThingsBackToHex(const QList<Thing*>*)),
-                this, SLOT(sendbackThingToHexSlot(const QList<Thing*>*)));
+        connect(tempHexWidget, SIGNAL(sendbackThingSignal(Thing*)),
+                this, SLOT(sendbackThingToRackSlot(Thing*)));
+        connect(tempHexWidget, SIGNAL(sendThingsBackToHex(const QList<Thing*>)),
+                this, SLOT(sendbackThingToHexSlot(const QList<Thing*>)));
+        connect(tempHexWidget, SIGNAL(sendbackOneThingSignal(Thing*)),
+                this, SLOT(sendbackOneThingToHexSlot(Thing*)));
+        connect(tempHexWidget, SIGNAL(refreshMapClickState()),
+                this, SLOT(refreshClickStateSlot()));
         //show that this widget is unowned
         tempHexWidget->setObjectName("0");
         tempHexWidget->setID(i);
@@ -1131,9 +1215,9 @@ void MainWindow::initAllWidget()
     MovementWidget = new MapWidget(this);
     MovementWidget->setFixedSize(500,240);
     MovementWidget->hide();
-    MovementWidget->setStyleSheet("background-color:white");
     connect(this,SIGNAL(initThingsToMovementWidget(vector<Thing*>)),
             MovementWidget, SLOT(initThingToRackSlot(vector<Thing*>)));
     connect(MovementWidget,SIGNAL(startDragSignal(QList<mylabel*>)),
             this,SLOT(movePhaseStartDragSlot(QList<mylabel*>)));
+
 }

@@ -30,6 +30,7 @@ public:
     void setPlayerThings(const vector<Thing *> &value);
     void deletePlayerThings(QList<Thing *> value);
     void setPlayerThing(Thing *value);
+    void setAllThingsMovementCount(int count);
 
     vector<Building *> getPlayerBuildings() const;
     void setPlayerBuildings(const vector<Building *> &value);

@@ -16,6 +16,8 @@ Thing::Thing(int tempID, int tempAttackValue, int tempType, int tempTerrainType,
     terrainType = tempTerrainType;
     //initial the Qimage for the thing
     image = QImage(tempUrl);
+    //each things have four movement count
+    movementCount = 4;
 }
 int Thing::getID() const
 {
@@ -109,6 +111,16 @@ void Thing::setMode(int value)
 {
     mode = value;
 }
+int Thing::getMovementCount() const
+{
+    return movementCount;
+}
+
+void Thing::setMovementCount(int value)
+{
+    movementCount = value;
+}
+
 
 
 

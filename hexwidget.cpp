@@ -8,12 +8,11 @@ HexWidget::HexWidget(QWidget *parent) :
 HexWidget::HexWidget(QWidget *parent, Hex *tempHex) :
     QWidget(parent), m_hexData(tempHex), m_building(NULL), m_heroLabel(NULL)
 {
-    this->setStyleSheet("border-image: url(:/background/image/background/white.jpg)");
-    oldStyle = this->styleSheet();
     this->setAcceptDrops(false);
     this->setIsEnabledClick(false);
     this->setIsEnableDrag(false);
-    this->setSelectState(0);
+    this->setSelectState(3);
+    battle = false;
 }
 
 /********************************************************************
@@ -144,6 +143,52 @@ vector<mylabel *> HexWidget::thingsLabel() const
     return m_thingsLabel;
 }
 
+vector<mylabel *> HexWidget::getPlayerThingsLabel(int playerID)
+{
+    vector<mylabel *> temp;
+    switch (playerID) {
+    case 1:
+        for(size_t i = 0; i < m_thingsLabel.size(); i++)
+        {
+            if(m_thingsLabel.at(i)->geometry().contains(30,15))
+            {
+                temp.push_back(m_thingsLabel.at(i));
+            }
+        }
+        break;
+    case 2:
+        for(size_t i = 0; i < m_thingsLabel.size(); i++)
+        {
+            if(m_thingsLabel.at(i)->geometry().contains(65,15))
+            {
+                temp.push_back(m_thingsLabel.at(i));
+            }
+        }
+        break;
+    case 3:
+        for(size_t i = 0; i < m_thingsLabel.size(); i++)
+        {
+            if(m_thingsLabel.at(i)->geometry().contains(25,65))
+            {
+                temp.push_back(m_thingsLabel.at(i));
+            }
+        }
+        break;
+    case 4:
+        for(size_t i = 0; i < m_thingsLabel.size(); i++)
+        {
+            if(m_thingsLabel.at(i)->geometry().contains(65,65))
+            {
+                temp.push_back(m_thingsLabel.at(i));
+            }
+        }
+        break;
+    default:
+        break;
+    }
+    return temp;
+}
+
 void HexWidget::setThingsLabel(mylabel* thingsLabel)
 {
     m_thingsLabel.push_back(thingsLabel);
@@ -167,6 +212,16 @@ void HexWidget::deleteThingsLabel(QList<mylabel *> tempthingsLabel)
         }
     }
 }
+
+void HexWidget::returnAllThings()
+{
+    for(int i = 0; i < m_thingsLabel.size(); i++)
+    {
+        m_thingsLabel.at(i)->getData()->setInRack(true);
+        m_thingsLabel.at(i)->getData()->setUsed(false);
+        qDeleteAll(m_thingsLabel);
+    }
+}
 /********************************************************************
  *
  * protected
@@ -182,10 +237,7 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
         {
             //show that this hex has been owned
             this->setObjectName("1");
-            QString temp = "border-image: url(" +  m_hexData->getUrl() + ");";
-            this->setStyleSheet(temp);
-            oldStyle = this->styleSheet();
-            this->setSelectState(2);
+            this->setSelectState(0);
             this->setIsEnabledClick(false);
             emit(hexHasChangedSignal(this));
         } else if (this->objectName() == "1" && isEnabledClick && phase == 0) {
@@ -211,7 +263,8 @@ void HexWidget::paintEvent(QPaintEvent *e)
     switch (SelectState) {
     case 0:
         //do nothing about the stylesheet
-        this->setStyleSheet(oldStyle);
+        temp = "border-image: url(" +  m_hexData->getUrl() + ");";
+        this->setStyleSheet(temp);
         break;
     case 1:
         //add the greeen frame
@@ -223,6 +276,11 @@ void HexWidget::paintEvent(QPaintEvent *e)
         temp = "border-image: url(" +  m_hexData->getRedUrl() + ");";
         this->setStyleSheet(temp);
         break;
+    case 3:
+        this->setStyleSheet("border-image: url(:/background/image/background/white.jpg)");
+        break;
+    case 4:
+        this->setStyleSheet("border-image: url(:/background/image/background/dice1.gif)");
     default:
         break;
     }
@@ -243,37 +301,149 @@ void HexWidget::dropEvent(QDropEvent *event)
 {
     emit(requirePlayerIDnPhaseSignal());
     const ThingMimeData *pMimeData = (const ThingMimeData*)event->mimeData();
-    const QList<Thing*>* pList = pMimeData->thingDragData();
-    //check the total things should be no more than 10
-    if(m_thingsLabel.size() + pList->size() > 10)
+    const QList<Thing*>* tempList = pMimeData->thingDragData();
+    QList<Thing*> pList;
+    //check the things can move or not
+    if(phase == 5)
     {
-        QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, "Warning", "Too many things");
-        message->setIconPixmap(QPixmap(":/palyer/image/things/player_battle_building/Thing26.jpg"));
-        message->exec();
-        if(phase == 5)
+        if(m_hexData->getTypeID() == 8||
+                m_hexData->getTypeID() == 6||
+                m_hexData->getTypeID() == 3||
+                m_hexData->getTypeID() == 5)
         {
-            emit(sendThingsBackToHex(pList));
-        } else {
-        //send back the qlist            
-            emit(sendbackThingSignal(pList));
-        }
-        delete message;
-    } else {
-        if(pList)
-        {
-            for(int i = 0; i < pList->size(); i++)
+            for(int i = 0; i < tempList->size(); i++)
             {
-                pList->at(i)->setMode(SmallIcon_Mode);
-                pList->at(i)->setInRack(false);
-                mylabel *tempLabel = new mylabel(pList->at(i), this);
-                m_thingsLabel.push_back(tempLabel);
+                if(tempList->at(i)->getMovementCount() == 0||
+                        tempList->at(i)->getMovementCount() == 1)
+                {
+                    //things can't move, because there is not enough movment count
+                    Message("Warning", "Don't have enough movment count");
+                    emit(sendbackOneThingSignal(tempList->at(i)));
+                } else {
+                    pList.push_back(tempList->at(i));
+                }
+            }
+        } else {
+            for(int i = 0; i < tempList->size(); i++)
+            {
+                if(tempList->at(i)->getMovementCount() == 0)
+                {
+                    //things can't move, because there is not enough movment count
+                    Message("Warning", "Don't have enough movment count");
+                    emit(sendbackOneThingSignal(tempList->at(i)));
+                } else {
+                    pList.push_back(tempList->at(i));
+                }
+            }
+        }
+        //check the total things should be no more than 10
+        if(m_thingsLabel.size() + pList.size() > 10)
+        {
+            Message("Warning", "Too many things");
+            emit(sendThingsBackToHex(pList));
+
+        } else if(m_hexData->getTypeID() == 1){
+            //hex is sea
+            //check if the things contain flying feature
+            Message("Warning", "Only flying feature can pass sea");
+            for(int i = 0; i < pList.size(); i++)
+            {
+                //things is flying feature
+                if(pList.at(i)->getType() == 2)
+                {
+                    pList.at(i)->setMovementCount(pList.at(i)->getMovementCount() - 1);
+                    pList.at(i)->setMode(SmallIcon_Mode);
+                    pList.at(i)->setInRack(false);
+                    mylabel *tempLabel = new mylabel(pList.at(i), this);
+                    m_thingsLabel.push_back(tempLabel);
+                } else {
+                    //they are not flying feature
+                    emit(sendbackOneThingSignal(pList.at(i)));
+                }
+            }
+        } else {
+            if(pList.size() != 0)
+            {
+
+                for(int i = 0; i < pList.size(); i++)
+                {
+                    if(m_hexData->getTypeID() == 8||
+                            m_hexData->getTypeID() == 6||
+                            m_hexData->getTypeID() == 3||
+                            m_hexData->getTypeID() == 5)
+                    {
+                        if(pList.at(i)->getType() == 2 || pList.at(i)->getType() == 8)
+                        {
+                            pList.at(i)->setMovementCount(pList.at(i)->getMovementCount() - 1);
+                        } else {
+                            pList.at(i)->setMovementCount(pList.at(i)->getMovementCount() - 2);
+                        }
+                    } else {
+                        pList.at(i)->setMovementCount(pList.at(i)->getMovementCount() - 1);
+                    }
+                    pList.at(i)->setMode(SmallIcon_Mode);
+                    pList.at(i)->setInRack(false);
+                    mylabel *tempLabel = new mylabel(pList.at(i), this);
+                    m_thingsLabel.push_back(tempLabel);
+                }
+                event->accept();
+            }
+        }
+        emit(refreshMapClickState());
+    } else {
+        if(tempList)
+        {
+            //check if the hex have hero or special income
+            bool checkHeroSpecial = false;
+            for(size_t i = 0; i < m_thingsLabel.size(); i++)
+            {
+                if(m_thingsLabel.at(i)->getData()->getType() == 7)
+                {
+                    checkHeroSpecial = true;
+                }
+            }
+            if(m_heroLabel)
+            {
+                checkHeroSpecial = true;
+            }
+            for(int i = 0; i < tempList->size(); i++)
+            {
+                if(tempList->at(i)->getType() == 7 && checkHeroSpecial)
+                {
+                    Message("Warning", "Already have hero or special income");
+                    emit(sendbackThingSignal(tempList->at(i)));
+                } else if(m_thingsLabel.size() >= 10) {
+                    Message("Warning","Too many things");
+                    for(int j = i; j < tempList->size(); j++)
+                    {
+                        emit(sendbackThingSignal(tempList->at(j)));
+                    }
+                    break;
+                } else if(tempList->at(i)->getType() == 6 ||
+                          tempList->at(i)->getType() == 10 ||
+                          tempList->at(i)->getType() == 11){
+                    Message("Warning", "Things are treasure or magic or event, can't move");
+                    emit(sendbackThingSignal(tempList->at(i)));
+                } else {
+                    tempList->at(i)->setMode(SmallIcon_Mode);
+                    tempList->at(i)->setInRack(false);
+                    mylabel *tempLabel = new mylabel(tempList->at(i), this);
+                    m_thingsLabel.push_back(tempLabel);
+                }
             }
             event->accept();
         }
     }
+    pList.clear();
     refreshMyLabel();
 }
 
+void HexWidget::Message(QString title, QString body)
+{
+    QMessageBox *message = new QMessageBox(QMessageBox::NoIcon, title, body);
+    message->setIconPixmap(QPixmap(":/palyer/image/things/player_battle_building/Thing26.jpg"));
+    message->exec();
+}
 /********************************************************************
  *
  * public slots

@@ -74,6 +74,14 @@ void Player::setPlayerThing(Thing *value)
 {
     playerThings.push_back(value);
 }
+
+void Player::setAllThingsMovementCount(int count)
+{
+    for(int i = 0; i < playerThings.size(); i++)
+    {
+        playerThings.at(i)->setMovementCount(count);
+    }
+}
 vector<Building *> Player::getPlayerBuildings() const
 {
     return playerBuildings;

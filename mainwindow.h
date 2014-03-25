@@ -55,6 +55,8 @@ public:
     void enableNearHexDrag(int hexID);
     void enablePlayerMapDrag();
     void disableMapDrag();
+    void resetAllThingMovementCount();
+    void deleteAllSeaHex();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void getRequirePlayerIDnPhaseSlot();
@@ -64,7 +66,7 @@ public slots:
     void setBuildingToHexSlot(HexWidget *tempHexWidget);
     void initThingSlot();
     void confirmThingSlot();
-    void startDragSlot(QList<mylabel *> tempLabel);
+    void startDragSlot(QList<mylabel *>);
     void collectGoldSLOT();
     void chooseHeroSLOT();
     void heroConfirmSlot(Hero *tempHero);
@@ -78,11 +80,11 @@ public slots:
     void skipRecruitHeroSlot();
     void getHexForMoveWidgetSlot(HexWidget *tempHex);
     void movePhaseStartDragSlot(QList<mylabel *> tempLabel);
-    void sendbackThingToRackSlot(const QList<Thing *> *pList);
+    void sendbackThingToRackSlot(Thing *tempThing);
     void finishedMovementSlot();
-    void sendbackThingToHexSlot(const QList<Thing *> *tempThing);
-
-
+    void sendbackThingToHexSlot(const QList<Thing *> tempThing);
+    void sendbackOneThingToHexSlot(Thing *tempThing);
+    void refreshClickStateSlot();
 signals:
     void initThingToRackSignal(vector<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);

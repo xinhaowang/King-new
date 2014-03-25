@@ -37,12 +37,16 @@ public:
     vector<mylabel *> thingsLabel() const;
     void setThingsLabel(mylabel *thingsLabel);
     void deleteThingsLabel(QList<mylabel *> tempthingsLabel);
+    void returnAllThings();
 
     Hex *hexData() const;
     void setHexData(Hex *hexData);
 
     HeroLabel *heroLabel() const;
     void setHeroLabel(HeroLabel *heroLabel);
+
+    void Message(QString title, QString body);
+    vector<mylabel *> getPlayerThingsLabel(int playerID);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -56,8 +60,10 @@ signals:
     void setBulidngSingal(HexWidget*);
     void setHeroSignal(HexWidget*);
     void setThingsToMoveWidgetSignal(HexWidget*);
-    void sendThingsBackToHex(const QList<Thing*>*);
-    void sendbackThingSignal(const QList<Thing*>*);
+    void sendThingsBackToHex(const QList<Thing*>);
+    void sendbackThingSignal(Thing *tempThing);
+    void sendbackOneThingSignal(Thing*);
+    void refreshMapClickState();
 
 public slots:
     void setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase);
@@ -69,7 +75,7 @@ private:
     int                 SelectState;
     bool                isEnableDrag;
     bool                isEnabledClick;
-    QString             oldStyle;
+    bool                battle;
     Hex                 *m_hexData;
     vector<mylabel *>   m_thingsLabel;
     Building            *m_building;

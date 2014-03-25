@@ -54,12 +54,16 @@ public:
     int getMode() const;
     void setMode(int value);
 
+    int getMovementCount() const;
+    void setMovementCount(int value);
+
 private:
     int ID;
     int attackValue;
     int Type;
     int terrainType;
     int mode;
+    int movementCount;
     bool inRack;
     bool used;
     QString Name;
