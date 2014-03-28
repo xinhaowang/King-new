@@ -146,6 +146,11 @@ void HexWidget::setBuilding(Building *building)
     m_building = building;
 }
 
+void HexWidget::deleteBuilding()
+{
+    m_building = NULL;
+}
+
 QList<mylabel *> HexWidget::thingsLabel() const
 {
     return m_thingsLabel;
@@ -221,14 +226,21 @@ void HexWidget::deleteThingsLabel(QList<mylabel *> tempthingsLabel)
     }
 }
 
+void HexWidget::deleteAllThingsLabel()
+{
+    qDeleteAll(m_thingsLabel);
+    m_thingsLabel.clear();
+}
+
 void HexWidget::returnAllThings()
 {
     for(int i = 0; i < m_thingsLabel.size(); i++)
     {
         m_thingsLabel.at(i)->getData()->setInRack(true);
-        m_thingsLabel.at(i)->getData()->setUsed(false);
-        qDeleteAll(m_thingsLabel);
+        m_thingsLabel.at(i)->getData()->setUsed(false);       
     }
+    qDeleteAll(m_thingsLabel);
+    m_thingsLabel.clear();
 }
 /********************************************************************
  *
@@ -257,6 +269,9 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
         } else if (isEnabledClick && phase == 5) {
             //movement phase
             emit(setThingsToMoveWidgetSignal(this));
+        } else if (isEnabledClick && phase == 6) {
+            //combat pahse
+            emit(startCombatSignal(this));
         }
     }
 }
@@ -401,25 +416,26 @@ void HexWidget::dropEvent(QDropEvent *event)
     } else {
         if(tempList)
         {
-            //check if the hex have hero or special income
-            bool checkHeroSpecial = false;
-            for(int i = 0; i < m_thingsLabel.size(); i++)
+            for(int i = 0; i < tempList->size(); i++)
             {
-                if(m_thingsLabel.at(i)->getData()->getType() == 7)
+                //check if the hex have hero or special income
+                bool checkHeroSpecial = false;
+                for(int j = 0; j < m_thingsLabel.size(); j++)
+                {
+                    if(m_thingsLabel.at(j)->getData()->getType() == 7)
+                    {
+                        checkHeroSpecial = true;
+                    }
+                }
+                if(m_heroLabel)
                 {
                     checkHeroSpecial = true;
                 }
-            }
-            if(m_heroLabel)
-            {
-                checkHeroSpecial = true;
-            }
-            for(int i = 0; i < tempList->size(); i++)
-            {
                 if(tempList->at(i)->getType() == 7 && checkHeroSpecial)
                 {
                     Message("Warning", "Already have hero or special income");
                     emit(sendbackThingSignal(tempList->at(i)));
+                    continue;
                 } else if(m_thingsLabel.size() >= 10) {
                     Message("Warning","Too many things");
                     for(int j = i; j < tempList->size(); j++)
@@ -432,11 +448,13 @@ void HexWidget::dropEvent(QDropEvent *event)
                           tempList->at(i)->getType() == 11){
                     Message("Warning", "Things are treasure or magic or event, can't move");
                     emit(sendbackThingSignal(tempList->at(i)));
+                    continue;
                 } else {
                     tempList->at(i)->setMode(SmallIcon_Mode);
                     tempList->at(i)->setInRack(false);
                     mylabel *tempLabel = new mylabel(tempList->at(i), this);
                     m_thingsLabel.push_back(tempLabel);
+                    emit(refrshThingRack());
                 }
             }
             event->accept();

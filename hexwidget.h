@@ -33,10 +33,12 @@ public:
 
     Building *building() const;
     void setBuilding(Building *building);
+    void deleteBuilding();
 
     QList<mylabel *> thingsLabel() const;
     void setThingsLabel(mylabel *thingsLabel);
     void deleteThingsLabel(QList<mylabel *> tempthingsLabel);
+    void deleteAllThingsLabel();
     void returnAllThings();
 
     Hex *hexData() const;
@@ -67,7 +69,8 @@ signals:
     void sendbackThingSignal(Thing *tempThing);
     void sendbackOneThingSignal(Thing*);
     void refreshMapClickState(HexWidget*);
-
+    void startCombatSignal(HexWidget*);
+    void refrshThingRack();
 public slots:
     void setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase);
 
@@ -80,7 +83,7 @@ private:
     bool                isEnabledClick;
     bool                battle;
     Hex                 *m_hexData;
-    QList<mylabel *>   m_thingsLabel;
+    QList<mylabel *>    m_thingsLabel;
     Building            *m_building;
     HeroLabel           *m_heroLabel;
 };

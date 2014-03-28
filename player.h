@@ -29,6 +29,7 @@ public:
     QList<Thing *> getInRackThings() const;
     void setPlayerThings(const QList<Thing *> &value);
     void deletePlayerThings(QList<Thing *> value);
+    void deletePlayerThing(Thing *value);
     void setPlayerThing(Thing *value);
     void setAllThingsMovementCount(int count);
 
@@ -43,6 +44,7 @@ public:
     QList<HexWidget *> getPlayerHexs() const;
     void setPlayerHexs(const QList<HexWidget *> &value);
     void setPlayerHex(HexWidget *value);
+    void deleteHexWidget(HexWidget *value);
 
     QString getControlMark() const;
     void setControlMark(const QString &value);

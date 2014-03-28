@@ -49,3 +49,69 @@ hero type:
 5.      2R
 6.      triangle
 7. 	normal
+
+
+iteration2:
+Crocodiles	123	Thing		142
+Mountain Men	65	giant lizard	141
+Giant Lizard	122	swamp rat	126
+Slime Beast	131	unicorn		94
+Killer Racoon	89	bears		83
+Farmers		48	giant spider	113
+Wild Cat	96	camel corps	110
+
+
+
+• Crocodiles		123	
+• Mountain Men		65	
+• Nomads (Bluff)	114
+• Giant Spider (Bluff)	113
+• Killer Racoon		89
+• Farmers		48
+• Ice Giant (R5)	10
+• White Dragon (Star5)	
+• Mammoth (C5)		3
+• Head Hunter (R2)	26
+
+• Thing			142
+• Giant Lizard		141	
+• Swamp Rat		126	
+• Unicorn		94	
+• Bears			83
+• Camel Corps		110
+• Sandworm		101
+• Black Knight (C3)	143
+• Dervish (Star2)	103
+• Forester (R2)		95
+
+
+• Flying Squirrel (Flying)	97
+• Pixies (Flying)		98
+• Giant Spider (Bluff)		113
+• Killer Racoon			89
+• Farmers			48
+• Ice Giant (R5)		10
+• White Dragon (Star5)	
+• Head Hunter (R2)		26
+• Ghost (Flying)		124
+• Dark Wizard (Flying)		134
+
+• Thing
+• Unicorn
+• Bears
+• Camel Corps
+• Sandworm
+• Black Knight (C3)
+• Dervish (Star2)
+• Forester (R2)
+• Pterodactyl Warriors (Flying)
+• Bird of Paradise (Flying)
+
+• Nomads
+• Dervish
+• Giant Spider
+
+• Walking Tree
+• Wild Cat
+• Elves 
+• Great Owl (Flying)

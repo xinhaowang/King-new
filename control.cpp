@@ -105,6 +105,29 @@ QList<Thing *> Control::getRandomThingFromNum(int count)
         {
             break;
         } else {
+            int tempNum = getRandomNumber(173) - 1;
+            if(m_thingData.at(tempNum)->getUsed())
+            {
+                //the thing has been used
+            } else {
+                temp.push_back(m_thingData.at(tempNum));
+                m_thingData.at(tempNum)->setUsed(true);
+                count--;
+            }
+        }
+    }
+    return temp;
+}
+
+QList<Thing *> Control::getRandomCreatureFromNum(int count)
+{
+    QList<Thing *> temp;
+    while(true)
+    {
+        if(count == 0)
+        {
+            break;
+        } else {
             int tempNum = getRandomNumber(146) - 1;
             if(m_thingData.at(tempNum)->getUsed())
             {

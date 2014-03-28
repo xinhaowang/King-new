@@ -33,6 +33,7 @@ public:
     Thing *getThing(int index);
     Thing *getThingFromID(int thingID);
     QList<Thing*> getRandomThingFromNum(int count);
+    QList<Thing *> getRandomCreatureFromNum(int count);
     //function for players' operation
     void initPlayers();
     Player *getPlayerFromID(int playerID);
@@ -57,6 +58,7 @@ public:
     QList<Hero *> get10heroData() const;
     void set10heroData(const QList<Hero *> &temp10heroData);
     void removeHeroFromID(int heroID);
+
 
 signals:
 

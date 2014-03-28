@@ -57,12 +57,23 @@ void Player::deletePlayerThings(QList<Thing *> value)
     {
         value.at(i)->setUsed(false);
         value.at(i)->setInRack(true);
-        for(int i = 0; i < playerThings.size(); i++)
+        for(int j = 0; j < playerThings.size(); j++)
         {
-            if(value.at(i) == playerThings.at(i))
+            if(value.at(i) == playerThings.at(j))
             {
                 playerThings.removeAt(i);
             }
+        }
+    }
+}
+
+void Player::deletePlayerThing(Thing *value)
+{
+    for(int i = 0; i < playerThings.size(); i++)
+    {
+        if(playerThings.at(i) == value)
+        {
+            playerThings.removeAt(i);
         }
     }
 }
@@ -121,6 +132,11 @@ void Player::setPlayerHexs(const QList<HexWidget *> &value)
 void Player::setPlayerHex(HexWidget *value)
 {
     playerHexs.push_back(value);
+}
+
+void Player::deleteHexWidget(HexWidget *value)
+{
+    playerHexs.removeOne(value);
 }
 QString Player::getControlMark() const
 {

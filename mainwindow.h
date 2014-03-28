@@ -39,7 +39,6 @@ public:
     void initThing();
     void startCollectGold(int count);
     void refreshPlayerGold();    
-    void refreshThingWidget();
     void startChooseHero(int count);
     void setHeroWidget();
     void checkOwnHero(int dicevalue);
@@ -57,8 +56,12 @@ public:
     void disableMapDrag();
     void resetAllThingMovementCount();
     void deleteAllSeaHex();
+    void startCombat(int count);
+    void enableCombatHexClick();
+    void checkExploration(int diceValue);
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
+    void refreshThingWidget();
     void getRequirePlayerIDnPhaseSlot();
     void changePlayerTurnSlot(QAbstractButton *);
     void changePlayerTurnSlot2(QAbstractButton *);
@@ -85,11 +88,16 @@ public slots:
     void sendbackThingToHexSlot(const QList<Thing *> tempThing);
     void sendbackOneThingToHexSlot(Thing *tempThing);
     void refreshClickStateSlot(HexWidget *tempwidget);
+    void startCombatSlot(HexWidget *tempHex);
 signals:
     void initThingToRackSignal(QList<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
     void initHeroToWidget(QList<Hero*> herolist);
     void initThingsToMovementWidget(QList<Thing*>);
+    void sendThingToCombatSignal(QList<Thing*>,int PlayerID);
+    void sendBuildingToCombatSignal(Building*);
+    void startCombatSignal();
+    void startExploration();
 
 private:
     Ui::MainWindow       *ui;
