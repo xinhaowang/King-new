@@ -32,6 +32,11 @@ void Combat::startExplorationSlot()
     qDebug() << "playerfourthings " << PlayerFourThing.size();
 }
 
+void Combat::initQGroupBox()
+{
+
+}
+
 void Combat::getBuildingFromHexSlot(Building *tempBuilding)
 {
     HexBuilding = tempBuilding;

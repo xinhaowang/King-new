@@ -19,6 +19,7 @@ public:
     ~Combat();
 
     QList<int> detectWhichPlayer();
+    void initQGroupBox();
 public slots:
     void getThingFromHexSlot(QList<Thing*> tempThings, int playerID);
     void getBuildingFromHexSlot(Building *tempBuilding);
@@ -28,6 +29,7 @@ private:
     Ui::Combat *ui;
     Building        *HexBuilding;
     Hero            *HexHero;
+    QGroupBox       *Player1;
     QList<Thing*>   PlayerOneThing;
     QList<Thing*>   PlayerTwoThing;
     QList<Thing*>   PlayerThreeThing;
