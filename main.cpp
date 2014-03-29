@@ -17,10 +17,13 @@ int main(int argc, char *argv[])
                      &combat, SLOT(getThingFromHexSlot(QList<Thing*>,int)));
     QObject::connect(&w, SIGNAL(sendBuildingToCombatSignal(Building*)),
                      &combat, SLOT(getBuildingFromHexSlot(Building*)));
+    QObject::connect(&w, SIGNAL(sendOwnerToCombatSignal(int)),
+                     &combat, SLOT(getOwnPlayer(int)));
     QObject::connect(&w, SIGNAL(startExploration()),
                      &combat, SLOT(startExplorationSlot()));
     QObject::connect(&w, SIGNAL(startCombatSignal()),
                      &combat, SLOT(startCombatSlot()));
+
 
     w.show();
     return a.exec();

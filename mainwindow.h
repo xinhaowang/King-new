@@ -96,6 +96,7 @@ signals:
     void initThingsToMovementWidget(QList<Thing*>);
     void sendThingToCombatSignal(QList<Thing*>,int PlayerID);
     void sendBuildingToCombatSignal(Building*);
+    void sendOwnerToCombatSignal(int);
     void startCombatSignal();
     void startExploration();
 

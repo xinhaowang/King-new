@@ -6,6 +6,7 @@ Combat::Combat(QWidget *parent) :
     ui(new Ui::Combat)
 {
     ui->setupUi(this);
+    this->setObjectName("Combat");
 }
 
 Combat::~Combat()
@@ -13,23 +14,71 @@ Combat::~Combat()
     delete ui;
 }
 
+QGroupBox *Combat::createPlayerBox(QList<Thing*> tempThings)
+{
+    QGroupBox *groupBox = new QGroupBox(tr("Player  Things"));
+    QGridLayout *vbox = new QGridLayout();
+    QList<QPushButton*> tempButton;
+    for(int i = 0; i < tempThings.size(); i++)
+    {
+        QPushButton *button = new QPushButton;
+        button->setObjectName(QString::number(tempThings.at(i)->getID()));
+        QString temp = "border-image: url(" + tempThings.at(i)->getUrl();
+        button->setStyleSheet(temp + ")");
+        button->setFixedSize(80,80);
+        tempButton.push_back(button);
+    }
+    for(int i = 0; i < tempButton.size(); i++)
+    {
+        if(i < 5)
+        {
+            vbox->addWidget(tempButton.at(i),0,i);
+        } else {
+            vbox->addWidget(tempButton.at(i),1,i);
+        }
+    }
+    groupBox->setLayout(vbox);
+    return groupBox;
+}
+
+void Combat::initialLayout()
+{
+    QGridLayout *vertical_layout = new QGridLayout;
+    QList<int> playerCount = detectWhichPlayer();
+    for(int i = 0; i < playerCount.size(); i++)
+    {
+        switch (playerCount.at(i)) {
+        case 1:
+            vertical_layout->addWidget(createPlayerBox(PlayerOneThing),i,0);
+            break;
+        case 2:
+            vertical_layout->addWidget(createPlayerBox(PlayerTwoThing),i,0);
+            break;
+        case 3:
+            vertical_layout->addWidget(createPlayerBox(PlayerThreeThing),i,0);
+            break;
+        case 4:
+            vertical_layout->addWidget(createPlayerBox(PlayerFourThing),i,0);
+            break;
+        default:
+            break;
+        }
+    }
+    QWidget *widget = new QWidget(this);
+    widget->setLayout(vertical_layout);
+    widget->resize(900,900);
+}
+
 void Combat::startCombatSlot()
 {
     //begin the combat
-    qDebug() << 1;
-    qDebug() << "playeronethings " << PlayerOneThing.size();
-    qDebug() << "playertwothings " << PlayerTwoThing.size();
-    qDebug() << "playerthreethings " << PlayerThreeThing.size();
-    qDebug() << "playerfourthings " << PlayerFourThing.size();
+    initialLayout();
 }
 
 void Combat::startExplorationSlot()
 {
-    qDebug() << 2;
-    qDebug() << "playeronethings " << PlayerOneThing.size();
-    qDebug() << "playertwothings " << PlayerTwoThing.size();
-    qDebug() << "playerthreethings " << PlayerThreeThing.size();
-    qDebug() << "playerfourthings " << PlayerFourThing.size();
+    //begin the exploration
+    initialLayout();
 }
 
 void Combat::initQGroupBox()
@@ -40,6 +89,11 @@ void Combat::initQGroupBox()
 void Combat::getBuildingFromHexSlot(Building *tempBuilding)
 {
     HexBuilding = tempBuilding;
+}
+
+void Combat::getOwnPlayer(int Player)
+{
+    ownPlayer = Player;
 }
 
 QList<int> Combat::detectWhichPlayer()

@@ -954,6 +954,9 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
                 tempHex->deleteBuilding();
                 delete tempHex->childAt(87,50);
             }
+            //send the owner of the hex to the combat
+            int ownPlayer = tempHex->childAt(57,50)->objectName().toInt();
+            emit(sendOwnerToCombatSignal(ownPlayer));
             //disable the click for the hex
             tempHex->setIsEnabledClick(false);
             //delete the battle mark
