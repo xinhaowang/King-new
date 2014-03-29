@@ -24,6 +24,7 @@ public:
 
     QList<int> detectWhichPlayer();
     void initQGroupBox();
+    void initialLayout();
 public slots:
     void getThingFromHexSlot(QList<Thing*> tempThings, int playerID);
     void getBuildingFromHexSlot(Building *tempBuilding);
@@ -37,7 +38,7 @@ private:
     int             playerTurn;
     int             combatTurn;
     Building        *HexBuilding;
-    QGroupBox       *createPlayerBox(QList<Thing *> tempThings, Building *tempBuilding);
+    QGroupBox       *createPlayerBox(QList<Thing *> tempThings);
     QList<Thing*>   PlayerOneThing;
     QList<Thing*>   PlayerTwoThing;
     QList<Thing*>   PlayerThreeThing;
