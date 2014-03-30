@@ -64,9 +64,20 @@ void Combat::initialLayout()
             break;
         }
     }
-    QWidget *widget = new QWidget(this);
-    widget->setLayout(vertical_layout);
-    widget->resize(900,900);
+    //initial the dice widget
+    dice = new DiceWidget(this);
+    dice->setGeometry(0,0,100,100);
+    dice->hide();
+    connect(dice, SIGNAL(updateDiceValueSignal(int)), this, SLOT(updateDiceValueSlot(int)));
+    globalWidget = new QWidget(this);
+    globalWidget->setLayout(vertical_layout);
+    globalWidget->resize(900,900);
+
+}
+
+void Combat::updateDiceValueSlot(int tempDice)
+{
+    diceValue = tempDice;
 }
 
 void Combat::startCombatSlot()

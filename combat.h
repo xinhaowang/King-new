@@ -9,6 +9,7 @@
 #include <QPixmap>
 #include <QVBoxLayout>
 #include "control.h"
+#include "dicewidget.h"
 
 namespace Ui {
 class Combat;
@@ -32,12 +33,16 @@ public slots:
     void startExplorationSlot();
     void startCombatSlot();
 
+    void updateDiceValueSlot(int tempDice);
 private:
     Ui::Combat *ui;
     int             ownPlayer;
     int             playerTurn;
     int             combatTurn;
+    int             diceValue;
+    DiceWidget           *dice;
     Building        *HexBuilding;
+    QWidget         *globalWidget;
     QGroupBox       *createPlayerBox(QList<Thing *> tempThings);
     QList<Thing*>   PlayerOneThing;
     QList<Thing*>   PlayerTwoThing;

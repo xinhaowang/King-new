@@ -59,7 +59,6 @@ public:
     void set10heroData(const QList<Hero *> &temp10heroData);
     void removeHeroFromID(int heroID);
 
-
 signals:
 
 public slots:   

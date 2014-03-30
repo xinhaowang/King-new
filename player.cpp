@@ -59,9 +59,9 @@ void Player::deletePlayerThings(QList<Thing *> value)
         value.at(i)->setInRack(true);
         for(int j = 0; j < playerThings.size(); j++)
         {
-            if(value.at(i) == playerThings.at(j))
+            if(value.at(i)->getID() == playerThings.at(j)->getID())
             {
-                playerThings.removeAt(i);
+                playerThings.removeAt(j);
             }
         }
     }
@@ -71,7 +71,9 @@ void Player::deletePlayerThing(Thing *value)
 {
     for(int i = 0; i < playerThings.size(); i++)
     {
-        if(playerThings.at(i) == value)
+        value->setUsed(false);
+        value->setInRack(true);
+        if(playerThings.at(i)->getID() == value->getID())
         {
             playerThings.removeAt(i);
         }
