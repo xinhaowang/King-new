@@ -14,7 +14,7 @@ class Building
 public:
     //building's constructor
     Building();
-    Building(int tempID, int tempIncome, QString tempUrl);
+    Building(int tempID, int tempIncome, QString tempUrl, QString url);
     
     // building ID accessors
     int getID() const;
@@ -28,10 +28,14 @@ public:
     QString getUrl() const;
     void setUrl(const QString &value);
 
+    QString getNeutralURL() const;
+    void setNeutralURL(const QString &value);
+
 private:
     int ID;          //building ID
     int income;      //building income
     QString Url;     //building's Url
+    QString NeutralURL; //building's neutral url
     
 };
 

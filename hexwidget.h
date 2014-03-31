@@ -40,6 +40,9 @@ public:
     void deleteThingsLabel(QList<mylabel *> tempthingsLabel);
     void deleteAllThingsLabel();
     void returnAllThings();
+    void setPlayerThing(QList<Thing *> tempThings, int playerID);
+    void setPlayerThing(Thing *tempThings, int playerID);
+
 
     Hex *hexData() const;
     void setHexData(Hex *hexData);
@@ -71,6 +74,7 @@ signals:
     void refreshMapClickState(HexWidget*);
     void startCombatSignal(HexWidget*);
     void refrshThingRack();
+
 public slots:
     void setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase);
 

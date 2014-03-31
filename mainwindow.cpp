@@ -27,6 +27,27 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//combat test
+void MainWindow::combatTest()
+{
+    //combat test
+    QList<Thing*> player1 = GameData->getRandomCreatureFromNum(1);
+    emit(sendThingToCombatSignal(player1,1));
+    QList<Thing*> player2 = GameData->getRandomCreatureFromNum(1);
+    emit(sendThingToCombatSignal(player2,2));
+//    QList<Thing*> player3 = GameData->getRandomCreatureFromNum(10);
+//    emit(sendThingToCombatSignal(player3,3));
+//    QList<Thing*> player4 = GameData->getRandomCreatureFromNum(10);
+//    emit(sendThingToCombatSignal(player4,4));
+    //send the owener player
+    emit(sendOwnerToCombatSignal(1));
+    //send the buidling
+//    Building *tempbuilding = GameData->getBuildingFromID(1);
+//    emit(sendBuildingToCombatSignal(tempbuilding));
+    //start the combat
+    emit(startCombatSignal(true));
+}
+
 /*********************************************************
  *
  * function for the phase 0
@@ -80,6 +101,7 @@ void MainWindow::startInitMap()
 
 void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
 {
+    //combatTest();
     int playerID = getPlayerTurn();
     GameData->addHexWidget(tempHexWidget, playerID);
     //set the control mark on this Hex
@@ -725,7 +747,7 @@ void MainWindow::refreshClickStateSlot(HexWidget *tempwidget)
         }
     } else {
         //set the battle mark on the hex, this hex is uncontrolled
-        if(tempwidget->hexData()->getTypeID() != 1)
+        if(!tempwidget->childAt(57,80)&&tempwidget->hexData()->getTypeID() != 1)
         {
             QImage tempImage = QImage(":/palyer/image/things/player_battle_building/Thing26.jpg");
             QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
@@ -792,6 +814,7 @@ void MainWindow::startCombat(int count)
     if(count == 4)
     {
         //start nex phase
+
     } else {
         button->setObjectName(QString::number(count));
         Things_rack->hide();
@@ -801,6 +824,7 @@ void MainWindow::startCombat(int count)
 
 void MainWindow::enableCombatHexClick()
 {
+    int count = 0;
     for(int i = 0; i < m_hexWidget.size(); i++)
     {
         //hex has this player things and has battle mark
@@ -808,7 +832,14 @@ void MainWindow::enableCombatHexClick()
                 (m_hexWidget.at(i)->getPlayerThingsLabel(getPlayerTurn()).size() != 0))
         {
             m_hexWidget.at(i)->setIsEnabledClick(true);
+            count++;
         }
+    }
+    if(count == 0)
+    {
+        //change to next player
+        popMessageBox(1);
+        startCombat(button->objectName().toInt()+1);
     }
 }
 
@@ -834,16 +865,25 @@ void MainWindow::checkExploration(int diceValue)
         delete selectedHex->childAt(57,80);
         //show the message
         Message("Congratulation", "You win the hex");
+        //change to next player
+        popMessageBox(1);
+        startCombat(button->objectName().toInt()+1);
     } else {
         //exploration
+        //get random things from the bag as the defence
         QList<Thing*> tempCreatures = GameData->getRandomCreatureFromNum(diceValue);
-        emit(sendThingToCombatSignal(tempCreatures,(getPlayerTurn()+1)/4));
-
+        for(int i = 0; i < tempCreatures.size(); i++)
+        {
+            tempCreatures.at(i)->setUsed(false);
+        }
+        emit(sendThingToCombatSignal(tempCreatures,(getPlayerTurn()+1)%4));
+        //get the player things from the hex and delete things in this player
         QList<mylabel*> tempMyLabel = selectedHex->getPlayerThingsLabel(getPlayerTurn());
         QList<Thing*> tempThings;
         for(int i = 0; i < tempMyLabel.size(); i++)
         {
             tempThings.push_back(tempMyLabel.at(i)->getData());
+            GameData->getPlayerFromID(getPlayerTurn())->deletePlayerThing(tempThings.at(i));
         }
         //check bluff feature
         QList<HexWidget*> PlayerHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
@@ -852,16 +892,22 @@ void MainWindow::checkExploration(int diceValue)
         {
             HexType.push_back(PlayerHex.at(i)->hexData()->getTypeID());
         }
-        for(int i = 0; i < tempThings.size(); i++)
+        for(int i = 0; i < tempThings.size();)
         {
             if(!HexType.contains(tempThings.at(i)->getTerrainType()))
             {
-                //return the things to the rack
-                tempThings.at(i)->setUsed(false);
-                tempThings.at(i)->setInRack(true);
-                //delete the thing in this player
-                GameData->getPlayerFromID(getPlayerTurn())->deletePlayerThing(tempThings.at(i));
-                tempThings.removeAt(i);
+                if(tempThings.at(i)->getType() != 7)
+                {
+                    //return the things to the rack
+                    tempThings.at(i)->setUsed(false);
+                    tempThings.at(i)->setInRack(true);
+                    //delete the thing in this player
+                    tempThings.removeAt(i);
+                } else {
+                    i++;
+                }
+            } else {
+                i++;
             }
         }
         //delete the battle mark
@@ -871,8 +917,23 @@ void MainWindow::checkExploration(int diceValue)
         //delete all the things in the hex
         selectedHex->deleteAllThingsLabel();
         //start exploration
-        emit(startExploration());
+        if(tempThings.size() == 0)
+        {
+            Message("Warning", "All the things are bluff");
+            //change to next player
+            popMessageBox(1);
+            startCombat(button->objectName().toInt()+1);
+        } else {
+            emit(sendOwnerToCombatSignal(getPlayerTurn()));
+            emit(startCombatSignal(false));
+        }
     }
+}
+
+void MainWindow::changeNextPlayerSlot()
+{
+    popMessageBox(1);
+    startCombat(button->objectName().toInt()+1);
 }
 
 void MainWindow::startCombatSlot(HexWidget *tempHex)
@@ -913,36 +974,53 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
             //disable the click for the hex
             tempHex->setIsEnabledClick(false);
         } else {
+            //get the own player of this hex
+            int ownPlayer = tempHex->childAt(57,50)->objectName().toInt();
+            GameData->getPlayerFromID(ownPlayer)->deleteHexWidget(tempHex);
+            delete tempHex->childAt(57,50);
+            //delete the owner of the hex
             //Combat or fighting over explorations
             //send all the creature to the combat widget including special income item
+            //and delete all the thing of the player
             for(int j = 1; j <= 4; j++)
             {
                 QList<mylabel*> tempMyLabel = tempHex->getPlayerThingsLabel(j);
-                QList<Thing*> tempThings;
-                for(int i = 0; i < tempMyLabel.size(); i++)
+                if(tempMyLabel.size() != 0)
                 {
-                    tempThings.push_back(tempMyLabel.at(i)->getData());
-                }
-                //check bluff feature
-                QList<HexWidget*> PlayerHex = GameData->getPlayerFromID(j)->getPlayerHexs();
-                QList<int> HexType;
-                for(int i = 0; i < PlayerHex.size(); i++)
-                {
-                    HexType.push_back(PlayerHex.at(i)->hexData()->getTypeID());
-                }
-                for(int i = 0; i < tempThings.size(); i++)
-                {
-                    if(!HexType.contains(tempThings.at(i)->getTerrainType()))
+                    QList<Thing*> tempThings;
+                    for(int i = 0; i < tempMyLabel.size(); i++)
                     {
-                        //return the things to the rack
-                        tempThings.at(i)->setUsed(false);
-                        tempThings.at(i)->setInRack(true);
-                        //delete the thing in this player
+                        tempThings.push_back(tempMyLabel.at(i)->getData());
                         GameData->getPlayerFromID(j)->deletePlayerThing(tempThings.at(i));
-                        tempThings.removeAt(i);
                     }
+                    //check bluff feature
+                    QList<HexWidget*> PlayerHex = GameData->getPlayerFromID(j)->getPlayerHexs();
+                    QList<int> HexType;
+                    for(int i = 0; i < PlayerHex.size(); i++)
+                    {
+                        HexType.push_back(PlayerHex.at(i)->hexData()->getTypeID());
+                    }
+                    for(int i = 0; i < tempThings.size();)
+                    {
+                        if(tempThings.at(i)->getType() != 7)
+                        {
+                            if(!HexType.contains(tempThings.at(i)->getTerrainType()))
+                            {
+                                //return the things to the rack
+                                tempThings.at(i)->setUsed(false);
+                                tempThings.at(i)->setInRack(true);
+                                //delete the thing in this player
+                                tempThings.removeAt(i);
+                            } else {
+                                i++;
+                            }
+
+                        } else {
+                            i++;
+                        }
+                    }
+                    emit(sendThingToCombatSignal(tempThings,j));
                 }
-                emit(sendThingToCombatSignal(tempThings,j));
             }
             //remove all the things in the hex
             tempHex->deleteAllThingsLabel();
@@ -953,19 +1031,92 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
                 //delete the building in the hex
                 tempHex->deleteBuilding();
                 delete tempHex->childAt(87,50);
+                //delete the building in this player
+                GameData->getPlayerFromID(ownPlayer)->deleteBuilding(tempHex->building());
             }
-            //send the owner of the hex to the combat
-            int ownPlayer = tempHex->childAt(57,50)->objectName().toInt();
+            //send the owner of the hex to the combats
             emit(sendOwnerToCombatSignal(ownPlayer));
             //disable the click for the hex
             tempHex->setIsEnabledClick(false);
             //delete the battle mark
             delete tempHex->childAt(57,80);
-            emit(startCombatSignal());
+            emit(startCombatSignal(true));
         }
     }
 }
 
+void MainWindow::getThingsFromRetreatSlot(QList<Thing*> tempThings, int playerID)
+{
+    QList<int> tempHexs = getNearHex(selectedHex->getID());
+    for(int i = 0; i < tempHexs.size(); i++)
+    {
+        if(m_hexWidget.at(tempHexs.at(i))->childAt(57,50))
+        {
+            if(m_hexWidget.at(tempHexs.at(i))->childAt(57,50)->objectName().toInt() == playerID)
+            {
+                for(int j = 0; j < tempThings.size(); j++)
+                {
+                    if(m_hexWidget.at(tempHexs.at(i))->getPlayerThingsLabel(playerID).size() < 10)
+                    {
+                        tempThings.at(j)->setUsed(true);
+                        tempThings.at(j)->setInRack(false);
+                        //set the thing on the hex
+                        m_hexWidget.at(tempHexs.at(j))->setPlayerThing(tempThings.at(j),playerID);
+                        //set the thing to the player
+                        GameData->getPlayerFromID(playerID)->setPlayerThing(tempThings.at(j));
+                    } else {
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
+
+void MainWindow::getThingsFromCombatWinnerSlot(QList<Thing*> tempThings, int playerID)
+{
+    //set the controlmark
+    QImage tempImage = QImage(GameData->getPlayerFromID(playerID)->getControlMark());
+    QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+    QLabel *controlMark = new QLabel(selectedHex);
+    controlMark->setObjectName(QString::number(playerID));
+    controlMark->setFixedSize(30,30);
+    controlMark->setGeometry(42,35,30,30);
+    controlMark->setPixmap(pixmap);
+    controlMark->show();
+    //set the things to the player
+    for(int i = 0; i < tempThings.size(); i++)
+    {
+        tempThings.at(i)->setUsed(true);
+        tempThings.at(i)->setInRack(false);
+        GameData->getPlayerFromID(playerID)->setPlayerThing(tempThings.at(i));
+    }
+    //set the things on the hex
+    selectedHex->setPlayerThing(tempThings,playerID);
+    //set the hexwidget to the player
+    GameData->getPlayerFromID(playerID)->setPlayerHex(selectedHex);
+    //change to next player
+    popMessageBox(1);
+    startCombat(button->objectName().toInt()+1);
+}
+
+void MainWindow::getBuildingFromCombatSlot(Building* tempBuilding, int playerID)
+{
+    //set building to the hex
+    selectedHex->setBuilding(tempBuilding);
+    //set the label on the hex
+    QString tempBuidlingUrl = tempBuilding->getUrl();
+    QImage tempImage = QImage(tempBuidlingUrl);
+    QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+    QLabel *building = new QLabel(selectedHex);
+    building->setFixedSize(30,30);
+    building->setGeometry(72,35,30,30);
+    building->setPixmap(pixmap);
+    building->show();
+    //set building to the player
+    GameData->getPlayerFromID(playerID)->setPlayerBuilding(tempBuilding);
+}
 
 /*********************************************************
  *

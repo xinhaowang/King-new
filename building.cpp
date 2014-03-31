@@ -4,11 +4,12 @@ Building::Building()
 {
 }
 
-Building::Building(int tempID, int tempIncome, QString tempUrl)
+Building::Building(int tempID, int tempIncome, QString tempUrl, QString url)
 {
     ID = tempID;
     income = tempIncome;
     Url = tempUrl;
+    NeutralURL = url;
 }
 
 int Building::getIncome() const
@@ -29,6 +30,16 @@ void Building::setUrl(const QString &value)
 {
     Url = value;
 }
+QString Building::getNeutralURL() const
+{
+    return NeutralURL;
+}
+
+void Building::setNeutralURL(const QString &value)
+{
+    NeutralURL = value;
+}
+
 
 
 int Building::getID() const

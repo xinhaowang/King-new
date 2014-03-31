@@ -36,6 +36,7 @@ public:
     QList<Building *> getPlayerBuildings() const;
     void setPlayerBuildings(const QList<Building *> &value);
     void setPlayerBuilding(Building *value);
+    void deleteBuilding(Building *value);
 
     QList<Hero *> getPlayerHeros() const;
     void setPlayerHero(Hero *value);

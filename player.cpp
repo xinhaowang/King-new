@@ -57,11 +57,13 @@ void Player::deletePlayerThings(QList<Thing *> value)
     {
         value.at(i)->setUsed(false);
         value.at(i)->setInRack(true);
-        for(int j = 0; j < playerThings.size(); j++)
+        for(int j = 0; j < playerThings.size();)
         {
             if(value.at(i)->getID() == playerThings.at(j)->getID())
             {
                 playerThings.removeAt(j);
+            } else {
+                j++;
             }
         }
     }
@@ -105,6 +107,17 @@ void Player::setPlayerBuildings(const QList<Building *> &value)
 void Player::setPlayerBuilding(Building *value)
 {
     playerBuildings.push_back(value);
+}
+
+void Player::deleteBuilding(Building *value)
+{
+    for(int i = 0; i < playerBuildings.size(); i++)
+    {
+        if(value == playerBuildings.at(i))
+        {
+            playerBuildings.removeAt(i);
+        }
+    }
 }
 
 QList<Hero *> Player::getPlayerHeros() const

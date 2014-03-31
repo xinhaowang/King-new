@@ -12,6 +12,7 @@ HexWidget::HexWidget(QWidget *parent, Hex *tempHex) :
     this->setIsEnabledClick(false);
     this->setIsEnableDrag(false);
     this->setSelectState(3);
+    m_building = NULL;
     battle = false;
 }
 
@@ -55,6 +56,64 @@ void HexWidget::refreshMyLabel()
         }
     }
     this->repaint();
+}
+
+void HexWidget::setPlayerThing(QList<Thing*> tempThings, int playerID)
+{
+    for(int i = 0; i < tempThings.size(); i++)
+    {
+        tempThings.at(i)->setMode(SmallIcon_Mode);
+        mylabel *templabel = new mylabel(tempThings.at(i),this);
+        m_thingsLabel.push_back(templabel);
+        switch (playerID) {
+        case 1:
+            templabel->setGeometry(15,5,30,30);
+            templabel->show();
+            break;
+        case 2:
+            templabel->setGeometry(65,5,30,30);
+            templabel->show();
+            break;
+        case 3:
+            templabel->setGeometry(15,65,30,30);
+            templabel->show();
+            break;
+        case 4:
+            templabel->setGeometry(65,65,30,30);
+            templabel->show();
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void HexWidget::setPlayerThing(Thing *tempThings, int playerID)
+{
+
+    tempThings->setMode(SmallIcon_Mode);
+    mylabel *templabel = new mylabel(tempThings,this);
+    m_thingsLabel.push_back(templabel);
+    switch (playerID) {
+    case 1:
+        templabel->setGeometry(15,5,30,30);
+        templabel->show();
+        break;
+    case 2:
+        templabel->setGeometry(65,5,30,30);
+        templabel->show();
+        break;
+    case 3:
+        templabel->setGeometry(15,65,30,30);
+        templabel->show();
+        break;
+    case 4:
+        templabel->setGeometry(65,65,30,30);
+        templabel->show();
+        break;
+    default:
+        break;
+    }
 }
 
 HeroLabel *HexWidget::heroLabel() const

@@ -254,10 +254,10 @@ void Control::init37hex()
  **/
 void Control::initBuilding()
 {
-    Building *building1 = new Building(1, 1, ":/buildings/image/things/player_battle_building/Thing41.jpg");
-    Building *building2 = new Building(2, 2, ":/buildings/image/things/player_battle_building/Thing43.jpg");
-    Building *building3 = new Building(3, 3, ":/buildings/image/things/player_battle_building/Thing45.jpg");
-    Building *building4 = new Building(4, 4, ":/buildings/image/things/player_battle_building/Thing47.jpg");
+    Building *building1 = new Building(1, 1, ":/buildings/image/things/player_battle_building/Thing41.jpg",":/buildings/image/things/player_battle_building/Thing42.jpg");
+    Building *building2 = new Building(2, 2, ":/buildings/image/things/player_battle_building/Thing43.jpg",":/buildings/image/things/player_battle_building/Thing44.jpg");
+    Building *building3 = new Building(3, 3, ":/buildings/image/things/player_battle_building/Thing45.jpg",":/buildings/image/things/player_battle_building/Thing46.jpg");
+    Building *building4 = new Building(4, 4, ":/buildings/image/things/player_battle_building/Thing47.jpg",":/buildings/image/things/player_battle_building/Thing48.jpg");
     m_building.push_back(building1);
     m_building.push_back(building2);
     m_building.push_back(building3);

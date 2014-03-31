@@ -8,6 +8,8 @@
 #include <QPushButton>
 #include <QPixmap>
 #include <QVBoxLayout>
+#include <QMessageBox>
+#include <QPushButton>
 #include "control.h"
 #include "dicewidget.h"
 
@@ -24,26 +26,58 @@ public:
     ~Combat();
 
     QList<int> detectWhichPlayer();
-    void initQGroupBox();
     void initialLayout();
+    Thing *getThingFromID(int thingID);
+    int getCombatTurn() const;
+    void setCombatTurn(int value);
+    int getPlayerTurn() const;
+    void setPlayerTurn(int value);
+    void popMessageBox();
+    void removePlayerThingFromID(int thingID);
+    QList<Thing *> getThingsFromPlayerID(int playerID);
+    void Message(QString title, QString body);
+    bool checkAllPlayerRack();
+    Building *getHexBuilding() const;
+    void setHexBuilding(Building *value);
+    int getBuildingValue() const;
+    void setBuildingValue(int value);
+    void deleteALLWidget();
 public slots:
     void getThingFromHexSlot(QList<Thing*> tempThings, int playerID);
     void getBuildingFromHexSlot(Building *tempBuilding);
     void getOwnPlayer(int Player);
-    void startExplorationSlot();
-    void startCombatSlot();
-
+    void startCombatSlot(bool Combat);
     void updateDiceValueSlot(int tempDice);
+    void buttonClickedSlot();
+    void changePlayerTurnSlot(QAbstractButton *temp);
+    void continueButtonSlot();
+    void retreatButtonSlot();
+    void buildingButtonClickSlot();
+signals:
+    void sendRetretThingSignal(QList<Thing*>, int);
+    void sendCombatWinnerThingSignal(QList<Thing*>,int);
+    void sendBuildingToHexSignal(Building*,int);
+    void changeNextPlayerSingal();
 private:
     Ui::Combat *ui;
     int             ownPlayer;
     int             playerTurn;
     int             combatTurn;
     int             diceValue;
-    DiceWidget           *dice;
+    int             buildingValue;
+    bool            rollDice;
+    bool            isCombat;
+    QPushButton     *button;
+    QPushButton     *button2;
+    QPushButton     *buildingButton;
+    QList<int>      playerCount;
+    QList<QLabel*>  playerHitPoint;
+    QLabel          *playerTurnLabel;
+    DiceWidget      *dice;
     Building        *HexBuilding;
     QWidget         *globalWidget;
-    QGroupBox       *createPlayerBox(QList<Thing *> tempThings);
+    QGridLayout     *vertical_layout;
+    QGroupBox       *createPlayerBox(QList<Thing *> tempThings, int PlayerID);
     QList<Thing*>   PlayerOneThing;
     QList<Thing*>   PlayerTwoThing;
     QList<Thing*>   PlayerThreeThing;

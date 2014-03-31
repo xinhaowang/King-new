@@ -59,6 +59,7 @@ public:
     void startCombat(int count);
     void enableCombatHexClick();
     void checkExploration(int diceValue);
+    void combatTest();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void refreshThingWidget();
@@ -89,6 +90,10 @@ public slots:
     void sendbackOneThingToHexSlot(Thing *tempThing);
     void refreshClickStateSlot(HexWidget *tempwidget);
     void startCombatSlot(HexWidget *tempHex);
+    void getThingsFromRetreatSlot(QList<Thing *> tempThings, int playerID);
+    void getThingsFromCombatWinnerSlot(QList<Thing *> tempThings, int playerID);
+    void getBuildingFromCombatSlot(Building *tempBuilding, int playerID);
+    void changeNextPlayerSlot();
 signals:
     void initThingToRackSignal(QList<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
@@ -97,9 +102,7 @@ signals:
     void sendThingToCombatSignal(QList<Thing*>,int PlayerID);
     void sendBuildingToCombatSignal(Building*);
     void sendOwnerToCombatSignal(int);
-    void startCombatSignal();
-    void startExploration();
-
+    void startCombatSignal(bool);
 private:
     Ui::MainWindow       *ui;
     Control              *GameData;
@@ -110,7 +113,7 @@ private:
     DiceWidget           *dice;
     SelectGoldWidget     *selectedGold;
     HeroWidget           *Hero_widget;
-    QList<HexWidget*>   m_hexWidget;
+    QList<HexWidget*>    m_hexWidget;
     HexWidget            *selectedHex;
     ThingsDropWidget     *DropBoxWidget;
     ThingsDropWidget     *TradeBoxWidget;

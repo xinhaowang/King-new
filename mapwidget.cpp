@@ -152,11 +152,13 @@ void MapWidget::performDrag()
     //delete all the selected things when we drag them
     for(int a = 0; a < m_selectThingsLabel.size(); a++)
     {
-        for(int i = 0; i < m_thingsLabel.size(); i++)
+        for(int i = 0; i < m_thingsLabel.size();)
         {
             if(m_thingsLabel.at(i) == m_selectThingsLabel[a])
             {
                 m_thingsLabel.removeAt(i);
+            } else {
+                i++;
             }
         }
     }
