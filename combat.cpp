@@ -85,7 +85,7 @@ void Combat::buttonClickedSlot()
                         QString temp ="Player " + QString::number(playerCount.at(i)) +  " HitPoint : " + playerHitPoint.at(i)->objectName();
                         playerHitPoint.at(i)->setText(temp);
                         //check if the hitPoint become to 0
-                        if((hitPoint == 1)&&!checkAllPlayerRack())
+                        if(!checkAllPlayerRack()&&(hitPoint == 1))
                         {
                             popMessageBox();
                             break;
@@ -334,17 +334,21 @@ void Combat::deleteALLWidget()
     {
         qDeleteAll(vertical_layout->itemAtPosition(i,0)->widget()->children());
         delete vertical_layout->itemAtPosition(i,0)->widget();
+        delete vertical_layout->itemAtPosition(i,1)->widget();
     }
+    delete vertical_layout;
+    delete globalWidget;
+    //delete playerTurnLabel;
+    //delete dice;
+    //delete button;
+    //delete button2;
+    playerHitPoint.clear();
+    HexBuilding = NULL;
     PlayerOneThing.clear();
     PlayerTwoThing.clear();
     PlayerThreeThing.clear();
     PlayerFourThing.clear();
-    playerCount.clear();
-    qDeleteAll(playerHitPoint);
-    playerHitPoint.clear();
-    delete playerTurnLabel;
-    delete globalWidget;
-    HexBuilding = NULL;
+
 }
 
 void Combat::retreatButtonSlot()
@@ -478,8 +482,8 @@ bool Combat::checkAllPlayerRack()
             } else {
                 //exploration lose
                 Message("Sorry", "You lose the Exploration");
-                deleteALLWidget();
                 this->close();
+                deleteALLWidget();                
                 emit(changeNextPlayerSingal());
             }
             return true;

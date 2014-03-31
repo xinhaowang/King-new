@@ -45,7 +45,7 @@ void MainWindow::combatTest()
 //    Building *tempbuilding = GameData->getBuildingFromID(1);
 //    emit(sendBuildingToCombatSignal(tempbuilding));
     //start the combat
-    emit(startCombatSignal(true));
+    emit(startCombatSignal(false));
 }
 
 /*********************************************************
@@ -586,8 +586,8 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
     int ownPlayer;
     QList<Thing*> tempThings;
     if(tempHex->hexData()->getTypeID() != 1){
-    QWidget *controlMark = tempHex->childAt(57,50);    
-    ownPlayer = controlMark->objectName().toInt();
+        QWidget *controlMark = tempHex->childAt(57,50);
+        ownPlayer = controlMark->objectName().toInt();
     }
 
     if(tempHex->hexData()->getTypeID() == 1) {
@@ -904,10 +904,10 @@ void MainWindow::checkExploration(int diceValue)
                     //delete the thing in this player
                     tempThings.removeAt(i);
                 } else {
-                    i++;
+                    ++i;
                 }
             } else {
-                i++;
+                ++i;
             }
         }
         //delete the battle mark
@@ -938,6 +938,7 @@ void MainWindow::changeNextPlayerSlot()
 
 void MainWindow::startCombatSlot(HexWidget *tempHex)
 {
+    selectedHex = tempHex;
     int hexOwner = 0;
     if(tempHex->childAt(57,50))
     {
@@ -948,15 +949,14 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
     {
         //row the dice
         dice->show();
-        selectedHex = tempHex;
     } else {
         if(tempHex->thingsLabel().size() == tempHex->getPlayerThingsLabel(getPlayerTurn()).size()
                 && tempHex->building() == NULL)
         {
             //change the owner of this hex
             //delete the owner of the previous player
-            int ownPlayer = tempHex->childAt(57,50)->objectName().toInt();
-            GameData->getPlayerFromID(ownPlayer)->deleteHexWidget(tempHex);
+            int hexOwner = tempHex->childAt(57,50)->objectName().toInt();
+            GameData->getPlayerFromID(hexOwner)->deleteHexWidget(tempHex);
             delete tempHex->childAt(57,50);
             //set the control mark on this Hex
             QImage tempImage = QImage(GameData->getPlayerFromID(getPlayerTurn())->getControlMark());
@@ -974,9 +974,7 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
             //disable the click for the hex
             tempHex->setIsEnabledClick(false);
         } else {
-            //get the own player of this hex
-            int ownPlayer = tempHex->childAt(57,50)->objectName().toInt();
-            GameData->getPlayerFromID(ownPlayer)->deleteHexWidget(tempHex);
+            GameData->getPlayerFromID(hexOwner)->deleteHexWidget(tempHex);
             delete tempHex->childAt(57,50);
             //delete the owner of the hex
             //Combat or fighting over explorations
@@ -1012,11 +1010,11 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
                                 //delete the thing in this player
                                 tempThings.removeAt(i);
                             } else {
-                                i++;
+                                ++i;
                             }
 
                         } else {
-                            i++;
+                            ++i;
                         }
                     }
                     emit(sendThingToCombatSignal(tempThings,j));
@@ -1032,10 +1030,10 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
                 tempHex->deleteBuilding();
                 delete tempHex->childAt(87,50);
                 //delete the building in this player
-                GameData->getPlayerFromID(ownPlayer)->deleteBuilding(tempHex->building());
+                GameData->getPlayerFromID(hexOwner)->deleteBuilding(tempHex->building());
             }
             //send the owner of the hex to the combats
-            emit(sendOwnerToCombatSignal(ownPlayer));
+            emit(sendOwnerToCombatSignal(hexOwner));
             //disable the click for the hex
             tempHex->setIsEnabledClick(false);
             //delete the battle mark
@@ -1068,7 +1066,6 @@ void MainWindow::getThingsFromRetreatSlot(QList<Thing*> tempThings, int playerID
                         break;
                     }
                 }
-                break;
             }
         }
     }
@@ -1076,6 +1073,7 @@ void MainWindow::getThingsFromRetreatSlot(QList<Thing*> tempThings, int playerID
 
 void MainWindow::getThingsFromCombatWinnerSlot(QList<Thing*> tempThings, int playerID)
 {
+    //selectedHex = m_hexWidget.at(10);
     //set the controlmark
     QImage tempImage = QImage(GameData->getPlayerFromID(playerID)->getControlMark());
     QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
