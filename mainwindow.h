@@ -60,6 +60,10 @@ public:
     void enableCombatHexClick();
     void checkExploration(int diceValue);
     void combatTest();
+    void startConstruction(int count);
+    int checkTotalCitadelNumber();
+    int checkPlayerCitadel(int playerID);
+    void changePlayerOrder();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void refreshThingWidget();
@@ -94,6 +98,8 @@ public slots:
     void getThingsFromCombatWinnerSlot(QList<Thing *> tempThings, int playerID);
     void getBuildingFromCombatSlot(Building *tempBuilding, int playerID);
     void changeNextPlayerSlot();
+    void startConstructionSlot(HexWidget *tempHex);
+    void constrcutionSkipSlot();
 signals:
     void initThingToRackSignal(QList<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
@@ -117,9 +123,12 @@ private:
     HexWidget            *selectedHex;
     ThingsDropWidget     *DropBoxWidget;
     ThingsDropWidget     *TradeBoxWidget;
+    int                  hexOwnPlayer;
     int                  temp_selectedGold;
     int                  playerTurn;
     int                  PhaseTurn;
+    bool                  KeepOneTurn;
+
     int getRandomNumber(int range);
     void popMessageBox(int index);
     void disableMapClickandDrag();

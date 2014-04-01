@@ -158,6 +158,16 @@
         <file>image/hex/Swamp.png</file>
         <file>image/hex/green.jpg</file>
         <file>image/hex/red.jpg</file>
+        <file>image/hex/Mountain_select.png</file>
+        <file>image/hex/Plains_select.png</file>
+        <file>image/hex/Sea_select.png</file>
+        <file>image/hex/Swamp_select.png</file>
+        <file>image/hex/Jungle_select.png</file>
+        <file>image/hex/Frozen_waste_select.png</file>
+        <file>image/hex/Forest_select.png</file>
+        <file>image/hex/Desert_select.png</file>
+        <file>image/hex/green.png</file>
+        <file>image/hex/white.png</file>
     </qresource>
     <qresource prefix="/heros">
         <file>image/things/special_character/Thing49.jpg</file>

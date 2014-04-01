@@ -204,14 +204,14 @@ void Control::addHexWidget(HexWidget *tempHexWidget, int playerID)
  **/
 void Control::initHex()
 {
-    Hex *hex1 = new Hex(1,"sea",":/hex/image/hex/Sea.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
-    Hex *hex2 = new Hex(2,"desert",":/hex/image/hex/Desert.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
-    Hex *hex3 = new Hex(3,"forest",":/hex/image/hex/Forest.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
-    Hex *hex4 = new Hex(4,"frozen waste",":/hex/image/hex/Frozen_waste.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
-    Hex *hex5 = new Hex(5,"jungle",":/hex/image/hex/Jungle.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
-    Hex *hex6 = new Hex(6,"mountain",":/hex/image/hex/Mountain.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
-    Hex *hex7 = new Hex(7,"plains",":/hex/image/hex/Plains.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
-    Hex *hex8 = new Hex(8,"swamp",":/hex/image/hex/Swamp.png",":/hex/image/hex/green.jpg",":/hex/image/hex/red.jpg");
+    Hex *hex1 = new Hex(1,"sea",":/hex/image/hex/Sea.png",":/hex/image/hex/Sea_select.png",":/hex/image/hex/Sea_select.png");
+    Hex *hex2 = new Hex(2,"desert",":/hex/image/hex/Desert.png",":/hex/image/hex/Desert_select.png",":/hex/image/hex/Desert_select.png");
+    Hex *hex3 = new Hex(3,"forest",":/hex/image/hex/Forest.png",":/hex/image/hex/Forest_select.png",":/hex/image/hex/Forest_select.png");
+    Hex *hex4 = new Hex(4,"frozen waste",":/hex/image/hex/Frozen_waste.png",":/hex/image/hex/Frozen_waste_select.png",":/hex/image/hex/Frozen_waste_select.png");
+    Hex *hex5 = new Hex(5,"jungle",":/hex/image/hex/Jungle.png",":/hex/image/hex/Jungle_select.png",":/hex/image/hex/Jungle_select.png");
+    Hex *hex6 = new Hex(6,"mountain",":/hex/image/hex/Mountain.png",":/hex/image/hex/Mountain_select.png",":/hex/image/hex/Mountain_select.png");
+    Hex *hex7 = new Hex(7,"plains",":/hex/image/hex/Plains.png",":/hex/image/hex/Plains_select.png",":/hex/image/hex/Plains_select.png");
+    Hex *hex8 = new Hex(8,"swamp",":/hex/image/hex/Swamp.png",":/hex/image/hex/Swamp_select.png",":/hex/image/hex/Swamp_select.png");
     m_hex.push_back(hex1);
     m_hex.push_back(hex2);
     m_hex.push_back(hex3);
@@ -244,10 +244,47 @@ void Control::set37hex(const QList<Hex *> &temp37hex)
 
 void Control::init37hex()
 {
-    for(int i = 0; i < 37; i++)
-    {
-        m_37hex.push_back(m_hex.at(getRandomNumber(8) - 1));
-    }
+//    for(int i = 0; i < 37; i++)
+//    {
+//        m_37hex.push_back(m_hex.at(getRandomNumber(8) - 1));
+//    }
+    m_37hex.push_back(m_hex.at(0));
+    m_37hex.push_back(m_hex.at(6));
+    m_37hex.push_back(m_hex.at(7));
+    m_37hex.push_back(m_hex.at(4));
+    m_37hex.push_back(m_hex.at(7));
+    m_37hex.push_back(m_hex.at(1));
+    m_37hex.push_back(m_hex.at(0));
+    m_37hex.push_back(m_hex.at(5));
+    m_37hex.push_back(m_hex.at(3));
+    m_37hex.push_back(m_hex.at(6));
+    m_37hex.push_back(m_hex.at(3));
+    m_37hex.push_back(m_hex.at(5));
+    m_37hex.push_back(m_hex.at(7));
+    m_37hex.push_back(m_hex.at(6));
+    m_37hex.push_back(m_hex.at(2));
+    m_37hex.push_back(m_hex.at(6));
+    m_37hex.push_back(m_hex.at(2));
+    m_37hex.push_back(m_hex.at(5));
+    m_37hex.push_back(m_hex.at(2));
+    m_37hex.push_back(m_hex.at(1));
+    m_37hex.push_back(m_hex.at(3));
+    m_37hex.push_back(m_hex.at(1));
+    m_37hex.push_back(m_hex.at(3));
+    m_37hex.push_back(m_hex.at(7));
+    m_37hex.push_back(m_hex.at(0));
+    m_37hex.push_back(m_hex.at(6));
+    m_37hex.push_back(m_hex.at(5));
+    m_37hex.push_back(m_hex.at(4));
+    m_37hex.push_back(m_hex.at(2));
+    m_37hex.push_back(m_hex.at(7));
+    m_37hex.push_back(m_hex.at(0));
+    m_37hex.push_back(m_hex.at(7));
+    m_37hex.push_back(m_hex.at(2));
+    m_37hex.push_back(m_hex.at(5));
+    m_37hex.push_back(m_hex.at(3));
+    m_37hex.push_back(m_hex.at(1));
+    m_37hex.push_back(m_hex.at(1));
 }
 /*
  * Accessor for the Building data

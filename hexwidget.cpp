@@ -331,6 +331,9 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
         } else if (isEnabledClick && phase == 6) {
             //combat pahse
             emit(startCombatSignal(this));
+        } else if (isEnabledClick && phase == 7) {
+            //construction phase
+            emit(startConstrction(this));
         }
     }
 }
@@ -359,10 +362,10 @@ void HexWidget::paintEvent(QPaintEvent *e)
         this->setStyleSheet(temp);
         break;
     case 3:
-        this->setStyleSheet("border-image: url(:/background/image/background/white.jpg)");
+        this->setStyleSheet("border-image: url(:/hex/image/hex/white.png)");
         break;
     case 4:
-        this->setStyleSheet("border-image: url(:/background/image/background/dice1.gif)");
+        this->setStyleSheet("border-image: url(:/hex/image/hex/green.png)");
     default:
         break;
     }

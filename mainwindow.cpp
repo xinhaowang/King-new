@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), temp_selectedGold(0),
+    QMainWindow(parent), temp_selectedGold(0), KeepOneTurn(false),
     ui(new Ui::MainWindow)
 {
     //initial the all the widget and background
@@ -86,9 +86,16 @@ void MainWindow::startInitMap()
             QList<int> temp2 = getNearHex(temp.at(i)->getID());
             for(int j = 0; j < temp2.size(); j++)
             {
-                m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
-                m_hexWidget.at(temp2.at(j))->setIsEnableDrag(true);
-                m_hexWidget.at(temp2.at(j))->setSelectState(4);
+                if((m_hexWidget.at(temp2.at(j))->hexData()->getTypeID() == 1) ||
+                        (m_hexWidget.at(temp2.at(j))->childAt(57,50))) {
+                    m_hexWidget.at(temp2.at(j))->setIsEnabledClick(false);
+                    m_hexWidget.at(temp2.at(j))->setIsEnableDrag(false);
+                    m_hexWidget.at(temp2.at(j))->setSelectState(3);
+                } else {
+                    m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
+                    m_hexWidget.at(temp2.at(j))->setIsEnableDrag(true);
+                    m_hexWidget.at(temp2.at(j))->setSelectState(4);
+                }
             }
         }
         for(int i = 0; i < temp.size(); i++)
@@ -256,6 +263,9 @@ void MainWindow::startCollectGold(int count)
         //start next phase
         setPhaseTurn(2);
     } else {
+        //hide the things rack
+        Things_rack->hide();
+        //set up the button
         button->setText("Collect");
         button->setObjectName(QString::number(count));
         connect(button, SIGNAL(clicked()), this, SLOT(collectGoldSLOT()));
@@ -814,7 +824,7 @@ void MainWindow::startCombat(int count)
     if(count == 4)
     {
         //start nex phase
-
+        setPhaseTurn(7);
     } else {
         button->setObjectName(QString::number(count));
         Things_rack->hide();
@@ -975,7 +985,6 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
             tempHex->setIsEnabledClick(false);
         } else {
             GameData->getPlayerFromID(hexOwner)->deleteHexWidget(tempHex);
-            delete tempHex->childAt(57,50);
             //delete the owner of the hex
             //Combat or fighting over explorations
             //send all the creature to the combat widget including special income item
@@ -1004,9 +1013,6 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
                         {
                             if(!HexType.contains(tempThings.at(i)->getTerrainType()))
                             {
-                                //return the things to the rack
-                                tempThings.at(i)->setUsed(false);
-                                tempThings.at(i)->setInRack(true);
                                 //delete the thing in this player
                                 tempThings.removeAt(i);
                             } else {
@@ -1026,16 +1032,20 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
             if(tempHex->building())
             {
                 emit(sendBuildingToCombatSignal(tempHex->building()));
-                //delete the building in the hex
-                tempHex->deleteBuilding();
-                delete tempHex->childAt(87,50);
                 //delete the building in this player
                 GameData->getPlayerFromID(hexOwner)->deleteBuilding(tempHex->building());
+                //delete the building in the hex
+                tempHex->deleteBuilding();
+                delete tempHex->childAt(87,50);               
             }
             //send the owner of the hex to the combats
             emit(sendOwnerToCombatSignal(hexOwner));
+            //set up the hex player
+            hexOwnPlayer = hexOwner;
             //disable the click for the hex
             tempHex->setIsEnabledClick(false);
+            //delete the controal mark
+            delete tempHex->childAt(57,50);
             //delete the battle mark
             delete tempHex->childAt(57,80);
             emit(startCombatSignal(true));
@@ -1073,7 +1083,6 @@ void MainWindow::getThingsFromRetreatSlot(QList<Thing*> tempThings, int playerID
 
 void MainWindow::getThingsFromCombatWinnerSlot(QList<Thing*> tempThings, int playerID)
 {
-    //selectedHex = m_hexWidget.at(10);
     //set the controlmark
     QImage tempImage = QImage(GameData->getPlayerFromID(playerID)->getControlMark());
     QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
@@ -1114,6 +1123,246 @@ void MainWindow::getBuildingFromCombatSlot(Building* tempBuilding, int playerID)
     building->show();
     //set building to the player
     GameData->getPlayerFromID(playerID)->setPlayerBuilding(tempBuilding);
+    //check the winning of this player
+    if(checkPlayerCitadel(playerID) == 2)
+    {
+        QString temp = "Player " + QString::number(playerID) + " Win the Game";
+        Message("Congratulation", temp);
+        this->close();
+    }
+    //refresh the keep one turn
+    if((tempBuilding->getID() == 4) && (hexOwnPlayer == playerID))
+    {
+        KeepOneTurn = false;
+    }
+}
+
+/*********************************************************
+ *
+ * phase 7 function : Construction phases
+ *
+ * *******************************************************/
+
+void MainWindow::startConstruction(int count)
+{
+    if(count == 4)
+    {
+        //change to next phase
+        //check the winnning of the game
+        if((checkTotalCitadelNumber() == 1) && KeepOneTurn)
+        {
+            int playerID;
+            for(int i = 1; i <= 4; i++)
+            {
+                if(checkPlayerCitadel(i) == 1)
+                {
+                    playerID = i;
+                }
+            }
+            QString temp = "Player " + QString::number(playerID) + " Win the Game";
+            Message("Congratulation", temp);
+            this->close();
+        } else {
+            changePlayerOrder();
+        }
+    } else {
+        //hide the thingrack
+        Things_rack->hide();
+        //disable all the hex click first
+        disableMapClickandDrag();
+        button->setObjectName(QString::number(count));
+        //set skip button
+        button->setText("Skip");
+        connect(button,SIGNAL(clicked()),this,SLOT(constrcutionSkipSlot()));
+        button->show();
+        //enable the hex click for updating the tower
+        enablePlayerMapClick();
+    }
+
+}
+
+void MainWindow::constrcutionSkipSlot()
+{
+    //hide the button
+    button->hide();
+    disconnect(button,SIGNAL(clicked()),this,SLOT(constrcutionSkipSlot()));
+    //skip this phase,change to nex player
+    popMessageBox(1);
+    startConstruction(button->objectName().toInt()+1);
+}
+
+void MainWindow::startConstructionSlot(HexWidget *tempHex)
+{
+    //disable the click for the hex
+    tempHex->setIsEnabledClick(false);
+    //check the player have enough money or not
+    if(GameData->getPlayerFromID(getPlayerTurn())->getGold() < 5)
+    {
+        Message("Warning", "Don't have enough money!");
+        //hide the button
+        button->hide();
+        disconnect(button,SIGNAL(clicked()),this,SLOT(constrcutionSkipSlot()));
+        popMessageBox(1);
+        startConstruction(button->objectName().toInt()+1);
+    } else {
+        /*
+         * check the hex has buidling or not, if it has builidng then update the building
+         * if not, then put a tower on the building
+         * */
+        if(tempHex->building())
+        {
+            if(tempHex->building()->getID() == 3)
+            {
+                if(checkTotalCitadelNumber() < 2 && checkPlayerCitadel(getPlayerTurn()) == 0)
+                {
+                    if(GameData->getPlayerFromID(getPlayerTurn())->getGold() < 20)
+                    {
+                        Message("Warning", "Don't have enough money to build a citadel!");
+                    } else {
+                        //build a citadel
+                        //delete the building in the player
+                        GameData->getPlayerFromID(getPlayerTurn())->deleteBuilding(tempHex->building());
+                        //delete the building in the hex
+                        tempHex->deleteBuilding();
+                        //delete the building label in the hex
+                        delete tempHex->childAt(87,50);
+                        //add citadel to the player
+                        Building* citadel = GameData->getBuildingFromID(4);
+                        GameData->getPlayerFromID(getPlayerTurn())->setPlayerBuilding(citadel);
+                        //add the citadel to the hex
+                        tempHex->setBuilding(citadel);
+                        //set the citadel label to the hex
+                        QString tempBuidlingUrl = citadel->getUrl();
+                        QImage tempImage = QImage(tempBuidlingUrl);
+                        QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+                        QLabel *building = new QLabel(tempHex);
+                        building->setFixedSize(30,30);
+                        building->setGeometry(72,35,30,30);
+                        building->setPixmap(pixmap);
+                        building->show();
+
+                    }
+                } else {
+                    Message("Warning", "Too many Citadel!");
+                }
+            } else if(tempHex->building()->getID() == 4) {
+                Message("Warning", "Can't upgrade the citadel!");
+            } else {
+                //upgrade the building in the hex
+                Building* building;
+                switch (tempHex->building()->getID()) {
+                case 1:
+                    building = GameData->getBuildingFromID(2);
+                    break;
+                case 2:
+                    building = GameData->getBuildingFromID(3);
+                    break;
+                default:
+                    break;
+                }
+                //delete the building in the player
+                GameData->getPlayerFromID(getPlayerTurn())->deleteBuilding(tempHex->building());
+                //delete the building in the hex
+                tempHex->deleteBuilding();
+                //delete the building label in the hex
+                delete tempHex->childAt(87,50);
+                //add the building to the player
+                GameData->getPlayerFromID(getPlayerTurn())->setPlayerBuilding(building);
+                //add the building to the hex
+                tempHex->setBuilding(building);
+                //set the building label on the hex
+                QString tempBuidlingUrl = building->getUrl();
+                QImage tempImage = QImage(tempBuidlingUrl);
+                QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+                QLabel *buildinglabel = new QLabel(tempHex);
+                buildinglabel->setFixedSize(30,30);
+                buildinglabel->setGeometry(72,35,30,30);
+                buildinglabel->setPixmap(pixmap);
+                buildinglabel->show();
+                //decrease the money of the player
+                int money = GameData->getPlayerFromID(getPlayerTurn())->getGold();
+                GameData->getPlayerFromID(getPlayerTurn())->setGold(money-5);
+                refreshPlayerGold();
+            }
+        } else {
+            //add tower to the player
+            Building* tower = GameData->getBuildingFromID(1);
+            GameData->getPlayerFromID(getPlayerTurn())->setPlayerBuilding(tower);
+            //add the citadel to the hex
+            tempHex->setBuilding(tower);
+            //set the citadel label to the hex
+            QString tempBuidlingUrl = tower->getUrl();
+            QImage tempImage = QImage(tempBuidlingUrl);
+            QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+            QLabel *building = new QLabel(tempHex);
+            building->setFixedSize(30,30);
+            building->setGeometry(72,35,30,30);
+            building->setPixmap(pixmap);
+            building->show();
+            //decrease the money of the player
+            int money = GameData->getPlayerFromID(getPlayerTurn())->getGold();
+            GameData->getPlayerFromID(getPlayerTurn())->setGold(money-5);
+            refreshPlayerGold();
+        }
+    }
+
+}
+
+int MainWindow::checkTotalCitadelNumber()
+{
+    int count = 0;
+    for(int i = 1; i <= 4; i++)
+    {
+        QList<Building*> tempBuildings = GameData->getPlayerFromID(i)->getPlayerBuildings();
+        for(int j = 0; j < tempBuildings.size(); j++)
+        {
+            if(tempBuildings.at(j)->getID() == 4)
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+int MainWindow::checkPlayerCitadel(int playerID)
+{
+    int count;
+    QList<Building*> tempBuildings = GameData->getPlayerFromID(playerID)->getPlayerBuildings();
+    for(int i = 0; i < tempBuildings.size(); i++)
+    {
+        if(tempBuildings.at(i)->getID() == 4)
+        {
+            count++;
+        }
+    }
+    return count;
+}
+
+/*********************************************************
+ *
+ * phase 8 function : Special power phases
+ *
+ * *******************************************************/
+
+/*********************************************************
+ *
+ * phase 9 function : change player order
+ *
+ * *******************************************************/
+
+void MainWindow::changePlayerOrder()
+{
+    Message("Warning", "Start next game turn");
+    //finish one turn
+    if(checkTotalCitadelNumber() == 1)
+    {
+        KeepOneTurn = true;
+    }
+    //change the player turn
+    setPlayerTurn((getPlayerTurn()+1)%4);
+    //start the gold collection phase
+    setPhaseTurn(1);
 }
 
 /*********************************************************
@@ -1297,6 +1546,9 @@ void MainWindow::setPhaseTurn(int value)
     case 6:
         startCombat(0);
         break;
+    case 7:
+        startConstruction(0);
+        break;
     default:
         break;
     }
@@ -1348,6 +1600,7 @@ int MainWindow::getRandomNumber(int range)
     int x = qrand() % range + 1;
     return x;
 }
+
 void MainWindow::refreshThingWidget()
 {
     emit(initThingToRackSignal(GameData->getPlayerFromID(getPlayerTurn())->getInRackThings()));
@@ -1464,6 +1717,7 @@ void MainWindow::changePlayerTurnSlot2(QAbstractButton *)
  * initial function
  *
  * *******************************************************/
+
 //set the background of the main window
 void MainWindow::setBackground()
 {
@@ -1517,6 +1771,8 @@ void MainWindow::initMap()
                 this, SLOT(startCombatSlot(HexWidget*)));
         connect(tempHexWidget, SIGNAL(refrshThingRack()),
                 this, SLOT(refreshThingWidget()));
+        connect(tempHexWidget, SIGNAL(startConstrction(HexWidget*)),
+                this, SLOT(startConstructionSlot(HexWidget*)));
         //show that this widget is unowned
         tempHexWidget->setObjectName("0");
         tempHexWidget->setID(i);
