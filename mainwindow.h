@@ -108,6 +108,7 @@ public slots:
     void confirmUseTreasure(mylabel *tempLabel);
     void heroHexClickSlot(HexWidget *tempHex);
     void specialPowerSkipSlot();
+    void heroMasterThiefButtonClicked();
 signals:
     void initThingToRackSignal(QList<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
