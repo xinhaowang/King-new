@@ -182,6 +182,8 @@ void MainWindow::initThing()
 void MainWindow::initThingSlot()
 {
     QList<Thing *> temp = GameData->getRandomThingFromNum(10);
+    //show the trade
+    TradeBoxWidget->show();
     //set the thing to the player
     GameData->getPlayerFromID(getPlayerTurn())->setPlayerThings(temp);
     //refresh the thingWidget
@@ -193,6 +195,7 @@ void MainWindow::initThingSlot()
 
 void MainWindow::confirmThingSlot()
 {
+    TradeBoxWidget->hide();
     button->hide();
     disconnect(button,SIGNAL(clicked()),this,SLOT(confirmThingSlot()));
     //change next player
@@ -525,15 +528,41 @@ void MainWindow::tradeboxSlot(QList<Thing *> tempThings)
     //delete the things in the player
     GameData->getPlayerFromID(getPlayerTurn())->deletePlayerThings(tempThings);
     //send player new things
-    int count = tempThings.size()/2;
+    int count;
+    if(getPhaseTurn() == 0)
+    {
+        count = tempThings.size();
+    } else {
+        count = tempThings.size()/2;
+    }
     QList<Thing *> tempThing = GameData->getRandomThingFromNum(count);
     for(int i = 0; i < count; i++)
     {
         GameData->getPlayerFromID(getPlayerTurn())->setPlayerThing(tempThing.at(i));
     }
     refreshThingWidget();
+    TradeBoxWidget->hide();
 }
 
+//confirm use treasure slot
+void MainWindow::confirmUseTreasure(mylabel* tempLabel)
+{
+    if (QMessageBox::Yes == QMessageBox::question(this,
+                                                  tr("Warning"),
+                                                  tr("Use the treasure!"),
+                                                  QMessageBox::Yes | QMessageBox::No,
+                                                  QMessageBox::Yes)) {
+        //return the thing to the system
+        tempLabel->getData()->setUsed(false);
+        //delete the thing in the player
+        GameData->getPlayerFromID(getPlayerTurn())->deletePlayerThing(tempLabel->getData());
+        //refresh the thing widget
+        refreshThingWidget();
+    } else {
+        //do nothing
+    }
+
+}
 /*********************************************************
  *
  * phase 5 function : movement phases
@@ -1166,8 +1195,6 @@ void MainWindow::startConstruction(int count)
             changePlayerOrder();
         }
     } else {
-        //hide the thingrack
-        Things_rack->hide();
         //disable all the hex click first
         disableMapClickandDrag();
         button->setObjectName(QString::number(count));
@@ -1917,6 +1944,8 @@ void MainWindow::setThingsRack()
             Things_rack, SLOT(initThingToRackSlot(QList<Thing*>)));
     connect(Things_rack, SIGNAL(startDragSignal(QList<mylabel*>)),
             this, SLOT(startDragSlot(QList<mylabel*>)));
+    connect(Things_rack, SIGNAL(confirmUseTreasure(mylabel*)),
+            this, SLOT(confirmUseTreasure(mylabel*)));
 }
 //set up the special character widget
 void MainWindow::setHeroWidget()

@@ -41,6 +41,7 @@ protected:
 
 signals:
     void startDragSignal(QList<mylabel*>);
+    void confirmUseTreasure(mylabel*);
 
 private:
     int                 iconMode;

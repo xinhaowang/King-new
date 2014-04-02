@@ -67,11 +67,16 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
             QRect rect = getThingRect(i);
             if(rect.contains(m_mousePressPosn))
             {
-                if(m_thingsLabel[i]->selected())
+                if(m_thingsLabel.at(i)->getData()->getType() == 6)
                 {
-                    unSelectThing();
+                    emit(confirmUseTreasure(m_thingsLabel.at(i)));
                 } else {
-                    selectThing();
+                    if(m_thingsLabel[i]->selected())
+                    {
+                        unSelectThing();
+                    } else {
+                        selectThing();
+                    }
                 }
             }
         }

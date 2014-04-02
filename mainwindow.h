@@ -100,6 +100,7 @@ public slots:
     void changeNextPlayerSlot();
     void startConstructionSlot(HexWidget *tempHex);
     void constrcutionSkipSlot();
+    void confirmUseTreasure(mylabel *tempLabel);
 signals:
     void initThingToRackSignal(QList<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
