@@ -399,7 +399,7 @@ QList<Hero *> Control::get10heroData() const
 
 void Control::removeHeroFromID(int heroID)
 {
-    for(int i = 0; i < m_10heroData.size();)
+    for(int i = 0; i < m_10heroData.size(); i++)
     {
         if(heroID == m_10heroData.at(i)->getID())
         {

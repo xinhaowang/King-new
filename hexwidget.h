@@ -75,6 +75,7 @@ signals:
     void startCombatSignal(HexWidget*);
     void refrshThingRack();
     void startConstrction(HexWidget*);
+    void startSpecialPowerSingal(HexWidget*);
 
 public slots:
     void setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase);

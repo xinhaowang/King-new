@@ -108,7 +108,6 @@ void MainWindow::startInitMap()
 
 void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
 {
-    //combatTest();
     int playerID = getPlayerTurn();
     GameData->addHexWidget(tempHexWidget, playerID);
     //set the control mark on this Hex
@@ -283,7 +282,13 @@ void MainWindow::collectGoldSLOT()
     int amount = GameData->getPlayerFromID(getPlayerTurn())->getGold();
     //hex you control
     QList<HexWidget *> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
-    amount += tempHex.size();
+    for(int i = 0; i < tempHex.size(); i++)
+    {
+        if(tempHex.at(i)->hexData()->getTypeName() != "")
+        {
+            amount++;
+        }
+    }
     //combat value of forks
     for(int i = 0; i < tempHex.size(); i++)
     {
@@ -357,12 +362,13 @@ void MainWindow::skipRecruitHeroSlot()
 
 void MainWindow::heroConfirmSlot(Hero *tempHero)
 {
+    //set up the choosen of the hero
+    temp_hero = tempHero;
     disconnect(button, SIGNAL(clicked()), this, SLOT(skipRecruitHeroSlot()));
     button->hide();
     button->setText("Confirm");
     connect(button, SIGNAL(clicked()), this, SLOT(chooseHeroSLOT()));
-    button->show();
-    temp_hero = tempHero;
+    button->show();    
     selectedGold->refreshGoldValue(GameData->getPlayerFromID(getPlayerTurn())->getGold());
     selectedGold->show();
     button->show();
@@ -386,9 +392,6 @@ void MainWindow::checkOwnHero(int dicevalue)
     int additionDice = getselectedGold()/5;
     if(dicevalue + additionDice >= temp_hero->getAttackValue())
     {
-        GameData->getPlayerFromID(getPlayerTurn())->setPlayerHero(temp_hero);
-        //reduce from the controller
-        GameData->removeHeroFromID(temp_hero->getID());
         Message("Message", "Win a Hero");
         enablePlayerMapClick();        
         Hero_widget->hide();
@@ -403,19 +406,31 @@ void MainWindow::checkOwnHero(int dicevalue)
 
 void MainWindow::setHeroSlot(HexWidget* tempHexWidget)
 {
-    //show the hero on the hex
-    temp_hero->setMode(SmallIcon_Mode);
-    HeroLabel *tempHero = new HeroLabel(temp_hero, tempHexWidget);
-    tempHero->setGeometry(12,35,30,30);
-    tempHero->show();
-    //set up the hero on the hex
-    tempHexWidget->setHeroLabel(tempHero);
-    tempHero->clear();
-    //change next player
-    disableMapClickandDrag();
-    Hero_widget->hide();
-    popMessageBox(1);
-    startChooseHero(button->objectName().toInt() + 1);
+    if(tempHexWidget->heroLabel())
+    {
+        //the hex already have hero
+        Message("Warning", "Already have hero in this hex");
+    } else {
+        //add hero to the player
+        GameData->getPlayerFromID(getPlayerTurn())->setPlayerHero(temp_hero);
+        //reduce from the controller
+        GameData->removeHeroFromID(temp_hero->getID());
+        //show the hero on the hex
+        temp_hero->setMode(SmallIcon_Mode);
+        HeroLabel *tempHero = new HeroLabel(temp_hero, tempHexWidget);
+        tempHero->setGeometry(12,35,30,30);
+        tempHero->show();
+        //set up the hero on the hex
+        tempHexWidget->setHeroLabel(tempHero);
+        tempHero->clear();
+        //check the terrain loard and update the hex information of the player
+        checkTerrainLord();
+        //change next player
+        disableMapClickandDrag();
+        Hero_widget->hide();
+        popMessageBox(1);
+        startChooseHero(button->objectName().toInt() + 1);
+    }
 }
 
 /*********************************************************
@@ -439,7 +454,16 @@ void MainWindow::startRecruitThings(int count)
 //free recruits
 void MainWindow::freeRecruitThings()
 {
-    int count = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs().size()/2 + 1;
+    QList<HexWidget*> temphex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    int count = 0;
+    for(int i = 0; i < temphex.size(); i++)
+    {
+        if(temphex.at(i)->hexData()->getTypeName() != "")
+        {
+            count++;
+        }
+    }
+    count = count/2 + 1;
     QList<Thing *> temp = GameData->getRandomThingFromNum(count);
     for(int i = 0; i < temp.size(); i++)
     {
@@ -804,12 +828,15 @@ void MainWindow::refreshClickStateSlot(HexWidget *tempwidget)
     QList<HexWidget*> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
     for(int i = 0; i < tempHex.size(); i++)
     {
-        QList<int> temp = getNearHex(tempHex.at(i)->getID());
-        for(int j = 0; j < temp.size(); j++)
+        if(tempHex.at(i)->hexData()->getTypeName() != "")
         {
-            if(m_hexWidget.at(temp.at(j))->hexData()->getTypeID() == 1)
+            QList<int> temp = getNearHex(tempHex.at(i)->getID());
+            for(int j = 0; j < temp.size(); j++)
             {
-                m_hexWidget.at(temp.at(j))->setIsEnabledClick(true);
+                if(m_hexWidget.at(temp.at(j))->hexData()->getTypeID() == 1)
+                {
+                    m_hexWidget.at(temp.at(j))->setIsEnabledClick(true);
+                }
             }
         }
     }
@@ -1371,6 +1398,198 @@ int MainWindow::checkPlayerCitadel(int playerID)
  * phase 8 function : Special power phases
  *
  * *******************************************************/
+void MainWindow::startSpecialPower(int count)
+{
+    if(count == 4)
+    {
+        //change to next phase
+        changePlayerOrder();
+    } else {
+        //show the skip button
+        button->setObjectName(QString::number(count));
+        button->setText("skip");
+        connect(button,SIGNAL(clicked()),this,SLOT(specialPowerSkipSlot()));
+        button->show();
+        //check all the hero ability power
+        Things_rack->hide();
+        enableHeroHexClick();
+    }
+}
+
+void MainWindow::specialPowerSkipSlot()
+{
+    button->hide();
+    disconnect(button,SIGNAL(clicked()),this,SLOT(specialPowerSkipSlot());
+    //change to next player
+    popMessageBox(1);
+    startSpecialPower(button->objectName().toInt()+1);
+}
+
+void MainWindow::enableHeroHexClick()
+{
+    QList<HexWidget*> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    for(int i = 0; i < tempHex.size(); i++)
+    {
+        if(tempHex.at(i)->heroLabel())
+        {
+            tempHex.at(i)->setIsEnabledClick(true);
+        }
+    }
+}
+
+void MainWindow::heroHexClickSlot(HexWidget* tempHex)
+{
+    switch (tempHex->heroLabel()->getData()->getID()) {
+    case 4:
+        heroMasterThief();
+        break;
+    default:
+        Message("Warning", "Don't have this kind of hero!");
+        break;
+    }
+    tempHex->setIsEnabledClick(false);
+}
+
+void MainWindow::heroMasterThief()
+{
+    //this is the operation of the hero master thief
+    groupbox = new QGroupBox(this);
+    QVBoxLayout *vbox =  new QVBoxLayout();
+    groupbox->move(800,300);
+    //set up the three label
+    for(int i = 1; i < 4; i++)
+    {
+        if(i != getPlayerTurn())
+        {
+            QPushButton *tempbutton = new QPushButton;
+            tempbutton->setObjectName(QString::number(i));
+            QString temp = "Player " + QString::number(i);
+            tempbutton->setFixedSize(80,80);
+            tempbutton->setText(temp);
+            connect(tempbutton, SIGNAL(clicked()), this, SLOT(heroMasterThiefButtonClicked());
+            vbox->addWidget(tempbutton);
+        }
+    }
+    groupbox->setLayout(vbox);
+    groupbox->show();
+}
+
+void MainWindow::heroMasterThiefButtonClicked()
+{
+    delete groupbox;
+    groupbox->hide();
+    QObject *senderButton = sender();
+    int currentPlayer = getPlayerTurn();
+    int selectPlayer = senderButton->objectName().toInt();
+    //both player roll the dice
+    dice->show();
+}
+
+//check therain loard and add the hex to the player
+void MainWindow::checkTerrainLord()
+{
+    //get all the hex of this player
+    QList<HexWidget*> tempHex = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+    //get the hex type
+    QList<int> hexType;
+    for(int i = 0; i < tempHex.size(); i++)
+    {
+        hexType.push_back(tempHex.at(i)->hexData()->getTypeID());
+    }
+    //check if there has hero, heroID
+    QList<int> tempID;
+    for(int i = 0; i < tempHex.size(); i++)
+    {
+        if(tempHex.at(i)->heroLabel())
+        {
+            //they are all terrain lords
+            if(tempHex.at(i)->heroLabel()->getData()->getID() == 0 ||
+                    tempHex.at(i)->heroLabel()->getData()->getID() == 2 ||
+                    tempHex.at(i)->heroLabel()->getData()->getID() == 19 ||
+                    tempHex.at(i)->heroLabel()->getData()->getID() == 17||
+                    tempHex.at(i)->heroLabel()->getData()->getID() == 9 ||
+                    tempHex.at(i)->heroLabel()->getData()->getID() == 21 ||
+                    tempHex.at(i)->heroLabel()->getData()->getID() == 12
+                    )
+            {
+                tempID.push_back(tempHex.at(i)->heroLabel()->getData()->getID());
+            }
+        }
+    }
+    //set the new type of hex into the player
+    for(int i = 0; i < tempID.size(); i++)
+    {
+
+        switch (tempID.at(i)) {
+        case 0:
+            //desert master
+            if(!hexType.contains(2))
+            {
+                Hex *hextype = new Hex(2,"","","","");
+                HexWidget *temphexwidget = new HexWidget(this,hextype);
+                GameData->getPlayerFromID(getPlayerTurn())->setPlayerHex(temphexwidget);
+            }
+            break;
+        case 2:
+            //forest king
+            if(!hexType.contains(3))
+            {
+                Hex *hextype = new Hex(3,"","","","");
+                HexWidget *temphexwidget = new HexWidget(this,hextype);
+                GameData->getPlayerFromID(getPlayerTurn())->setPlayerHex(temphexwidget);
+            }
+            break;
+        case 19:
+            //ice lord
+            if(!hexType.contains(4))
+            {
+                Hex *hextype = new Hex(4,"","","","");
+                HexWidget *temphexwidget = new HexWidget(this,hextype);
+                GameData->getPlayerFromID(getPlayerTurn())->setPlayerHex(temphexwidget);
+            }
+            break;
+        case 17:
+            //jungle king
+            if(!hexType.contains(5))
+            {
+                Hex *hextype = new Hex(5,"","","","");
+                HexWidget *temphexwidget = new HexWidget(this,hextype);
+                GameData->getPlayerFromID(getPlayerTurn())->setPlayerHex(temphexwidget);
+            }
+            break;
+        case 9:
+            //mountain king
+            if(!hexType.contains(6))
+            {
+                Hex *hextype = new Hex(6,"","","","");
+                HexWidget *temphexwidget = new HexWidget(this,hextype);
+                GameData->getPlayerFromID(getPlayerTurn())->setPlayerHex(temphexwidget);
+            }
+            break;
+        case 21:
+            //plains king
+            if(!hexType.contains(7))
+            {
+                Hex *hextype = new Hex(7,"","","","");
+                HexWidget *temphexwidget = new HexWidget(this,hextype);
+                GameData->getPlayerFromID(getPlayerTurn())->setPlayerHex(temphexwidget);
+            }
+            break;
+        case 12:
+            //swamp king
+            if(!hexType.contains(8))
+            {
+                Hex *hextype = new Hex(8,"","","","");
+                HexWidget *temphexwidget = new HexWidget(this,hextype);
+                GameData->getPlayerFromID(getPlayerTurn())->setPlayerHex(temphexwidget);
+            }
+            break;
+        default:
+            break;
+        }
+    }
+}
+
 
 /*********************************************************
  *
@@ -1663,6 +1882,7 @@ void MainWindow::updateDiceValueSlot(int tempdiceValue)
         checkOwnHero(tempdiceValue);
     } else if(getPhaseTurn() == 6){
         checkExploration(tempdiceValue);
+    } else if(getPhaseTurn() == 8){
     }
 }
 
@@ -1800,6 +2020,8 @@ void MainWindow::initMap()
                 this, SLOT(refreshThingWidget()));
         connect(tempHexWidget, SIGNAL(startConstrction(HexWidget*)),
                 this, SLOT(startConstructionSlot(HexWidget*)));
+        connect(tempHexWidget, SIGNAL(startSpecialPowerSingal(HexWidget*)),
+                this, SLOT(heroHexClickSlot(HexWidget*)));
         //show that this widget is unowned
         tempHexWidget->setObjectName("0");
         tempHexWidget->setID(i);

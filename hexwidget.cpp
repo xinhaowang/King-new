@@ -13,6 +13,7 @@ HexWidget::HexWidget(QWidget *parent, Hex *tempHex) :
     this->setIsEnableDrag(false);
     this->setSelectState(3);
     m_building = NULL;
+    m_heroLabel = NULL;
     battle = false;
 }
 
@@ -324,6 +325,7 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
             //emit the signal to the mainwindow
             emit(setBulidngSingal(this));
         } else if (isEnabledClick && phase == 2) {
+            //set up the hero
             emit(setHeroSignal(this));
         } else if (isEnabledClick && phase == 5) {
             //movement phase
@@ -334,6 +336,9 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
         } else if (isEnabledClick && phase == 7) {
             //construction phase
             emit(startConstrction(this));
+        } else if (isEnabledClick ** phase == 8) {
+            //special power phase
+            emit(startSpecialPowerSingal(this));
         }
     }
 }
@@ -551,22 +556,3 @@ void HexWidget::setBattle(bool value)
 {
     battle = value;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
