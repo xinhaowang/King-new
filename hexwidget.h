@@ -49,12 +49,19 @@ public:
 
     HeroLabel *heroLabel() const;
     void setHeroLabel(HeroLabel *heroLabel);
+    void deleteHeroLabel();
 
     void Message(QString title, QString body);
     QList<mylabel *> getPlayerThingsLabel(int playerID);
 
     bool getBattle() const;
     void setBattle(bool value);
+
+    void initialControlMark(QString url, int PlayerID);
+    void deleteControlMark();
+    void initialBuildingLabel(Building *tempbuilding);
+    void deleteBuildingLabel();
+    void initialNeutralizedBuilidng(Building *tempbuilding);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -92,6 +99,8 @@ private:
     QList<mylabel *>    m_thingsLabel;
     Building            *m_building;
     HeroLabel           *m_heroLabel;
+    QLabel              *control_mark;
+    QLabel              *building_Label;
 };
 
 #endif // HEXWIDGET_H

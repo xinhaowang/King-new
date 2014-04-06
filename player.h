@@ -39,6 +39,7 @@ public:
     void deleteBuilding(Building *value);
 
     QList<Hero *> getPlayerHeros() const;
+    void deleteHeroFromID(int heroID);
     void setPlayerHero(Hero *value);
     void setPlayerHeros(const QList<Hero *> &value);
 

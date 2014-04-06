@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QHBoxLayout>
 #include <QGroupBox>
 #include <QTime>
 #include "mapwidget.h"
@@ -68,7 +69,8 @@ public:
     void checkTerrainLord();
     void startSpecialPower(int count);
     void enableHeroHexClick();
-    void heroMasterThief();
+    void heroMasterThief(int count);
+    void initTestData();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void refreshThingWidget();
@@ -137,7 +139,7 @@ private:
     int                  temp_selectedGold;
     int                  playerTurn;
     int                  PhaseTurn;
-    bool                  KeepOneTurn;
+    bool                 KeepOneTurn;
 
     int getRandomNumber(int range);
     void popMessageBox(int index);

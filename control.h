@@ -56,6 +56,7 @@ public:
     void setHeroData(const QList<Hero *> &heroData);
     void chooseTenRandomHeros();
     QList<Hero *> get10heroData() const;
+    void addHeroTo10HeroData(Hero *tempHero);
     void set10heroData(const QList<Hero *> &temp10heroData);
     void removeHeroFromID(int heroID);
 

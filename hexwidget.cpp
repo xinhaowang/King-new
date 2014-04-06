@@ -128,6 +128,12 @@ void HexWidget::setHeroLabel(HeroLabel *heroLabel)
 
 }
 
+void HexWidget::deleteHeroLabel()
+{
+    delete m_heroLabel;
+    m_heroLabel = NULL;
+}
+
 Hex *HexWidget::hexData() const
 {
     return m_hexData;
@@ -302,6 +308,55 @@ void HexWidget::returnAllThings()
     qDeleteAll(m_thingsLabel);
     m_thingsLabel.clear();
 }
+
+void HexWidget::initialControlMark(QString url, int PlayerID)
+{
+    QImage tempImage = QImage(url);
+    QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+    control_mark = new QLabel(this);
+    control_mark->setObjectName(QString::number(PlayerID));
+    control_mark->setFixedSize(30,30);
+    control_mark->setGeometry(42,35,30,30);
+    control_mark->setPixmap(pixmap);
+    control_mark->show();
+}
+
+void HexWidget::deleteControlMark()
+{
+    delete control_mark;
+    control_mark->clear();
+}
+
+void HexWidget::initialBuildingLabel(Building *tempbuilding)
+{
+    m_building = tempbuilding;
+    QImage tempImage = QImage(tempbuilding->getUrl());
+    QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+    building_Label = new QLabel(this);
+    building_Label->setFixedSize(30,30);
+    building_Label->setGeometry(72,35,30,30);
+    building_Label->setPixmap(pixmap);
+    building_Label->show();
+}
+
+
+void HexWidget::initialNeutralizedBuilidng(Building *tempbuilding)
+{
+    m_building = tempbuilding;
+    QImage tempImage = QImage(tempbuilding->getNeutralURL());
+    QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
+    building_Label = new QLabel(this);
+    building_Label->setFixedSize(30,30);
+    building_Label->setGeometry(72,35,30,30);
+    building_Label->setPixmap(pixmap);
+    building_Label->show();
+}
+void HexWidget::deleteBuildingLabel()
+{
+    delete building_Label;
+    building_Label->clear();
+}
+
 /********************************************************************
  *
  * protected
@@ -336,7 +391,7 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
         } else if (isEnabledClick && phase == 7) {
             //construction phase
             emit(startConstrction(this));
-        } else if (isEnabledClick ** phase == 8) {
+        } else if (isEnabledClick && phase == 8) {
             //special power phase
             emit(startSpecialPowerSingal(this));
         }
@@ -556,3 +611,4 @@ void HexWidget::setBattle(bool value)
 {
     battle = value;
 }
+

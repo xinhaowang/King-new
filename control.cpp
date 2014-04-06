@@ -157,10 +157,7 @@ QList<Thing *> Control::getAllThings()
 
 Thing *Control::getThing(int index)
 {
-    if ((index >= 0) && (index < m_thingData.size()))
-    {
-        return m_thingData[index];
-    }
+    return m_thingData.at(index);
 }
 
 /*
@@ -361,6 +358,8 @@ void Control::chooseTenRandomHeros()
 {
     QList<Hero *> temp = m_heroData;
     QList<int> tempint;
+    //add the master thief to the data
+    tempint.push_back(4);
     while(true){
         int random = getRandomNumber(22) - 1;
         if(tempint.empty())
@@ -395,6 +394,11 @@ void Control::chooseTenRandomHeros()
 QList<Hero *> Control::get10heroData() const
 {
     return m_10heroData;
+}
+
+void Control::addHeroTo10HeroData(Hero *tempHero)
+{
+    m_10heroData.push_back(tempHero);
 }
 
 void Control::removeHeroFromID(int heroID)
