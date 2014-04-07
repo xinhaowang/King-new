@@ -40,6 +40,7 @@ public:
 
     QList<Hero *> getPlayerHeros() const;
     void deleteHeroFromID(int heroID);
+    void deleteHero(Hero *temp);
     void setPlayerHero(Hero *value);
     void setPlayerHeros(const QList<Hero *> &value);
 

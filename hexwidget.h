@@ -83,6 +83,7 @@ signals:
     void refrshThingRack();
     void startConstrction(HexWidget*);
     void startSpecialPowerSingal(HexWidget*);
+    void checkHeroOwner(HexWidget*);
 
 public slots:
     void setPlayerIDnPhaseSlot(int tempPlayerID, int tempPhase);

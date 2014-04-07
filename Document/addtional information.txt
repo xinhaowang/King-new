@@ -29,7 +29,7 @@ things type:
 5. star
 6. treasure
 7. special income
-8. triangle and star
+8. triangle and star(flying)
 9. star and R
 10. magic
 11. random event
@@ -39,6 +39,8 @@ things id:
 146-155 : special income
 156-161 : treasure
 162-172 : magic
+173-174 : city and village (special income)
+175 : defection event
 
 
 hero type:
@@ -96,22 +98,22 @@ Wild Cat	96	camel corps	110
 • Ghost (Flying)		124
 • Dark Wizard (Flying)		134
 
-• Thing
-• Unicorn
-• Bears
-• Camel Corps
-• Sandworm
-• Black Knight (C3)
-• Dervish (Star2)
-• Forester (R2)
-• Pterodactyl Warriors (Flying)
-• Bird of Paradise (Flying)
+• Thing				142
+• Unicorn			94
+• Bears				83
+• Camel Corps			110
+• Sandworm			101
+• Black Knight (C3)		143
+• Dervish (Star2)		103
+• Forester (R2)			95
+• Pterodactyl Warriors (Flying)	38
+• Bird of Paradise (Flying)	30
 
-• Nomads
-• Dervish
-• Giant Spider
+• Nomads			114
+• Dervish			103
+• Giant Spider			
 
-• Walking Tree
-• Wild Cat
-• Elves 
-• Great Owl (Flying)
+• Walking Tree			100
+• Wild Cat			96
+• Elves 			92
+• Great Owl (Flying)		93

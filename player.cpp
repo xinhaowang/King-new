@@ -136,6 +136,17 @@ void Player::deleteHeroFromID(int heroID)
     }
 }
 
+void Player::deleteHero(Hero *temp)
+{
+    for(int i = 0; i < playerHeros.size(); i++)
+    {
+        if(temp == playerHeros.at(i))
+        {
+            playerHeros.removeAt(i);
+        }
+    }
+}
+
 void Player::setPlayerHero(Hero *value)
 {
     playerHeros.push_back(value);

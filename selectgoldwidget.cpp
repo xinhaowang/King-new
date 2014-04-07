@@ -5,7 +5,6 @@ SelectGoldWidget::SelectGoldWidget(QWidget *parent) :
 {
     this->setFixedWidth(80);
     initQlabel();
-    //initQComboBox(MaxGold);
     input = new QComboBox(this);
     input->move(0,20);
 }

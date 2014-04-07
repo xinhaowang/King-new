@@ -220,7 +220,9 @@
         <file>image/things/magic/Thing80.jpg</file>
         <file>image/things/magic/Thing81.jpg</file>
     </qresource>
-    <qresource prefix="/events"/>
+    <qresource prefix="/events">
+        <file>image/things/event/defection.jpg</file>
+    </qresource>
     <qresource prefix="/treasures">
         <file>image/things/special_income/Thing82.jpg</file>
         <file>image/things/special_income/Thing83.jpg</file>

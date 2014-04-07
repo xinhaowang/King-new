@@ -173,4 +173,5 @@
 172,0,10,0,firewall,:/magic/image/things/magic/Thing81.jpg
 173,1,7,0,village,:/buildings/image/things/player_battle_building/Thing34.jpg
 174,2,7,0,city,:/buildings/image/things/player_battle_building/Thing37.jpg
-174,2,7,0,city,:/buildings/image/things/player_battle_building/Thing37.jpg
+175,0,11,0,defection,:/events/image/things/event/defection.jpg
+175,0,11,0,defection,:/events/image/things/event/defection.jpg

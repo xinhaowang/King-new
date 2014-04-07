@@ -70,13 +70,11 @@ void Control::deleteThing(Thing *tempThing)
 {
     if(tempThing)
     {
-        QList<Thing*>::iterator it = m_thingData.begin();
-        for(it; it != m_thingData.end(); ++it)
+        for(int i = 0; i < m_thingData.size(); i++)
         {
-            if(tempThing == *it)
+            if(m_thingData.at(i) == tempThing)
             {
-                m_thingData.erase(it);
-                break;
+                m_thingData.removeAt(i);
             }
         }
     }
@@ -91,8 +89,11 @@ Thing* Control::getThingFromID(int thingID)
             if(thingID == m_thingData[i]->getID())
             {
                 return m_thingData[i];
+                break;
             }
         }
+    } else {
+        return NULL;
     }
 }
 
@@ -105,7 +106,7 @@ QList<Thing *> Control::getRandomThingFromNum(int count)
         {
             break;
         } else {
-            int tempNum = getRandomNumber(173) - 1;
+            int tempNum = getRandomNumber(176) - 1;
             if(m_thingData.at(tempNum)->getUsed())
             {
                 //the thing has been used

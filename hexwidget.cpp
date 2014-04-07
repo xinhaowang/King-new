@@ -382,6 +382,9 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
         } else if (isEnabledClick && phase == 2) {
             //set up the hero
             emit(setHeroSignal(this));
+        } else if (isEnabledClick && phase == 4) {
+            //defection event
+            emit(checkHeroOwner(this));
         } else if (isEnabledClick && phase == 5) {
             //movement phase
             emit(setThingsToMoveWidgetSignal(this));
