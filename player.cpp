@@ -125,6 +125,28 @@ QList<Hero *> Player::getPlayerHeros() const
     return playerHeros;
 }
 
+void Player::deleteHeroFromID(int heroID)
+{
+    for(int i = 0; i < playerHeros.size(); i++)
+    {
+        if(heroID == playerHeros.at(i)->getID())
+        {
+            playerHeros.removeAt(i);
+        }
+    }
+}
+
+void Player::deleteHero(Hero *temp)
+{
+    for(int i = 0; i < playerHeros.size(); i++)
+    {
+        if(temp == playerHeros.at(i))
+        {
+            playerHeros.removeAt(i);
+        }
+    }
+}
+
 void Player::setPlayerHero(Hero *value)
 {
     playerHeros.push_back(value);

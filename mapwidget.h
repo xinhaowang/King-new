@@ -20,7 +20,7 @@ public:
 
 public slots:
     void initThingToRackSlot(QList<Thing*> tempThings);
-
+    void clear();
 private slots:
     void reLayoutIconSlot();
 
@@ -33,7 +33,7 @@ protected:
     void dropEvent(QDropEvent *event);
 
     QRect getThingRect(int index);
-    void clear();
+
     void performDrag();
     void selectThing();
     void unSelectThing();
@@ -42,6 +42,7 @@ protected:
 signals:
     void startDragSignal(QList<mylabel*>);
     void confirmUseTreasure(mylabel*);
+    void confirmUseRandomEvent(mylabel*);
 
 private:
     int                 iconMode;

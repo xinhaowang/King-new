@@ -70,6 +70,8 @@ void MapWidget::mousePressEvent(QMouseEvent *event)
                 if(m_thingsLabel.at(i)->getData()->getType() == 6)
                 {
                     emit(confirmUseTreasure(m_thingsLabel.at(i)));
+                } else if(m_thingsLabel.at(i)->getData()->getType() == 11){
+                    emit(confirmUseRandomEvent(m_thingsLabel.at(i)));
                 } else {
                     if(m_thingsLabel[i]->selected())
                     {

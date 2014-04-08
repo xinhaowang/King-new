@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), temp_selectedGold(0), KeepOneTurn(false),
+    QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     //initial the all the widget and background
@@ -15,10 +15,25 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //game start, set player turn and initial the board
     initData();
-    initMap();
+    //choose the player amount
+    if (QMessageBox::Yes == QMessageBox::question(this,
+                                                  tr("Selection"),
+                                                  tr("Yes for 4 Player and No for 3 Player"),
+                                                  QMessageBox::Yes | QMessageBox::No,
+                                                  QMessageBox::Yes))
+    {
+        setPlayerNumber(4);
+    } else {
+        setPlayerNumber(3);
+    }
     //start to play
     setPlayerTurn(1);
     setPhaseTurn(0);
+    //initial the test data
+    //initTestData();
+    //minimalFunction();
+    //averageFunction();
+    //superFunction();
 }
 
 
@@ -26,26 +41,458 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+/*********************************************************
+ *
+ * 2-3 Player
+ *
+ * *******************************************************/
 
-//combat test
-void MainWindow::combatTest()
+void MainWindow::setPlayerNumber(int playerNumber)
 {
-    //combat test
-    QList<Thing*> player1 = GameData->getRandomCreatureFromNum(1);
-    emit(sendThingToCombatSignal(player1,1));
-    QList<Thing*> player2 = GameData->getRandomCreatureFromNum(1);
-    emit(sendThingToCombatSignal(player2,2));
-//    QList<Thing*> player3 = GameData->getRandomCreatureFromNum(10);
-//    emit(sendThingToCombatSignal(player3,3));
-//    QList<Thing*> player4 = GameData->getRandomCreatureFromNum(10);
-//    emit(sendThingToCombatSignal(player4,4));
-    //send the owener player
-    emit(sendOwnerToCombatSignal(1));
-    //send the buidling
-//    Building *tempbuilding = GameData->getBuildingFromID(1);
-//    emit(sendBuildingToCombatSignal(tempbuilding));
-    //start the combat
-    emit(startCombatSignal(false));
+    this->playerNumber = playerNumber;
+    if(playerNumber == 4)
+    {
+        initMap();
+    } else {
+        initMap();
+        initialLessPlayerHex();
+        //decrease the player of the game data
+        GameData->lessPlayer(playerNumber);
+    }
+}
+
+void MainWindow::initialLessPlayerHex()
+{
+    //hidden the other hex
+    m_hexWidget.at(0)->hide();
+    m_hexWidget.at(1)->hide();
+    m_hexWidget.at(4)->hide();
+    m_hexWidget.at(9)->hide();
+    m_hexWidget.at(16)->hide();
+    m_hexWidget.at(23)->hide();
+    m_hexWidget.at(30)->hide();
+    m_hexWidget.at(31)->hide();
+    m_hexWidget.at(32)->hide();
+    m_hexWidget.at(33)->hide();
+    m_hexWidget.at(34)->hide();
+    m_hexWidget.at(35)->hide();
+    m_hexWidget.at(36)->hide();
+    m_hexWidget.at(29)->hide();
+    m_hexWidget.at(22)->hide();
+    m_hexWidget.at(15)->hide();
+    m_hexWidget.at(8)->hide();
+    m_hexWidget.at(3)->hide();
+}
+/*********************************************************
+ *
+ * Test data
+ *
+ * *******************************************************/
+
+void MainWindow::initTestData()
+{
+    //player 1 data
+    Player *one = GameData->getPlayerFromID(1);
+    m_hexWidget.at(3)->initialControlMark(one->getControlMark(),1);
+    m_hexWidget.at(8)->initialControlMark(one->getControlMark(),1);
+    m_hexWidget.at(15)->initialControlMark(one->getControlMark(),1);
+    m_hexWidget.at(2)->initialControlMark(one->getControlMark(),1);
+    m_hexWidget.at(7)->initialControlMark(one->getControlMark(),1);
+    m_hexWidget.at(14)->initialControlMark(one->getControlMark(),1);
+    m_hexWidget.at(13)->initialControlMark(one->getControlMark(),1);
+    m_hexWidget.at(12)->initialControlMark(one->getControlMark(),1);
+    //building
+    m_hexWidget.at(7)->initialBuildingLabel(GameData->getBuildingFromID(3));
+    m_hexWidget.at(14)->initialBuildingLabel(GameData->getBuildingFromID(1));
+    m_hexWidget.at(15)->initialNeutralizedBuilidng(GameData->getBuildingFromID(3));
+    m_hexWidget.at(13)->initialNeutralizedBuilidng(GameData->getBuildingFromID(1));
+    m_hexWidget.at(12)->initialNeutralizedBuilidng(GameData->getBuildingFromID(2));
+    //hex
+    one->setPlayerHex(m_hexWidget.at(3));
+    one->setPlayerHex(m_hexWidget.at(8));
+    one->setPlayerHex(m_hexWidget.at(15));
+    one->setPlayerHex(m_hexWidget.at(2));
+    one->setPlayerHex(m_hexWidget.at(7));
+    one->setPlayerHex(m_hexWidget.at(14));
+    one->setPlayerHex(m_hexWidget.at(13));
+    one->setPlayerHex(m_hexWidget.at(12));
+    //building
+    one->setPlayerBuilding(GameData->getBuildingFromID(3));
+    one->setPlayerBuilding(GameData->getBuildingFromID(1));
+    //village
+    one->setPlayerThing(GameData->getThing(173));
+    GameData->getThing(173)->setInRack(false);
+    GameData->getThing(173)->setUsed(false);
+    m_hexWidget.at(3)->setPlayerThing(GameData->getThing(173),1);
+
+
+    //player 2 data
+    Player *two = GameData->getPlayerFromID(2);
+    m_hexWidget.at(22)->initialControlMark(two->getControlMark(),2);
+    m_hexWidget.at(29)->initialControlMark(two->getControlMark(),2);
+    m_hexWidget.at(36)->initialControlMark(two->getControlMark(),2);
+    m_hexWidget.at(21)->initialControlMark(two->getControlMark(),2);
+    m_hexWidget.at(28)->initialControlMark(two->getControlMark(),2);
+    m_hexWidget.at(35)->initialControlMark(two->getControlMark(),2);
+    m_hexWidget.at(20)->initialControlMark(two->getControlMark(),2);
+    m_hexWidget.at(27)->initialControlMark(two->getControlMark(),2);
+    m_hexWidget.at(34)->initialControlMark(two->getControlMark(),2);
+    m_hexWidget.at(19)->initialControlMark(two->getControlMark(),2);
+    //building
+    m_hexWidget.at(22)->initialNeutralizedBuilidng(GameData->getBuildingFromID(2));
+    m_hexWidget.at(21)->initialNeutralizedBuilidng(GameData->getBuildingFromID(2));
+    m_hexWidget.at(28)->initialNeutralizedBuilidng(GameData->getBuildingFromID(2));
+    m_hexWidget.at(20)->initialBuildingLabel(GameData->getBuildingFromID(1));
+    m_hexWidget.at(27)->initialBuildingLabel(GameData->getBuildingFromID(3));
+    //hex
+    two->setPlayerHex(m_hexWidget.at(22));
+    two->setPlayerHex(m_hexWidget.at(29));
+    two->setPlayerHex(m_hexWidget.at(36));
+    two->setPlayerHex(m_hexWidget.at(21));
+    two->setPlayerHex(m_hexWidget.at(28));
+    two->setPlayerHex(m_hexWidget.at(35));
+    two->setPlayerHex(m_hexWidget.at(20));
+    two->setPlayerHex(m_hexWidget.at(27));
+    two->setPlayerHex(m_hexWidget.at(34));
+    two->setPlayerHex(m_hexWidget.at(19));
+    //building
+    two->setPlayerBuilding(GameData->getBuildingFromID(3));
+    two->setPlayerBuilding(GameData->getBuildingFromID(1));
+    //village
+    two->setPlayerThing(GameData->getThing(173));
+    m_hexWidget.at(29)->setPlayerThing(GameData->getThing(173),2);
+
+    //Player 3 data
+    Player *three = GameData->getPlayerFromID(3);
+    m_hexWidget.at(18)->initialControlMark(three->getControlMark(),3);
+    m_hexWidget.at(25)->initialControlMark(three->getControlMark(),3);
+    m_hexWidget.at(32)->initialControlMark(three->getControlMark(),3);
+    m_hexWidget.at(31)->initialControlMark(three->getControlMark(),3);
+    m_hexWidget.at(26)->initialControlMark(three->getControlMark(),3);
+    m_hexWidget.at(33)->initialControlMark(three->getControlMark(),3);
+    //building
+    m_hexWidget.at(32)->initialBuildingLabel(GameData->getBuildingFromID(2));
+    //hex
+    three->setPlayerHex(m_hexWidget.at(18));
+    three->setPlayerHex(m_hexWidget.at(25));
+    three->setPlayerHex(m_hexWidget.at(32));
+    three->setPlayerHex(m_hexWidget.at(31));
+    three->setPlayerHex(m_hexWidget.at(26));
+    three->setPlayerHex(m_hexWidget.at(33));
+    //building
+    three->setPlayerBuilding(GameData->getBuildingFromID(2));
+    //city
+    three->setPlayerThing(GameData->getThing(174));
+    m_hexWidget.at(31)->setPlayerThing(GameData->getThing(174),3);
+
+    //player 4 data
+    Player *four = GameData->getPlayerFromID(4);
+    m_hexWidget.at(1)->initialControlMark(four->getControlMark(),4);
+    m_hexWidget.at(5)->initialControlMark(four->getControlMark(),4);
+    m_hexWidget.at(4)->initialControlMark(four->getControlMark(),4);
+    m_hexWidget.at(10)->initialControlMark(four->getControlMark(),4);
+    m_hexWidget.at(9)->initialControlMark(four->getControlMark(),4);
+    m_hexWidget.at(16)->initialControlMark(four->getControlMark(),4);
+    m_hexWidget.at(23)->initialControlMark(four->getControlMark(),4);
+    //building
+    m_hexWidget.at(4)->initialNeutralizedBuilidng(GameData->getBuildingFromID(3));
+    m_hexWidget.at(10)->initialNeutralizedBuilidng(GameData->getBuildingFromID(1));
+    m_hexWidget.at(9)->initialBuildingLabel(GameData->getBuildingFromID(2));
+    //hex
+    four->setPlayerHex(m_hexWidget.at(1));
+    four->setPlayerHex(m_hexWidget.at(5));
+    four->setPlayerHex(m_hexWidget.at(4));
+    four->setPlayerHex(m_hexWidget.at(10));
+    four->setPlayerHex(m_hexWidget.at(9));
+    four->setPlayerHex(m_hexWidget.at(16));
+    four->setPlayerHex(m_hexWidget.at(23));
+    //building
+    four->setPlayerBuilding(GameData->getBuildingFromID(2));
+    //village
+    four->setPlayerThing(GameData->getThing(173));
+    m_hexWidget.at(16)->setPlayerThing(GameData->getThing(173),4);
+
+}
+
+void MainWindow::minimalFunction()
+{
+    //player one
+    Player *one = GameData->getPlayerFromID(1);
+    GameData->getThing(123)->setInRack(false);
+    GameData->getThing(123)->setUsed(true);
+    GameData->getThing(65)->setInRack(false);
+    GameData->getThing(65)->setUsed(true);
+    GameData->getThing(122)->setInRack(false);
+    GameData->getThing(122)->setUsed(true);
+    GameData->getThing(131)->setInRack(false);
+    GameData->getThing(131)->setUsed(true);
+    GameData->getThing(89)->setInRack(false);
+    GameData->getThing(89)->setUsed(true);
+    GameData->getThing(48)->setInRack(false);
+    GameData->getThing(48)->setUsed(true);
+    GameData->getThing(96)->setInRack(false);
+    GameData->getThing(96)->setUsed(true);
+    one->setPlayerThing(GameData->getThing(123));
+    one->setPlayerThing(GameData->getThing(65));
+    one->setPlayerThing(GameData->getThing(122));
+    one->setPlayerThing(GameData->getThing(131));
+    one->setPlayerThing(GameData->getThing(89));
+    one->setPlayerThing(GameData->getThing(48));
+    one->setPlayerThing(GameData->getThing(96));
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(123),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(65),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(122),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(131),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(89),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(48),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(96),1);
+
+    //player two
+    Player *two = GameData->getPlayerFromID(2);
+    GameData->getThing(142)->setUsed(true);
+    GameData->getThing(142)->setInRack(false);
+    GameData->getThing(141)->setUsed(true);
+    GameData->getThing(141)->setInRack(false);
+    GameData->getThing(126)->setUsed(true);
+    GameData->getThing(126)->setInRack(false);
+    GameData->getThing(94)->setUsed(true);
+    GameData->getThing(94)->setInRack(false);
+    GameData->getThing(83)->setUsed(true);
+    GameData->getThing(83)->setInRack(false);
+    GameData->getThing(113)->setUsed(true);
+    GameData->getThing(113)->setInRack(false);
+    GameData->getThing(110)->setUsed(true);
+    GameData->getThing(110)->setInRack(false);
+    two->setPlayerThing(GameData->getThing(142));
+    two->setPlayerThing(GameData->getThing(141));
+    two->setPlayerThing(GameData->getThing(126));
+    two->setPlayerThing(GameData->getThing(94));
+    two->setPlayerThing(GameData->getThing(83));
+    two->setPlayerThing(GameData->getThing(113));
+    two->setPlayerThing(GameData->getThing(110));
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(142),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(141),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(126),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(94),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(83),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(113),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(110),2);
+}
+
+void MainWindow::averageFunction()
+{
+    //player one
+    Player *one = GameData->getPlayerFromID(1);
+    GameData->getThing(123)->setInRack(false);
+    GameData->getThing(123)->setUsed(true);
+    GameData->getThing(65)->setInRack(false);
+    GameData->getThing(65)->setUsed(true);
+    GameData->getThing(114)->setInRack(false);
+    GameData->getThing(114)->setUsed(true);
+    GameData->getThing(113)->setInRack(false);
+    GameData->getThing(113)->setUsed(true);
+    GameData->getThing(89)->setInRack(false);
+    GameData->getThing(89)->setUsed(true);
+    GameData->getThing(48)->setInRack(false);
+    GameData->getThing(48)->setUsed(true);
+    GameData->getThing(10)->setInRack(false);
+    GameData->getThing(10)->setUsed(true);
+    GameData->getThing(3)->setInRack(false);
+    GameData->getThing(3)->setUsed(true);
+    GameData->getThing(26)->setInRack(false);
+    GameData->getThing(26)->setUsed(true);
+    one->setPlayerThing(GameData->getThing(123));
+    one->setPlayerThing(GameData->getThing(65));
+    one->setPlayerThing(GameData->getThing(114));
+    one->setPlayerThing(GameData->getThing(113));
+    one->setPlayerThing(GameData->getThing(89));
+    one->setPlayerThing(GameData->getThing(48));
+    one->setPlayerThing(GameData->getThing(10));
+    one->setPlayerThing(GameData->getThing(3));
+    one->setPlayerThing(GameData->getThing(26));
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(123),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(65),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(114),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(113),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(89),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(48),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(10),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(3),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(26),1);
+    //Things in rack
+    GameData->getThing(153)->setUsed(true);
+    one->setPlayerThing(GameData->getThing(153));
+    GameData->getThing(152)->setUsed(true);
+    one->setPlayerThing(GameData->getThing(152));
+    //player two
+    Player *two = GameData->getPlayerFromID(2);
+    GameData->getThing(142)->setUsed(true);
+    GameData->getThing(142)->setInRack(false);
+    GameData->getThing(141)->setUsed(true);
+    GameData->getThing(141)->setInRack(false);
+    GameData->getThing(126)->setUsed(true);
+    GameData->getThing(126)->setInRack(false);
+    GameData->getThing(94)->setUsed(true);
+    GameData->getThing(94)->setInRack(false);
+    GameData->getThing(83)->setUsed(true);
+    GameData->getThing(83)->setInRack(false);
+    GameData->getThing(101)->setUsed(true);
+    GameData->getThing(101)->setInRack(false);
+    GameData->getThing(110)->setUsed(true);
+    GameData->getThing(110)->setInRack(false);
+    GameData->getThing(143)->setUsed(true);
+    GameData->getThing(143)->setInRack(false);
+    GameData->getThing(103)->setUsed(true);
+    GameData->getThing(103)->setInRack(false);
+    GameData->getThing(95)->setUsed(true);
+    GameData->getThing(95)->setInRack(false);
+    two->setPlayerThing(GameData->getThing(142));
+    two->setPlayerThing(GameData->getThing(141));
+    two->setPlayerThing(GameData->getThing(126));
+    two->setPlayerThing(GameData->getThing(94));
+    two->setPlayerThing(GameData->getThing(83));
+    two->setPlayerThing(GameData->getThing(101));
+    two->setPlayerThing(GameData->getThing(110));
+    two->setPlayerThing(GameData->getThing(143));
+    two->setPlayerThing(GameData->getThing(103));
+    two->setPlayerThing(GameData->getThing(95));
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(142),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(141),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(126),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(94),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(83),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(101),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(110),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(143),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(103),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(95),2);
+    //Things in rack
+    GameData->getThing(146)->setUsed(true);
+    GameData->getThing(148)->setUsed(true);
+    GameData->getThing(157)->setUsed(true);
+    two->setPlayerThing(GameData->getThing(146));
+    two->setPlayerThing(GameData->getThing(148));
+    two->setPlayerThing(GameData->getThing(157));
+}
+
+void MainWindow::superFunction()
+{
+    //player one
+    Player *one = GameData->getPlayerFromID(1);
+    GameData->getThing(97)->setInRack(false);
+    GameData->getThing(97)->setUsed(true);
+    GameData->getThing(98)->setInRack(false);
+    GameData->getThing(98)->setUsed(true);
+    GameData->getThing(113)->setInRack(false);
+    GameData->getThing(113)->setUsed(true);
+    GameData->getThing(48)->setInRack(false);
+    GameData->getThing(48)->setUsed(true);
+    GameData->getThing(89)->setInRack(false);
+    GameData->getThing(89)->setUsed(true);
+    GameData->getThing(10)->setInRack(false);
+    GameData->getThing(10)->setUsed(true);
+    GameData->getThing(26)->setInRack(false);
+    GameData->getThing(26)->setUsed(true);
+    GameData->getThing(124)->setInRack(false);
+    GameData->getThing(124)->setUsed(true);
+    GameData->getThing(134)->setInRack(false);
+    GameData->getThing(134)->setUsed(true);
+    one->setPlayerThing(GameData->getThing(97));
+    one->setPlayerThing(GameData->getThing(98));
+    one->setPlayerThing(GameData->getThing(113));
+    one->setPlayerThing(GameData->getThing(10));
+    one->setPlayerThing(GameData->getThing(89));
+    one->setPlayerThing(GameData->getThing(48));
+    one->setPlayerThing(GameData->getThing(26));
+    one->setPlayerThing(GameData->getThing(124));
+    one->setPlayerThing(GameData->getThing(134));
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(97),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(98),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(113),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(10),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(89),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(48),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(26),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(124),1);
+    m_hexWidget.at(13)->setPlayerThing(GameData->getThing(134),1);
+
+    //player two
+    Player *two = GameData->getPlayerFromID(2);
+    GameData->getThing(142)->setUsed(true);
+    GameData->getThing(142)->setInRack(false);
+    GameData->getThing(94)->setUsed(true);
+    GameData->getThing(94)->setInRack(false);
+    GameData->getThing(83)->setUsed(true);
+    GameData->getThing(83)->setInRack(false);
+    GameData->getThing(110)->setUsed(true);
+    GameData->getThing(110)->setInRack(false);
+    GameData->getThing(101)->setUsed(true);
+    GameData->getThing(101)->setInRack(false);
+    GameData->getThing(143)->setUsed(true);
+    GameData->getThing(143)->setInRack(false);
+    GameData->getThing(103)->setUsed(true);
+    GameData->getThing(103)->setInRack(false);
+    GameData->getThing(95)->setUsed(true);
+    GameData->getThing(95)->setInRack(false);
+    GameData->getThing(38)->setUsed(true);
+    GameData->getThing(38)->setInRack(false);
+    GameData->getThing(30)->setUsed(true);
+    GameData->getThing(30)->setInRack(false);
+
+
+    GameData->getThing(114)->setUsed(true);
+    GameData->getThing(114)->setInRack(false);
+    GameData->getThing(103)->setUsed(true);
+    GameData->getThing(103)->setInRack(false);
+    two->setPlayerThing(GameData->getThing(142));
+    two->setPlayerThing(GameData->getThing(94));
+    two->setPlayerThing(GameData->getThing(83));
+    two->setPlayerThing(GameData->getThing(110));
+    two->setPlayerThing(GameData->getThing(101));
+    two->setPlayerThing(GameData->getThing(143));
+    two->setPlayerThing(GameData->getThing(103));
+    two->setPlayerThing(GameData->getThing(95));
+    two->setPlayerThing(GameData->getThing(30));
+    two->setPlayerThing(GameData->getThing(38));
+
+    two->setPlayerThing(GameData->getThing(114));
+    two->setPlayerThing(GameData->getThing(103));
+
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(142),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(94),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(83),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(110),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(101),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(143),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(103),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(95),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(30),2);
+    m_hexWidget.at(20)->setPlayerThing(GameData->getThing(38),2);
+
+    m_hexWidget.at(21)->setPlayerThing(GameData->getThing(114),2);
+    m_hexWidget.at(21)->setPlayerThing(GameData->getThing(103),2);
+
+    //Player three
+    Player *three = GameData->getPlayerFromID(3);
+    GameData->getThing(100)->setUsed(true);
+    GameData->getThing(100)->setInRack(false);
+    GameData->getThing(96)->setUsed(true);
+    GameData->getThing(96)->setInRack(false);
+    GameData->getThing(92)->setUsed(true);
+    GameData->getThing(92)->setInRack(false);
+    GameData->getThing(93)->setUsed(true);
+    GameData->getThing(93)->setInRack(false);
+
+    three->setPlayerThing(GameData->getThing(100));
+    three->setPlayerThing(GameData->getThing(96));
+    three->setPlayerThing(GameData->getThing(92));
+    three->setPlayerThing(GameData->getThing(93));
+
+    m_hexWidget.at(18)->setPlayerThing(GameData->getThing(100),3);
+    m_hexWidget.at(18)->setPlayerThing(GameData->getThing(96),3);
+    m_hexWidget.at(18)->setPlayerThing(GameData->getThing(92),3);
+    m_hexWidget.at(18)->setPlayerThing(GameData->getThing(93),3);
+
 }
 
 /*********************************************************
@@ -53,55 +500,90 @@ void MainWindow::combatTest()
  * function for the phase 0
  *
  * *******************************************************/
+
 //Each player set up the board in phase 0
 //there are four hex that the first player can choose
 void MainWindow::startInitMap()
 {
-    if(GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs().size() == 0)
+    if(playerNumber == 4)
     {
-        if(m_hexWidget[4]->objectName() == "0")
+        if(GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs().size() == 0)
         {
-            m_hexWidget[4]->setIsEnabledClick(true);
-            m_hexWidget[4]->setSelectState(4);
-        }
-        if(m_hexWidget[8]->objectName() == "0")
-        {
-            m_hexWidget[8]->setIsEnabledClick(true);
-            m_hexWidget[8]->setSelectState(4);
-        }
-        if(m_hexWidget[31]->objectName() == "0")
-        {
-            m_hexWidget[31]->setIsEnabledClick(true);
-            m_hexWidget[31]->setSelectState(4);
-        }
-        if(m_hexWidget[35]->objectName() == "0")
-        {
-            m_hexWidget[35]->setIsEnabledClick(true);
-            m_hexWidget[35]->setSelectState(4);
-        }
-    } else {
-        QList<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
-        for(int i = 0; i < temp.size(); i++)
-        {
-            QList<int> temp2 = getNearHex(temp.at(i)->getID());
-            for(int j = 0; j < temp2.size(); j++)
+            if(m_hexWidget[4]->objectName() == "0")
             {
-                if((m_hexWidget.at(temp2.at(j))->hexData()->getTypeID() == 1) ||
-                        (m_hexWidget.at(temp2.at(j))->childAt(57,50))) {
-                    m_hexWidget.at(temp2.at(j))->setIsEnabledClick(false);
-                    m_hexWidget.at(temp2.at(j))->setIsEnableDrag(false);
-                    m_hexWidget.at(temp2.at(j))->setSelectState(3);
-                } else {
-                    m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
-                    m_hexWidget.at(temp2.at(j))->setIsEnableDrag(true);
-                    m_hexWidget.at(temp2.at(j))->setSelectState(4);
+                m_hexWidget[4]->setIsEnabledClick(true);
+                m_hexWidget[4]->setSelectState(4);
+            }
+            if(m_hexWidget[8]->objectName() == "0")
+            {
+                m_hexWidget[8]->setIsEnabledClick(true);
+                m_hexWidget[8]->setSelectState(4);
+            }
+            if(m_hexWidget[31]->objectName() == "0")
+            {
+                m_hexWidget[31]->setIsEnabledClick(true);
+                m_hexWidget[31]->setSelectState(4);
+            }
+            if(m_hexWidget[35]->objectName() == "0")
+            {
+                m_hexWidget[35]->setIsEnabledClick(true);
+                m_hexWidget[35]->setSelectState(4);
+            }
+        } else {
+            QList<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+            for(int i = 0; i < temp.size(); i++)
+            {
+                QList<int> temp2 = getNearHex(temp.at(i)->getID());
+                for(int j = 0; j < temp2.size(); j++)
+                {
+                    if((m_hexWidget.at(temp2.at(j))->hexData()->getTypeID() == 1) ||
+                            (m_hexWidget.at(temp2.at(j))->childAt(57,50))) {
+                        m_hexWidget.at(temp2.at(j))->setIsEnabledClick(false);
+                        m_hexWidget.at(temp2.at(j))->setIsEnableDrag(false);
+                        m_hexWidget.at(temp2.at(j))->setSelectState(3);
+                    } else {
+                        m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
+                        m_hexWidget.at(temp2.at(j))->setIsEnableDrag(true);
+                        m_hexWidget.at(temp2.at(j))->setSelectState(4);
+                    }
                 }
             }
+            for(int i = 0; i < temp.size(); i++)
+            {
+                temp.at(i)->setIsEnabledClick(false);
+                temp.at(i)->setIsEnableDrag(false);
+            }
         }
-        for(int i = 0; i < temp.size(); i++)
+    } else {
+        if(m_hexWidget[2]->objectName() == "0")
         {
-            temp.at(i)->setIsEnabledClick(false);
-            temp.at(i)->setIsEnableDrag(false);
+            m_hexWidget[2]->setIsEnabledClick(true);
+            m_hexWidget[2]->setSelectState(4);
+        }
+        if(m_hexWidget[14]->objectName() == "0")
+        {
+            m_hexWidget[14]->setIsEnabledClick(true);
+            m_hexWidget[14]->setSelectState(4);
+        }
+        if(m_hexWidget[28]->objectName() == "0")
+        {
+            m_hexWidget[28]->setIsEnabledClick(true);
+            m_hexWidget[28]->setSelectState(4);
+        }
+        if(m_hexWidget[26]->objectName() == "0")
+        {
+            m_hexWidget[26]->setIsEnabledClick(true);
+            m_hexWidget[26]->setSelectState(4);
+        }
+        if(m_hexWidget[24]->objectName() == "0")
+        {
+            m_hexWidget[24]->setIsEnabledClick(true);
+            m_hexWidget[24]->setSelectState(4);
+        }
+        if(m_hexWidget[10]->objectName() == "0")
+        {
+            m_hexWidget[10]->setIsEnabledClick(true);
+            m_hexWidget[10]->setSelectState(4);
         }
     }
 }
@@ -111,26 +593,30 @@ void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
     int playerID = getPlayerTurn();
     GameData->addHexWidget(tempHexWidget, playerID);
     //set the control mark on this Hex
-    QImage tempImage = QImage(GameData->getPlayerFromID(playerID)->getControlMark());
-    QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
-    QLabel *controlMark = new QLabel(tempHexWidget);
-    controlMark->setObjectName(QString::number(playerID));
-    controlMark->setFixedSize(30,30);
-    controlMark->setGeometry(42,35,30,30);
-    controlMark->setPixmap(pixmap);
-    controlMark->show();
+    tempHexWidget->initialControlMark(GameData->getPlayerFromID(getPlayerTurn())->getControlMark(), getPlayerTurn());
     //check for next step
     int count = 0;
-    for(int i = 1; i < 5; i++)
+    if(playerNumber == 4 || playerNumber == 2)
     {
-        if(GameData->getPlayerFromID(i)->getPlayerHexs().size() == 3)
+        for(int i = 1; i <= playerNumber; i++)
         {
-            count++;
+            if(GameData->getPlayerFromID(i)->getPlayerHexs().size() == 3)
+            {
+                count++;
+            }
+        }
+    } else {
+        for(int i = 1; i <= playerNumber; i++)
+        {
+            if(GameData->getPlayerFromID(i)->getPlayerHexs().size() == 2)
+            {
+                count++;
+            }
         }
     }
     //if all the player set up their three hex
     //set up the gold and one tower
-    if(count == 4)
+    if(count == playerNumber)
     {
         //show up all the other hex
         for(int i = 0; i < m_hexWidget.size(); i++)
@@ -180,7 +666,16 @@ void MainWindow::initThing()
 
 void MainWindow::initThingSlot()
 {
-    QList<Thing *> temp = GameData->getRandomThingFromNum(10);
+    QList<Thing *> temp;
+    //just for the test
+    if(getPlayerTurn() == 2)
+    {
+        temp = GameData->getRandomThingFromNum(9);
+        GameData->getThing(175)->setUsed(true);
+        temp.push_back(GameData->getThing(175));
+    } else {
+        temp = GameData->getRandomThingFromNum(10);
+    }
     //show the trade
     TradeBoxWidget->show();
     //set the thing to the player
@@ -201,14 +696,14 @@ void MainWindow::confirmThingSlot()
     popMessageBox(1);
 
     int count = 0;
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < playerNumber; i++)
     {
         if(GameData->getPlayerFromID(i+1)->getPlayerThings().size() != 0)
         {
             count++;
         }
     }
-    if(count == 4)
+    if(count == playerNumber)
     {
         //go to another phase
         setPhaseTurn(1);
@@ -234,14 +729,7 @@ void MainWindow::buttonSlot()
 void MainWindow::setBuildingToHexSlot(HexWidget *tempHexWidget)
 {
     //draw the buildings on the Hex
-    QString tempBuidlingUrl = GameData->getPlayerFromID(getPlayerTurn())->getPlayerBuildings().at(0)->getUrl();
-    QImage tempImage = QImage(tempBuidlingUrl);
-    QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
-    QLabel *building = new QLabel(tempHexWidget);
-    building->setFixedSize(30,30);
-    building->setGeometry(72,35,30,30);
-    building->setPixmap(pixmap);
-    building->show();
+    tempHexWidget->initialBuildingLabel(GameData->getPlayerFromID(getPlayerTurn())->getPlayerBuildings().at(0));
     //pass the building to the hex
     tempHexWidget->setBuilding(GameData->getPlayerFromID(getPlayerTurn())->getPlayerBuildings().at(0));
     //delete the button of the mainwindow
@@ -260,7 +748,7 @@ void MainWindow::setBuildingToHexSlot(HexWidget *tempHexWidget)
 
 void MainWindow::startCollectGold(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //start next phase
         setPhaseTurn(2);
@@ -290,15 +778,12 @@ void MainWindow::collectGoldSLOT()
         }
     }
     //combat value of forks
-    for(int i = 0; i < tempHex.size(); i++)
+    QList<Building*> tempBuilding = GameData->getPlayerFromID(getPlayerTurn())->getPlayerBuildings();
+    for(int i = 0; i < tempBuilding.size(); i++)
     {
-        Building *tempBuilding = tempHex.at(i)->building();
-        if(tempBuilding != NULL)
-        {
-            amount += tempBuilding->getIncome();
-        }
+        amount += tempBuilding.at(i)->getIncome();
     }
-    //special income and hero
+    //special income and hero and city and village
     for(int i = 0; i < tempHex.size(); i++)
     {
         QList<mylabel *> tempLabel = tempHex.at(i)->thingsLabel();
@@ -306,7 +791,8 @@ void MainWindow::collectGoldSLOT()
         {
             //Things is special income and map the terrain
             if(tempLabel.at(j)->getData()->getType() == 7 &&
-                    tempLabel.at(j)->getData()->getTerrainType() == tempHex.at(i)->hexData()->getTypeID())
+                    (tempLabel.at(j)->getData()->getTerrainType() == tempHex.at(i)->hexData()->getTypeID() ||
+                    tempLabel.at(j)->getData()->getTerrainType() == 0))
             {
                 amount += tempLabel[j]->getData()->getAttackValue();
             }
@@ -333,12 +819,13 @@ void MainWindow::collectGoldSLOT()
  * phase 2 function : choose hero
  *
  * *******************************************************/
+
 void MainWindow::startChooseHero(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //start next phase
-        setPhaseTurn(3);
+        setPhaseTurn(4);
     } else {
         emit(initHeroToWidget(GameData->get10heroData()));
         Hero_widget->show();
@@ -364,7 +851,10 @@ void MainWindow::heroConfirmSlot(Hero *tempHero)
 {
     //set up the choosen of the hero
     temp_hero = tempHero;
-    disconnect(button, SIGNAL(clicked()), this, SLOT(skipRecruitHeroSlot()));
+    if(getPhaseTurn() == 2)
+    {
+        disconnect(button, SIGNAL(clicked()), this, SLOT(skipRecruitHeroSlot()));
+    }
     button->hide();
     button->setText("Confirm");
     connect(button, SIGNAL(clicked()), this, SLOT(chooseHeroSLOT()));
@@ -375,31 +865,47 @@ void MainWindow::heroConfirmSlot(Hero *tempHero)
 }
 
 void MainWindow::chooseHeroSLOT()
-{
+{    
+    Hero_widget->hide();
     selectedGold->hide();
     disconnect(button, SIGNAL(clicked()), this, SLOT(chooseHeroSLOT()));
     button->hide();
     //decrease the player gold;
     GameData->getPlayerFromID(getPlayerTurn())->setGold(
-                GameData->getPlayerFromID(getPlayerTurn())->getGold() - getselectedGold());
+                GameData->getPlayerFromID(getPlayerTurn())->getGold() - getselectedGold());    
     refreshPlayerGold();
     dice->refreshLabel();
     dice->show();
+    if(getPhaseTurn() == 4)
+    {
+        //defection event
+        disableMapClickandDrag();
+    }
 }
 
 void MainWindow::checkOwnHero(int dicevalue)
 {
     int additionDice = getselectedGold()/5;
+    temp_selectedGold = 0;
     if(dicevalue + additionDice >= temp_hero->getAttackValue())
     {
         Message("Message", "Win a Hero");
-        enablePlayerMapClick();        
-        Hero_widget->hide();
+        //reduce from the controller
+        GameData->removeHeroFromID(temp_hero->getID());
+        enablePlayerMapClick();
     } else {
         Message("Message", "Lose");
-        popMessageBox(1);
-        Hero_widget->hide();
-        startChooseHero(button->objectName().toInt() + 1);
+        if(getPhaseTurn() == 2)
+        {
+            popMessageBox(1);
+            startChooseHero(button->objectName().toInt() + 1);
+        } else if(getPhaseTurn() == 4) {
+            //lose to choose the hero
+            button->setText("Skip");
+            connect(button,SIGNAL(clicked()),this,SLOT(skipRandomEvent()));
+            button->show();
+        }
+
     }
     dice->hide();
 }
@@ -413,8 +919,6 @@ void MainWindow::setHeroSlot(HexWidget* tempHexWidget)
     } else {
         //add hero to the player
         GameData->getPlayerFromID(getPlayerTurn())->setPlayerHero(temp_hero);
-        //reduce from the controller
-        GameData->removeHeroFromID(temp_hero->getID());
         //show the hero on the hex
         temp_hero->setMode(SmallIcon_Mode);
         HeroLabel *tempHero = new HeroLabel(temp_hero, tempHexWidget);
@@ -422,7 +926,6 @@ void MainWindow::setHeroSlot(HexWidget* tempHexWidget)
         tempHero->show();
         //set up the hero on the hex
         tempHexWidget->setHeroLabel(tempHero);
-        tempHero->clear();
         //check the terrain loard and update the hex information of the player
         checkTerrainLord();
         //change next player
@@ -441,10 +944,10 @@ void MainWindow::setHeroSlot(HexWidget* tempHexWidget)
 
 void MainWindow::startRecruitThings(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //start next phase
-        setPhaseTurn(5);
+        setPhaseTurn(4);
     } else {
         button->setObjectName(QString::number(count));
         freeRecruitThings();
@@ -463,7 +966,12 @@ void MainWindow::freeRecruitThings()
             count++;
         }
     }
-    count = count/2 + 1;
+    if(count % 2 == 0)
+    {
+        count = count/2;
+    } else {
+        count = (count+1)/2;
+    }
     QList<Thing *> temp = GameData->getRandomThingFromNum(count);
     for(int i = 0; i < temp.size(); i++)
     {
@@ -573,9 +1081,13 @@ void MainWindow::confirmUseTreasure(mylabel* tempLabel)
 {
     if (QMessageBox::Yes == QMessageBox::question(this,
                                                   tr("Warning"),
-                                                  tr("Use the treasure!"),
+                                                  tr("Use the treasure?"),
                                                   QMessageBox::Yes | QMessageBox::No,
                                                   QMessageBox::Yes)) {
+        //add the money to the player
+        int temp = GameData->getPlayerFromID(getPlayerTurn())->getGold();
+        GameData->getPlayerFromID(getPlayerTurn())->setGold(temp + tempLabel->getData()->getAttackValue());
+        refreshPlayerGold();
         //return the thing to the system
         tempLabel->getData()->setUsed(false);
         //delete the thing in the player
@@ -587,6 +1099,141 @@ void MainWindow::confirmUseTreasure(mylabel* tempLabel)
     }
 
 }
+
+/*********************************************************
+ *
+ * phase 4 function : Random Event phases
+ *
+ * *******************************************************/
+
+void MainWindow::startRandomEvent(int count)
+{
+    if(count == playerNumber)
+    {
+        //change to next phase
+        setPhaseTurn(5);
+    } else {
+        //skip the random event
+        button->setText("Skip");
+        button->setObjectName(QString::number(count));
+        connect(button,SIGNAL(clicked()),this,SLOT(skipRandomEvent()));
+        button->show();
+        //start to use the random event
+    }
+}
+
+void MainWindow::skipRandomEvent()
+{
+    button->hide();
+    disconnect(button,SIGNAL(clicked()),this,SLOT(skipRandomEvent()));
+    //change to next player
+    popMessageBox(1);
+    startRandomEvent(button->objectName().toInt() + 1);
+}
+
+void MainWindow::confirmUseRandomEventSlot(mylabel *tempLabel)
+{
+    if (QMessageBox::Yes == QMessageBox::question(this,
+                                                  tr("Warning"),
+                                                  tr("Use this event?"),
+                                                  QMessageBox::Yes | QMessageBox::No,
+                                                  QMessageBox::Yes))
+    {
+        disconnect(button,SIGNAL(clicked()),this,SLOT(skipRandomEvent()));
+        int eventID = tempLabel->getData()->getID();
+        switch (eventID) {
+        case 175:
+            defectionEvent();
+            break;
+        default:
+            Message("Warning", "No function for this event now!");
+            break;
+        }
+    } else {
+        //do nothing
+    }
+}
+
+//defection event
+void MainWindow::defectionEvent()
+{
+    //return this event to the system
+    GameData->getPlayerFromID(getPlayerTurn())->deletePlayerThing(GameData->getThing(175));
+    refreshThingWidget();
+    Things_rack->hide();
+    Hero_widget->show();
+    //enable other player hexclick
+    for(int i = 1; i <= playerNumber; i++)
+    {
+        if(i != getPlayerTurn())
+        {
+            QList<HexWidget*> tempHex = GameData->getPlayerFromID(i)->getPlayerHexs();
+            for(int j = 0; j < tempHex.size(); j++)
+            {
+                if(tempHex.at(j)->heroLabel())
+                {
+                    tempHex.at(j)->setIsEnabledClick(true);
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::defectionCheckHero(HexWidget *temphex)
+{
+    //hide the hero_widget
+    Hero_widget->hide();
+    disableMapClickandDrag();
+
+    if(temphex->childAt(50,57)->objectName().toInt() == getPlayerTurn())
+    {
+        //set up the hero to the player
+        GameData->getPlayerFromID(getPlayerTurn())->setPlayerHero(temp_hero);
+        //set up the hero label to hex
+        temp_hero->setMode(SmallIcon_Mode);
+        HeroLabel *tempHero = new HeroLabel(temp_hero, temphex);
+        tempHero->setGeometry(12,35,30,30);
+        tempHero->show();
+        //set up the hero on the hex
+        temphex->setHeroLabel(tempHero);
+        //set up the skip button
+        button->setText("Skip");
+        connect(button,SIGNAL(clicked()),this,SLOT(skipRandomEvent()));
+        button->show();
+    } else {
+        //choose the other player hex
+        int currentPlayer = getPlayerTurn();
+        int selectPlayer = temphex->childAt(50,57)->objectName().toInt();
+        int dice1 = qrand()%6 + 1;
+        int dice2 = qrand()%6 + 1;
+        if(dice1 > dice2)
+        {
+            //set the select hero
+            temp_hero = temphex->heroLabel()->getData();
+            //delete the hero belong to the player
+            GameData->getPlayerFromID(selectPlayer)->deleteHero(temphex->heroLabel()->getData());
+            //delete the hero in the previous hex
+            temphex->deleteHeroLabel();
+            //enable hex click for the player
+            enablePlayerMapClick();
+            //apply the defection effect
+            QString temp =  "Player " + QString::number(currentPlayer) + " dice value : " + QString::number(dice1)
+                    + ". Player " + QString::number(selectPlayer) + " dice value : " + QString::number(dice2) + ". "
+                    + "Steal the hero successfully.";
+            Message("Result",temp);
+        } else {
+            QString temp =  "Player " + QString::number(currentPlayer) + " dice value : " + QString::number(dice1)
+                    + ". Player " + QString::number(selectPlayer) + " dice value : " + QString::number(dice2) + "."
+                    + "Fail for defection.";
+            Message("Result",temp);
+            button->setText("Skip");
+            connect(button,SIGNAL(clicked()),this,SLOT(skipRandomEvent()));
+            button->show();
+        }
+    }
+
+}
+
 /*********************************************************
  *
  * phase 5 function : movement phases
@@ -595,7 +1242,7 @@ void MainWindow::confirmUseTreasure(mylabel* tempLabel)
 
 void MainWindow::startMovement(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //next phase
         setPhaseTurn(6);
@@ -645,6 +1292,7 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
     //show the move widget
     QRect temp = getMapRect(tempHex->getID());
     MovementWidget->move(temp.x()+114,temp.y());
+    MovementWidget->hide();
     //get the things that belong to this player
     int ownPlayer;
     QList<Thing*> tempThings;
@@ -652,7 +1300,6 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
         QWidget *controlMark = tempHex->childAt(57,50);
         ownPlayer = controlMark->objectName().toInt();
     }
-
     if(tempHex->hexData()->getTypeID() == 1) {
         QList<mylabel*> tempThingsLabel = tempHex->getPlayerThingsLabel(getPlayerTurn());
         for(int i = 0; i < tempThingsLabel.size(); i++)
@@ -671,7 +1318,8 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
             //calculate the all flying feature
             for(int i = 0; i < tempHex->thingsLabel().size(); i++)
             {
-                if(tempHex->thingsLabel().at(i)->getData()->getType() == 2)
+                if(tempHex->thingsLabel().at(i)->getData()->getType() == 2 ||
+                        tempHex->thingsLabel().at(i)->getData()->getType() == 8)
                 {
                     count++;
                 }
@@ -679,7 +1327,8 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
             //calculate the player flying feature
             for(int i = 0; i < tempThingsLabel.size(); i++)
             {
-                if(tempThingsLabel.at(i)->getData()->getType() == 2)
+                if(tempThingsLabel.at(i)->getData()->getType() == 2 ||
+                        tempThingsLabel.at(i)->getData()->getType() == 8)
                 {
                     count--;
                 }
@@ -690,7 +1339,8 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
                 {
                     break;
                 }
-                if(tempThingsLabel.at(i)->getData()->getType() == 2)
+                if(tempThingsLabel.at(i)->getData()->getType() == 2 ||
+                        tempThingsLabel.at(i)->getData()->getType() == 8)
                 {
                     tempThings.push_back(tempThingsLabel.at(i)->getData());
                     count--;
@@ -715,7 +1365,8 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
             int ownFlyCreatureCount = 0;
             for(int i = 0; i < ownPlayerLabel.size(); i++)
             {
-                if(ownPlayerLabel.at(i)->getData()->getType() == 2)
+                if(ownPlayerLabel.at(i)->getData()->getType() == 2 ||
+                        ownPlayerLabel.at(i)->getData()->getType() == 8)
                 {
                     ownFlyCreatureCount++;
                 }
@@ -724,7 +1375,8 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
             int turnFlyCreatureCount = 0;
             for(int i = 0; i < turnPlayerLabel.size(); i++)
             {
-                if(turnPlayerLabel.at(i)->getData()->getType() == 2)
+                if(turnPlayerLabel.at(i)->getData()->getType() == 2 ||
+                        turnPlayerLabel.at(i)->getData()->getType() == 8)
                 {
                     turnFlyCreatureCount++;
                 }
@@ -736,7 +1388,9 @@ void MainWindow::getHexForMoveWidgetSlot(HexWidget *tempHex)
                 {
                     break;
                 }
-                if(turnPlayerLabel.at(i)->getData()->getType() == 2)
+                if(turnPlayerLabel.at(i)->getData()->getType() == 2 ||
+
+                        turnPlayerLabel.at(i)->getData()->getType() == 8)
                 {
                     tempThings.push_back(turnPlayerLabel.at(i)->getData());
                     count--;
@@ -877,7 +1531,7 @@ void MainWindow::resetAllThingMovementCount()
 
 void MainWindow::startCombat(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //start nex phase
         setPhaseTurn(7);
@@ -917,14 +1571,7 @@ void MainWindow::checkExploration(int diceValue)
     {
         //own the hex directly
         //set the control mark on this Hex
-        QImage tempImage = QImage(GameData->getPlayerFromID(getPlayerTurn())->getControlMark());
-        QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
-        QLabel *controlMark = new QLabel(selectedHex);
-        controlMark->setObjectName(QString::number(getPlayerTurn()));
-        controlMark->setFixedSize(30,30);
-        controlMark->setGeometry(42,35,30,30);
-        controlMark->setPixmap(pixmap);
-        controlMark->show();
+        selectedHex->initialControlMark(GameData->getPlayerFromID(getPlayerTurn())->getControlMark(),getPlayerTurn());
         //send the hex to the player
         GameData->getPlayerFromID(getPlayerTurn())->setPlayerHex(selectedHex);
         //delete the battle mark
@@ -1025,14 +1672,7 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
             GameData->getPlayerFromID(hexOwner)->deleteHexWidget(tempHex);
             delete tempHex->childAt(57,50);
             //set the control mark on this Hex
-            QImage tempImage = QImage(GameData->getPlayerFromID(getPlayerTurn())->getControlMark());
-            QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
-            QLabel *controlMark = new QLabel(tempHex);
-            controlMark->setObjectName(QString::number(getPlayerTurn()));
-            controlMark->setFixedSize(30,30);
-            controlMark->setGeometry(42,35,30,30);
-            controlMark->setPixmap(pixmap);
-            controlMark->show();
+            tempHex->initialControlMark(GameData->getPlayerFromID(getPlayerTurn())->getControlMark(),getPlayerTurn());
             //send the hex to the player
             GameData->getPlayerFromID(getPlayerTurn())->setPlayerHex(tempHex);
             //delete the battle mark
@@ -1045,7 +1685,7 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
             //Combat or fighting over explorations
             //send all the creature to the combat widget including special income item
             //and delete all the thing of the player
-            for(int j = 1; j <= 4; j++)
+            for(int j = 1; j <= playerNumber; j++)
             {
                 QList<mylabel*> tempMyLabel = tempHex->getPlayerThingsLabel(j);
                 if(tempMyLabel.size() != 0)
@@ -1140,14 +1780,7 @@ void MainWindow::getThingsFromRetreatSlot(QList<Thing*> tempThings, int playerID
 void MainWindow::getThingsFromCombatWinnerSlot(QList<Thing*> tempThings, int playerID)
 {
     //set the controlmark
-    QImage tempImage = QImage(GameData->getPlayerFromID(playerID)->getControlMark());
-    QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
-    QLabel *controlMark = new QLabel(selectedHex);
-    controlMark->setObjectName(QString::number(playerID));
-    controlMark->setFixedSize(30,30);
-    controlMark->setGeometry(42,35,30,30);
-    controlMark->setPixmap(pixmap);
-    controlMark->show();
+    selectedHex->initialControlMark(GameData->getPlayerFromID(playerID)->getControlMark(),playerID);
     //set the things to the player
     for(int i = 0; i < tempThings.size(); i++)
     {
@@ -1169,14 +1802,7 @@ void MainWindow::getBuildingFromCombatSlot(Building* tempBuilding, int playerID)
     //set building to the hex
     selectedHex->setBuilding(tempBuilding);
     //set the label on the hex
-    QString tempBuidlingUrl = tempBuilding->getUrl();
-    QImage tempImage = QImage(tempBuidlingUrl);
-    QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
-    QLabel *building = new QLabel(selectedHex);
-    building->setFixedSize(30,30);
-    building->setGeometry(72,35,30,30);
-    building->setPixmap(pixmap);
-    building->show();
+    selectedHex->initialBuildingLabel(tempBuilding);
     //set building to the player
     GameData->getPlayerFromID(playerID)->setPlayerBuilding(tempBuilding);
     //check the winning of this player
@@ -1201,14 +1827,14 @@ void MainWindow::getBuildingFromCombatSlot(Building* tempBuilding, int playerID)
 
 void MainWindow::startConstruction(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //change to next phase
         //check the winnning of the game
         if((checkTotalCitadelNumber() == 1) && KeepOneTurn)
         {
-            int playerID;
-            for(int i = 1; i <= 4; i++)
+            int playerID = 0;
+            for(int i = 1; i <= playerNumber; i++)
             {
                 if(checkPlayerCitadel(i) == 1)
                 {
@@ -1219,7 +1845,7 @@ void MainWindow::startConstruction(int count)
             Message("Congratulation", temp);
             this->close();
         } else {
-            changePlayerOrder();
+            setPhaseTurn(8);
         }
     } else {
         //disable all the hex click first
@@ -1286,15 +1912,8 @@ void MainWindow::startConstructionSlot(HexWidget *tempHex)
                         //add the citadel to the hex
                         tempHex->setBuilding(citadel);
                         //set the citadel label to the hex
-                        QString tempBuidlingUrl = citadel->getUrl();
-                        QImage tempImage = QImage(tempBuidlingUrl);
-                        QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
-                        QLabel *building = new QLabel(tempHex);
-                        building->setFixedSize(30,30);
-                        building->setGeometry(72,35,30,30);
-                        building->setPixmap(pixmap);
-                        building->show();
-
+                        tempHex->initialBuildingLabel(citadel);
+                        KeepOneTurn = false;
                     }
                 } else {
                     Message("Warning", "Too many Citadel!");
@@ -1303,7 +1922,7 @@ void MainWindow::startConstructionSlot(HexWidget *tempHex)
                 Message("Warning", "Can't upgrade the citadel!");
             } else {
                 //upgrade the building in the hex
-                Building* building;
+                Building* building = NULL;
                 switch (tempHex->building()->getID()) {
                 case 1:
                     building = GameData->getBuildingFromID(2);
@@ -1325,14 +1944,7 @@ void MainWindow::startConstructionSlot(HexWidget *tempHex)
                 //add the building to the hex
                 tempHex->setBuilding(building);
                 //set the building label on the hex
-                QString tempBuidlingUrl = building->getUrl();
-                QImage tempImage = QImage(tempBuidlingUrl);
-                QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
-                QLabel *buildinglabel = new QLabel(tempHex);
-                buildinglabel->setFixedSize(30,30);
-                buildinglabel->setGeometry(72,35,30,30);
-                buildinglabel->setPixmap(pixmap);
-                buildinglabel->show();
+                tempHex->initialBuildingLabel(building);
                 //decrease the money of the player
                 int money = GameData->getPlayerFromID(getPlayerTurn())->getGold();
                 GameData->getPlayerFromID(getPlayerTurn())->setGold(money-5);
@@ -1344,15 +1956,8 @@ void MainWindow::startConstructionSlot(HexWidget *tempHex)
             GameData->getPlayerFromID(getPlayerTurn())->setPlayerBuilding(tower);
             //add the citadel to the hex
             tempHex->setBuilding(tower);
-            //set the citadel label to the hex
-            QString tempBuidlingUrl = tower->getUrl();
-            QImage tempImage = QImage(tempBuidlingUrl);
-            QPixmap pixmap = QPixmap::fromImage(tempImage.scaled(QSize(30,30), Qt::IgnoreAspectRatio));
-            QLabel *building = new QLabel(tempHex);
-            building->setFixedSize(30,30);
-            building->setGeometry(72,35,30,30);
-            building->setPixmap(pixmap);
-            building->show();
+            //set the tower label to the hex
+            tempHex->initialBuildingLabel(tower);
             //decrease the money of the player
             int money = GameData->getPlayerFromID(getPlayerTurn())->getGold();
             GameData->getPlayerFromID(getPlayerTurn())->setGold(money-5);
@@ -1365,7 +1970,7 @@ void MainWindow::startConstructionSlot(HexWidget *tempHex)
 int MainWindow::checkTotalCitadelNumber()
 {
     int count = 0;
-    for(int i = 1; i <= 4; i++)
+    for(int i = 1; i <= playerNumber; i++)
     {
         QList<Building*> tempBuildings = GameData->getPlayerFromID(i)->getPlayerBuildings();
         for(int j = 0; j < tempBuildings.size(); j++)
@@ -1381,7 +1986,7 @@ int MainWindow::checkTotalCitadelNumber()
 
 int MainWindow::checkPlayerCitadel(int playerID)
 {
-    int count;
+    int count = 0;
     QList<Building*> tempBuildings = GameData->getPlayerFromID(playerID)->getPlayerBuildings();
     for(int i = 0; i < tempBuildings.size(); i++)
     {
@@ -1400,11 +2005,13 @@ int MainWindow::checkPlayerCitadel(int playerID)
  * *******************************************************/
 void MainWindow::startSpecialPower(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //change to next phase
         changePlayerOrder();
     } else {
+        //hid the things rack
+        Things_rack->hide();
         //show the skip button
         button->setObjectName(QString::number(count));
         button->setText("skip");
@@ -1439,9 +2046,10 @@ void MainWindow::enableHeroHexClick()
 
 void MainWindow::heroHexClickSlot(HexWidget* tempHex)
 {
+    selectedHex = tempHex;
     switch (tempHex->heroLabel()->getData()->getID()) {
     case 4:
-        heroMasterThief();
+        heroMasterThief(0);
         break;
     default:
         Message("Warning", "Don't have this kind of hero!");
@@ -1450,17 +2058,26 @@ void MainWindow::heroHexClickSlot(HexWidget* tempHex)
     tempHex->setIsEnabledClick(false);
 }
 
-void MainWindow::heroMasterThief()
+void MainWindow::heroMasterThief(int count)
 {
-    //this is the operation of the hero master thief
-    groupbox = new QGroupBox(this);
-    QVBoxLayout *vbox =  new QVBoxLayout();
-    groupbox->move(800,300);
-    //set up the three label
-    for(int i = 1; i < 4; i++)
+    if(count == 2)
     {
-        if(i != getPlayerTurn())
+        Message("Warning", "You loss the Master Thief");
+        //delete the master thief of the player
+        GameData->getPlayerFromID(getPlayerTurn())->deleteHeroFromID(4);
+        //add the master to the board
+        GameData->addHeroTo10HeroData(GameData->heroData().at(4));
+        //delete the master thief of the hex
+        selectedHex->deleteHeroLabel();
+    } else {
+        dice->setObjectName(QString::number(count));
+        //this is the operation of the hero master thief
+        selectPlayerWidget = new QComboBox(this);
+        selectPlayerWidget->move(800,300);
+        //set up the three label
+        for(int i = 1; i <= playerNumber; i++)
         {
+<<<<<<< HEAD
             QPushButton *tempbutton = new QPushButton;
             tempbutton->setObjectName(QString::number(i));
             QString temp = "Player " + QString::number(i);
@@ -1468,21 +2085,79 @@ void MainWindow::heroMasterThief()
             tempbutton->setText(temp);
             connect(tempbutton, SIGNAL(clicked()), this, SLOT(heroMasterThiefButtonClicked()));
             vbox->addWidget(tempbutton);
+=======
+            if(i != getPlayerTurn())
+            {
+                selectPlayerWidget->addItem(QString::number(i));
+            }
+>>>>>>> FETCH_HEAD
         }
+        connect(selectPlayerWidget, SIGNAL(activated(QString)), this, SLOT(heroMasterThiefButtonClicked(QString)));
+        selectPlayerWidget->show();
     }
-    groupbox->setLayout(vbox);
-    groupbox->show();
 }
 
-void MainWindow::heroMasterThiefButtonClicked()
+void MainWindow::heroMasterThiefButtonClicked(QString tempPlayer)
 {
-    delete groupbox;
-    groupbox->hide();
-    QObject *senderButton = sender();
+    selectPlayerWidget->hide();
+    selectPlayerWidget->clear();
+
     int currentPlayer = getPlayerTurn();
-    int selectPlayer = senderButton->objectName().toInt();
-    //both player roll the dice
-    dice->show();
+    int selectPlayer = tempPlayer.toInt();
+    int dice1 = qrand() % 6 + 1;
+    int dice2 = qrand() % 6 + 1;
+    if(dice1 > dice2)
+    {
+        //the first roll player win
+        if(dice->objectName().toInt() == 0)
+        {
+            QString temp =  "Player " + QString::number(currentPlayer) + " dice value : " + QString::number(dice1)
+                    + ". Player " + QString::number(selectPlayer) + " dice value : " + QString::number(dice2) + ". "
+                    + "Player " + QString::number(currentPlayer) + " Win, Apply Master thief";
+            Message("Result",temp);
+            //change all the gold from player 2 to player 1
+            int currentPlayerGold = GameData->getPlayerFromID(getPlayerTurn())->getGold();
+            int selectedPlayerGold = GameData->getPlayerFromID(selectPlayer)->getGold();
+            GameData->getPlayerFromID(getPlayerTurn())->setGold(currentPlayerGold + selectedPlayerGold);
+            GameData->getPlayerFromID(selectPlayer)->setGold(0);
+            refreshPlayerGold();
+        } else {
+            //the second roll player win, there is no effect
+            QString temp =  "Player " + QString::number(currentPlayer) + " dice value : " + QString::number(dice1)
+                    + ". Player " + QString::number(selectPlayer) + " dice value : " + QString::number(dice2) + ".";
+            Message("Result",temp);
+            Message("Warning", "No effect!");
+        }
+    } else if (dice1 == dice2){
+        if(dice->objectName().toInt() == 0)
+        {
+            QString temp =  "Player " + QString::number(currentPlayer) + " dice value : " + QString::number(dice1)
+                    + ". Player " + QString::number(selectPlayer) + " dice value : " + QString::number(dice2) + ".";
+            Message("Result",temp);
+            heroMasterThief(dice->objectName().toInt() + 1);
+        } else {
+            //the second roll player equal, there is no effect
+            QString temp =  "Player " + QString::number(currentPlayer) + " dice value : " + QString::number(dice1)
+                    + ". Player " + QString::number(selectPlayer) + " dice value : " + QString::number(dice2) + ".";
+            Message("Result",temp);
+            Message("Warning", "No effect!");
+        }
+    } else {
+        if(dice->objectName().toInt() == 0)
+        {
+            //the first roll player lose, there is no effect
+            QString temp =  "Player " + QString::number(currentPlayer) + " dice value : " + QString::number(dice1)
+                    + ". Player " + QString::number(selectPlayer) + " dice value : " + QString::number(dice2) + ".";
+            Message("Result",temp);
+            Message("Warning", "No effect!");
+        } else {
+            //the second roll player lose, player lose the master thief
+            QString temp =  "Player " + QString::number(currentPlayer) + " dice value : " + QString::number(dice1)
+                    + ". Player " + QString::number(selectPlayer) + " dice value : " + QString::number(dice2) + ".";
+            Message("Result",temp);
+            heroMasterThief(dice->objectName().toInt() + 1);
+        }
+    }
 }
 
 //check therain loard and add the hex to the player
@@ -1589,7 +2264,6 @@ void MainWindow::checkTerrainLord()
         }
     }
 }
-
 
 /*********************************************************
  *
@@ -1786,6 +2460,9 @@ void MainWindow::setPhaseTurn(int value)
     case 3:
         startRecruitThings(0);
         break;
+    case 4:
+        startRandomEvent(0);
+        break;
     case 5:
         startMovement(0);
         break;
@@ -1794,6 +2471,9 @@ void MainWindow::setPhaseTurn(int value)
         break;
     case 7:
         startConstruction(0);
+        break;
+    case 8:
+        startSpecialPower(0);
         break;
     default:
         break;
@@ -1855,14 +2535,30 @@ void MainWindow::refreshThingWidget()
 
 void MainWindow::refreshPlayerGold()
 {
-    int player1 = GameData->getPlayerFromID(1)->getGold();
-    int player2 = GameData->getPlayerFromID(2)->getGold();
-    int player3 = GameData->getPlayerFromID(3)->getGold();
-    int player4 = GameData->getPlayerFromID(4)->getGold();
-    ui->Player1_Gold->setText(QString::number(player1));
-    ui->Player2_Gold->setText(QString::number(player2));
-    ui->Player3_Gold->setText(QString::number(player3));
-    ui->Player4_Gold->setText(QString::number(player4));
+    if(playerNumber == 4)
+    {
+        int player1 = GameData->getPlayerFromID(1)->getGold();
+        int player2 = GameData->getPlayerFromID(2)->getGold();
+        int player3 = GameData->getPlayerFromID(3)->getGold();
+        int player4 = GameData->getPlayerFromID(4)->getGold();
+        ui->Player1_Gold->setText(QString::number(player1));
+        ui->Player2_Gold->setText(QString::number(player2));
+        ui->Player3_Gold->setText(QString::number(player3));
+        ui->Player4_Gold->setText(QString::number(player4));
+    } else if(playerNumber == 3) {
+        int player1 = GameData->getPlayerFromID(1)->getGold();
+        int player2 = GameData->getPlayerFromID(2)->getGold();
+        int player3 = GameData->getPlayerFromID(3)->getGold();
+        ui->Player1_Gold->setText(QString::number(player1));
+        ui->Player2_Gold->setText(QString::number(player2));
+        ui->Player3_Gold->setText(QString::number(player3));
+    } else if(playerNumber == 2) {
+        int player1 = GameData->getPlayerFromID(1)->getGold();
+        int player2 = GameData->getPlayerFromID(2)->getGold();
+        ui->Player1_Gold->setText(QString::number(player1));
+        ui->Player2_Gold->setText(QString::number(player2));
+    }
+
 }
 
 void MainWindow::getSelectedGoldSlot(int gold)
@@ -1877,12 +2573,12 @@ int MainWindow::getselectedGold() const
 
 void MainWindow::updateDiceValueSlot(int tempdiceValue)
 {
-    if(getPhaseTurn() == 2)
+    if(getPhaseTurn() == 2 ||
+            getPhaseTurn() == 4)
     {
         checkOwnHero(tempdiceValue);
     } else if(getPhaseTurn() == 6){
         checkExploration(tempdiceValue);
-    } else if(getPhaseTurn() == 8){
     }
 }
 
@@ -1933,24 +2629,24 @@ void MainWindow::popMessageBox(int index)
 
 void MainWindow::changePlayerTurnSlot(QAbstractButton*)
 {
-    setPlayerTurn(getPlayerTurn()%4 + 1);
+    setPlayerTurn(getPlayerTurn()%playerNumber + 1);
     refreshThingWidget();
     refreshPlayerGold();
 }
 
 void MainWindow::changePlayerTurnSlot2(QAbstractButton *)
 {
-    setPlayerTurn(getPlayerTurn()%4 + 1);
+    setPlayerTurn(getPlayerTurn()%playerNumber + 1);
     //if every one set the tower then system divide things
     int count = 0;
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < playerNumber; i++)
     {
         if(GameData->getPlayerFromID(i+1)->getPlayerBuildings().size() == 1)
         {
             count++;
         }
     }
-    if(count == 4)
+    if(count == playerNumber)
     {
         //go to the next step
         initThing();
@@ -1985,6 +2681,8 @@ void MainWindow::initData()
     GameData->chooseTenRandomHeros();
 
     refreshPlayerGold();
+    KeepOneTurn = false;
+    temp_selectedGold = 0;
 }
 
 //initial all the Hex in the map
@@ -2022,6 +2720,8 @@ void MainWindow::initMap()
                 this, SLOT(startConstructionSlot(HexWidget*)));
         connect(tempHexWidget, SIGNAL(startSpecialPowerSingal(HexWidget*)),
                 this, SLOT(heroHexClickSlot(HexWidget*)));
+        connect(tempHexWidget, SIGNAL(checkHeroOwner(HexWidget*)),
+                this, SLOT(defectionCheckHero(HexWidget*)));
         //show that this widget is unowned
         tempHexWidget->setObjectName("0");
         tempHexWidget->setID(i);
@@ -2168,6 +2868,8 @@ void MainWindow::setThingsRack()
             this, SLOT(startDragSlot(QList<mylabel*>)));
     connect(Things_rack, SIGNAL(confirmUseTreasure(mylabel*)),
             this, SLOT(confirmUseTreasure(mylabel*)));
+    connect(Things_rack, SIGNAL(confirmUseRandomEvent(mylabel*)),
+            this, SLOT(confirmUseRandomEventSlot(mylabel*)));
 }
 //set up the special character widget
 void MainWindow::setHeroWidget()

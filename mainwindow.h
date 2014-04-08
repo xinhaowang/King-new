@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QHBoxLayout>
 #include <QGroupBox>
+#include <QComboBox>
 #include <QTime>
 #include "mapwidget.h"
 #include "herowidget.h"
@@ -68,7 +70,15 @@ public:
     void checkTerrainLord();
     void startSpecialPower(int count);
     void enableHeroHexClick();
-    void heroMasterThief();
+    void heroMasterThief(int count);
+    void initTestData();
+    void minimalFunction();
+    void averageFunction();
+    void superFunction();
+    void startRandomEvent(int count);
+    void defectionEvent();
+    void setPlayerNumber(int playerNumber);
+    void initialLessPlayerHex();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void refreshThingWidget();
@@ -108,7 +118,10 @@ public slots:
     void confirmUseTreasure(mylabel *tempLabel);
     void heroHexClickSlot(HexWidget *tempHex);
     void specialPowerSkipSlot();
-    void heroMasterThiefButtonClicked();
+    void heroMasterThiefButtonClicked(QString tempPlayer);
+    void skipRandomEvent();
+    void confirmUseRandomEventSlot(mylabel *tempLabel);
+    void defectionCheckHero(HexWidget *temphex);
 signals:
     void initThingToRackSignal(QList<Thing*> m_thingData);
     void sendPlayerIDnPhaseSignal(int tempPlayerID, int tempPhase);
@@ -132,12 +145,13 @@ private:
     HexWidget            *selectedHex;
     ThingsDropWidget     *DropBoxWidget;
     ThingsDropWidget     *TradeBoxWidget;
-    QGroupBox            *groupbox;
+    QComboBox            *selectPlayerWidget;
     int                  hexOwnPlayer;
     int                  temp_selectedGold;
     int                  playerTurn;
     int                  PhaseTurn;
-    bool                  KeepOneTurn;
+    int                  playerNumber;
+    bool                 KeepOneTurn;
 
     int getRandomNumber(int range);
     void popMessageBox(int index);

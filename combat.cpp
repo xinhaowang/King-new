@@ -338,10 +338,6 @@ void Combat::deleteALLWidget()
     }
     delete vertical_layout;
     delete globalWidget;
-    //delete playerTurnLabel;
-    //delete dice;
-    //delete button;
-    //delete button2;
     playerHitPoint.clear();
     HexBuilding = NULL;
     PlayerOneThing.clear();
