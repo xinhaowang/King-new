@@ -1419,7 +1419,7 @@ void MainWindow::startSpecialPower(int count)
 void MainWindow::specialPowerSkipSlot()
 {
     button->hide();
-    disconnect(button,SIGNAL(clicked()),this,SLOT(specialPowerSkipSlot());
+    disconnect(button,SIGNAL(clicked()),this,SLOT(specialPowerSkipSlot()));
     //change to next player
     popMessageBox(1);
     startSpecialPower(button->objectName().toInt()+1);
@@ -1466,7 +1466,7 @@ void MainWindow::heroMasterThief()
             QString temp = "Player " + QString::number(i);
             tempbutton->setFixedSize(80,80);
             tempbutton->setText(temp);
-            connect(tempbutton, SIGNAL(clicked()), this, SLOT(heroMasterThiefButtonClicked());
+            connect(tempbutton, SIGNAL(clicked()), this, SLOT(heroMasterThiefButtonClicked()));
             vbox->addWidget(tempbutton);
         }
     }

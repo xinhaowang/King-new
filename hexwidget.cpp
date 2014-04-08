@@ -336,7 +336,7 @@ void HexWidget::mousePressEvent(QMouseEvent *event)
         } else if (isEnabledClick && phase == 7) {
             //construction phase
             emit(startConstrction(this));
-        } else if (isEnabledClick ** phase == 8) {
+        } else if (isEnabledClick && phase == 8) {
             //special power phase
             emit(startSpecialPowerSingal(this));
         }
