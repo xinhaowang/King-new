@@ -77,6 +77,8 @@ public:
     void superFunction();
     void startRandomEvent(int count);
     void defectionEvent();
+    void setPlayerNumber(int playerNumber);
+    void initialLessPlayerHex();
 public slots:
     void hexHasChangedSlot(HexWidget *tempHexWidget);
     void refreshThingWidget();
@@ -148,6 +150,7 @@ private:
     int                  temp_selectedGold;
     int                  playerTurn;
     int                  PhaseTurn;
+    int                  playerNumber;
     bool                 KeepOneTurn;
 
     int getRandomNumber(int range);

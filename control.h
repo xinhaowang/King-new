@@ -38,6 +38,7 @@ public:
     void initPlayers();
     Player *getPlayerFromID(int playerID);
     void addHexWidget(HexWidget *tempHexWidget, int playerID);
+    void lessPlayer(int playerNumber);
     //function for hexs' operation
     void initHex();
     QList<Hex *> hex() const;

@@ -15,7 +15,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //game start, set player turn and initial the board
     initData();
-    initMap();
+    //choose the player amount
+    if (QMessageBox::Yes == QMessageBox::question(this,
+                                                  tr("Selection"),
+                                                  tr("Yes for 4 Player and No for 3 Player"),
+                                                  QMessageBox::Yes | QMessageBox::No,
+                                                  QMessageBox::Yes))
+    {
+        setPlayerNumber(4);
+    } else {
+        setPlayerNumber(3);
+    }
     //start to play
     setPlayerTurn(1);
     setPhaseTurn(0);
@@ -31,7 +41,48 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+/*********************************************************
+ *
+ * 2-3 Player
+ *
+ * *******************************************************/
 
+void MainWindow::setPlayerNumber(int playerNumber)
+{
+    this->playerNumber = playerNumber;
+    if(playerNumber == 4)
+    {
+        initMap();
+    } else {
+        initMap();
+        initialLessPlayerHex();
+        //decrease the player of the game data
+        GameData->lessPlayer(playerNumber);
+    }
+}
+
+void MainWindow::initialLessPlayerHex()
+{
+    //hidden the other hex
+    m_hexWidget.at(0)->hide();
+    m_hexWidget.at(1)->hide();
+    m_hexWidget.at(4)->hide();
+    m_hexWidget.at(9)->hide();
+    m_hexWidget.at(16)->hide();
+    m_hexWidget.at(23)->hide();
+    m_hexWidget.at(30)->hide();
+    m_hexWidget.at(31)->hide();
+    m_hexWidget.at(32)->hide();
+    m_hexWidget.at(33)->hide();
+    m_hexWidget.at(34)->hide();
+    m_hexWidget.at(35)->hide();
+    m_hexWidget.at(36)->hide();
+    m_hexWidget.at(29)->hide();
+    m_hexWidget.at(22)->hide();
+    m_hexWidget.at(15)->hide();
+    m_hexWidget.at(8)->hide();
+    m_hexWidget.at(3)->hide();
+}
 /*********************************************************
  *
  * Test data
@@ -454,51 +505,85 @@ void MainWindow::superFunction()
 //there are four hex that the first player can choose
 void MainWindow::startInitMap()
 {
-    if(GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs().size() == 0)
+    if(playerNumber == 4)
     {
-        if(m_hexWidget[4]->objectName() == "0")
+        if(GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs().size() == 0)
         {
-            m_hexWidget[4]->setIsEnabledClick(true);
-            m_hexWidget[4]->setSelectState(4);
-        }
-        if(m_hexWidget[8]->objectName() == "0")
-        {
-            m_hexWidget[8]->setIsEnabledClick(true);
-            m_hexWidget[8]->setSelectState(4);
-        }
-        if(m_hexWidget[31]->objectName() == "0")
-        {
-            m_hexWidget[31]->setIsEnabledClick(true);
-            m_hexWidget[31]->setSelectState(4);
-        }
-        if(m_hexWidget[35]->objectName() == "0")
-        {
-            m_hexWidget[35]->setIsEnabledClick(true);
-            m_hexWidget[35]->setSelectState(4);
-        }
-    } else {
-        QList<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
-        for(int i = 0; i < temp.size(); i++)
-        {
-            QList<int> temp2 = getNearHex(temp.at(i)->getID());
-            for(int j = 0; j < temp2.size(); j++)
+            if(m_hexWidget[4]->objectName() == "0")
             {
-                if((m_hexWidget.at(temp2.at(j))->hexData()->getTypeID() == 1) ||
-                        (m_hexWidget.at(temp2.at(j))->childAt(57,50))) {
-                    m_hexWidget.at(temp2.at(j))->setIsEnabledClick(false);
-                    m_hexWidget.at(temp2.at(j))->setIsEnableDrag(false);
-                    m_hexWidget.at(temp2.at(j))->setSelectState(3);
-                } else {
-                    m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
-                    m_hexWidget.at(temp2.at(j))->setIsEnableDrag(true);
-                    m_hexWidget.at(temp2.at(j))->setSelectState(4);
+                m_hexWidget[4]->setIsEnabledClick(true);
+                m_hexWidget[4]->setSelectState(4);
+            }
+            if(m_hexWidget[8]->objectName() == "0")
+            {
+                m_hexWidget[8]->setIsEnabledClick(true);
+                m_hexWidget[8]->setSelectState(4);
+            }
+            if(m_hexWidget[31]->objectName() == "0")
+            {
+                m_hexWidget[31]->setIsEnabledClick(true);
+                m_hexWidget[31]->setSelectState(4);
+            }
+            if(m_hexWidget[35]->objectName() == "0")
+            {
+                m_hexWidget[35]->setIsEnabledClick(true);
+                m_hexWidget[35]->setSelectState(4);
+            }
+        } else {
+            QList<HexWidget *> temp = GameData->getPlayerFromID(getPlayerTurn())->getPlayerHexs();
+            for(int i = 0; i < temp.size(); i++)
+            {
+                QList<int> temp2 = getNearHex(temp.at(i)->getID());
+                for(int j = 0; j < temp2.size(); j++)
+                {
+                    if((m_hexWidget.at(temp2.at(j))->hexData()->getTypeID() == 1) ||
+                            (m_hexWidget.at(temp2.at(j))->childAt(57,50))) {
+                        m_hexWidget.at(temp2.at(j))->setIsEnabledClick(false);
+                        m_hexWidget.at(temp2.at(j))->setIsEnableDrag(false);
+                        m_hexWidget.at(temp2.at(j))->setSelectState(3);
+                    } else {
+                        m_hexWidget.at(temp2.at(j))->setIsEnabledClick(true);
+                        m_hexWidget.at(temp2.at(j))->setIsEnableDrag(true);
+                        m_hexWidget.at(temp2.at(j))->setSelectState(4);
+                    }
                 }
             }
+            for(int i = 0; i < temp.size(); i++)
+            {
+                temp.at(i)->setIsEnabledClick(false);
+                temp.at(i)->setIsEnableDrag(false);
+            }
         }
-        for(int i = 0; i < temp.size(); i++)
+    } else {
+        if(m_hexWidget[2]->objectName() == "0")
         {
-            temp.at(i)->setIsEnabledClick(false);
-            temp.at(i)->setIsEnableDrag(false);
+            m_hexWidget[2]->setIsEnabledClick(true);
+            m_hexWidget[2]->setSelectState(4);
+        }
+        if(m_hexWidget[14]->objectName() == "0")
+        {
+            m_hexWidget[14]->setIsEnabledClick(true);
+            m_hexWidget[14]->setSelectState(4);
+        }
+        if(m_hexWidget[28]->objectName() == "0")
+        {
+            m_hexWidget[28]->setIsEnabledClick(true);
+            m_hexWidget[28]->setSelectState(4);
+        }
+        if(m_hexWidget[26]->objectName() == "0")
+        {
+            m_hexWidget[26]->setIsEnabledClick(true);
+            m_hexWidget[26]->setSelectState(4);
+        }
+        if(m_hexWidget[24]->objectName() == "0")
+        {
+            m_hexWidget[24]->setIsEnabledClick(true);
+            m_hexWidget[24]->setSelectState(4);
+        }
+        if(m_hexWidget[10]->objectName() == "0")
+        {
+            m_hexWidget[10]->setIsEnabledClick(true);
+            m_hexWidget[10]->setSelectState(4);
         }
     }
 }
@@ -511,16 +596,27 @@ void MainWindow::hexHasChangedSlot(HexWidget *tempHexWidget)
     tempHexWidget->initialControlMark(GameData->getPlayerFromID(getPlayerTurn())->getControlMark(), getPlayerTurn());
     //check for next step
     int count = 0;
-    for(int i = 1; i < 5; i++)
+    if(playerNumber == 4 || playerNumber == 2)
     {
-        if(GameData->getPlayerFromID(i)->getPlayerHexs().size() == 3)
+        for(int i = 1; i <= playerNumber; i++)
         {
-            count++;
+            if(GameData->getPlayerFromID(i)->getPlayerHexs().size() == 3)
+            {
+                count++;
+            }
+        }
+    } else {
+        for(int i = 1; i <= playerNumber; i++)
+        {
+            if(GameData->getPlayerFromID(i)->getPlayerHexs().size() == 2)
+            {
+                count++;
+            }
         }
     }
     //if all the player set up their three hex
     //set up the gold and one tower
-    if(count == 4)
+    if(count == playerNumber)
     {
         //show up all the other hex
         for(int i = 0; i < m_hexWidget.size(); i++)
@@ -600,14 +696,14 @@ void MainWindow::confirmThingSlot()
     popMessageBox(1);
 
     int count = 0;
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < playerNumber; i++)
     {
         if(GameData->getPlayerFromID(i+1)->getPlayerThings().size() != 0)
         {
             count++;
         }
     }
-    if(count == 4)
+    if(count == playerNumber)
     {
         //go to another phase
         setPhaseTurn(1);
@@ -652,7 +748,7 @@ void MainWindow::setBuildingToHexSlot(HexWidget *tempHexWidget)
 
 void MainWindow::startCollectGold(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //start next phase
         setPhaseTurn(2);
@@ -726,7 +822,7 @@ void MainWindow::collectGoldSLOT()
 
 void MainWindow::startChooseHero(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //start next phase
         setPhaseTurn(4);
@@ -848,7 +944,7 @@ void MainWindow::setHeroSlot(HexWidget* tempHexWidget)
 
 void MainWindow::startRecruitThings(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //start next phase
         setPhaseTurn(4);
@@ -1012,7 +1108,7 @@ void MainWindow::confirmUseTreasure(mylabel* tempLabel)
 
 void MainWindow::startRandomEvent(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //change to next phase
         setPhaseTurn(5);
@@ -1067,7 +1163,7 @@ void MainWindow::defectionEvent()
     Things_rack->hide();
     Hero_widget->show();
     //enable other player hexclick
-    for(int i = 1; i <= 4; i++)
+    for(int i = 1; i <= playerNumber; i++)
     {
         if(i != getPlayerTurn())
         {
@@ -1146,7 +1242,7 @@ void MainWindow::defectionCheckHero(HexWidget *temphex)
 
 void MainWindow::startMovement(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //next phase
         setPhaseTurn(6);
@@ -1435,7 +1531,7 @@ void MainWindow::resetAllThingMovementCount()
 
 void MainWindow::startCombat(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //start nex phase
         setPhaseTurn(7);
@@ -1589,7 +1685,7 @@ void MainWindow::startCombatSlot(HexWidget *tempHex)
             //Combat or fighting over explorations
             //send all the creature to the combat widget including special income item
             //and delete all the thing of the player
-            for(int j = 1; j <= 4; j++)
+            for(int j = 1; j <= playerNumber; j++)
             {
                 QList<mylabel*> tempMyLabel = tempHex->getPlayerThingsLabel(j);
                 if(tempMyLabel.size() != 0)
@@ -1731,14 +1827,14 @@ void MainWindow::getBuildingFromCombatSlot(Building* tempBuilding, int playerID)
 
 void MainWindow::startConstruction(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //change to next phase
         //check the winnning of the game
         if((checkTotalCitadelNumber() == 1) && KeepOneTurn)
         {
             int playerID = 0;
-            for(int i = 1; i <= 4; i++)
+            for(int i = 1; i <= playerNumber; i++)
             {
                 if(checkPlayerCitadel(i) == 1)
                 {
@@ -1874,7 +1970,7 @@ void MainWindow::startConstructionSlot(HexWidget *tempHex)
 int MainWindow::checkTotalCitadelNumber()
 {
     int count = 0;
-    for(int i = 1; i <= 4; i++)
+    for(int i = 1; i <= playerNumber; i++)
     {
         QList<Building*> tempBuildings = GameData->getPlayerFromID(i)->getPlayerBuildings();
         for(int j = 0; j < tempBuildings.size(); j++)
@@ -1909,7 +2005,7 @@ int MainWindow::checkPlayerCitadel(int playerID)
  * *******************************************************/
 void MainWindow::startSpecialPower(int count)
 {
-    if(count == 4)
+    if(count == playerNumber)
     {
         //change to next phase
         changePlayerOrder();
@@ -1979,7 +2075,7 @@ void MainWindow::heroMasterThief(int count)
         selectPlayerWidget = new QComboBox(this);
         selectPlayerWidget->move(800,300);
         //set up the three label
-        for(int i = 1; i <= 4; i++)
+        for(int i = 1; i <= playerNumber; i++)
         {
             if(i != getPlayerTurn())
             {
@@ -2429,14 +2525,30 @@ void MainWindow::refreshThingWidget()
 
 void MainWindow::refreshPlayerGold()
 {
-    int player1 = GameData->getPlayerFromID(1)->getGold();
-    int player2 = GameData->getPlayerFromID(2)->getGold();
-    int player3 = GameData->getPlayerFromID(3)->getGold();
-    int player4 = GameData->getPlayerFromID(4)->getGold();
-    ui->Player1_Gold->setText(QString::number(player1));
-    ui->Player2_Gold->setText(QString::number(player2));
-    ui->Player3_Gold->setText(QString::number(player3));
-    ui->Player4_Gold->setText(QString::number(player4));
+    if(playerNumber == 4)
+    {
+        int player1 = GameData->getPlayerFromID(1)->getGold();
+        int player2 = GameData->getPlayerFromID(2)->getGold();
+        int player3 = GameData->getPlayerFromID(3)->getGold();
+        int player4 = GameData->getPlayerFromID(4)->getGold();
+        ui->Player1_Gold->setText(QString::number(player1));
+        ui->Player2_Gold->setText(QString::number(player2));
+        ui->Player3_Gold->setText(QString::number(player3));
+        ui->Player4_Gold->setText(QString::number(player4));
+    } else if(playerNumber == 3) {
+        int player1 = GameData->getPlayerFromID(1)->getGold();
+        int player2 = GameData->getPlayerFromID(2)->getGold();
+        int player3 = GameData->getPlayerFromID(3)->getGold();
+        ui->Player1_Gold->setText(QString::number(player1));
+        ui->Player2_Gold->setText(QString::number(player2));
+        ui->Player3_Gold->setText(QString::number(player3));
+    } else if(playerNumber == 2) {
+        int player1 = GameData->getPlayerFromID(1)->getGold();
+        int player2 = GameData->getPlayerFromID(2)->getGold();
+        ui->Player1_Gold->setText(QString::number(player1));
+        ui->Player2_Gold->setText(QString::number(player2));
+    }
+
 }
 
 void MainWindow::getSelectedGoldSlot(int gold)
@@ -2507,24 +2619,24 @@ void MainWindow::popMessageBox(int index)
 
 void MainWindow::changePlayerTurnSlot(QAbstractButton*)
 {
-    setPlayerTurn(getPlayerTurn()%4 + 1);
+    setPlayerTurn(getPlayerTurn()%playerNumber + 1);
     refreshThingWidget();
     refreshPlayerGold();
 }
 
 void MainWindow::changePlayerTurnSlot2(QAbstractButton *)
 {
-    setPlayerTurn(getPlayerTurn()%4 + 1);
+    setPlayerTurn(getPlayerTurn()%playerNumber + 1);
     //if every one set the tower then system divide things
     int count = 0;
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < playerNumber; i++)
     {
         if(GameData->getPlayerFromID(i+1)->getPlayerBuildings().size() == 1)
         {
             count++;
         }
     }
-    if(count == 4)
+    if(count == playerNumber)
     {
         //go to the next step
         initThing();

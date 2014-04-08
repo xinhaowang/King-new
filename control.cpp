@@ -197,6 +197,17 @@ void Control::addHexWidget(HexWidget *tempHexWidget, int playerID)
     m_playerData.at(playerID - 1)->setPlayerHex(tempHexWidget);
 }
 
+void Control::lessPlayer(int playerNumber)
+{
+    if(playerNumber == 2)
+    {
+        m_playerData.removeAt(3);
+        m_playerData.removeAt(2);
+    } else if(playerNumber == 3) {
+        m_playerData.removeAt(3);
+    }
+}
+
 /*
  * Accessor for the Hex data
  **/
